@@ -268,8 +268,7 @@
 .modal.wpp-session-manager-modal .wpp-session-item--card .wpp-icon-btn:focus-visible {
     background: var(--background-modifier-hover);
     color: var(--text-normal);
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: 2px;
+    outline: none;
     box-shadow: none;
 }
 
@@ -389,6 +388,13 @@
     border-top: 1px solid var(--background-modifier-border);
 }
 
+.wpp-modal-footer-left {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 4px;
+}
+
 .wpp-modal-footer-hints {
     flex: 1;
     min-width: 0;
@@ -397,6 +403,31 @@
 .wpp-archive-btn-wrap {
     position: relative;
     flex-shrink: 0;
+}
+
+/* Footer toolbar icons: no focus outline */
+.wpp-modal-footer-bar .wpp-icon-btn:focus,
+.wpp-modal-footer-bar .wpp-icon-btn:focus-visible,
+.wpp-modal-footer-bar .wpp-icon-btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+/* Session manager modal: suppress focus rings on toolbar / icon buttons */
+.modal.wpp-session-manager-modal .wpp-icon-btn:focus,
+.modal.wpp-session-manager-modal .wpp-icon-btn:focus-visible,
+.modal.wpp-session-manager-modal .wpp-icon-btn:active,
+.modal.wpp-session-manager-modal .wpp-settings-btn:focus,
+.modal.wpp-session-manager-modal .wpp-settings-btn:focus-visible,
+.modal.wpp-session-manager-modal .wpp-archive-btn:focus,
+.modal.wpp-session-manager-modal .wpp-archive-btn:focus-visible,
+.modal.wpp-session-manager-modal .wpp-session-actions .wpp-btn-focused,
+.modal.wpp-session-manager-modal button:focus,
+.modal.wpp-session-manager-modal button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .wpp-archive-badge {
@@ -601,8 +632,7 @@ body.wpp-session-list-dragging * {
 .wpp-icon-btn:focus-visible {
     background: var(--background-modifier-hover);
     color: var(--text-muted);
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: 2px;
+    outline: none;
     box-shadow: none;
 }
 
@@ -621,8 +651,9 @@ body.wpp-session-list-dragging * {
 
 .wpp-confirm-buttons button.wpp-btn-focused,
 .wpp-session-actions .wpp-btn-focused {
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: 2px;
+    background: var(--background-modifier-hover);
+    outline: none;
+    box-shadow: none;
 }
 
 /* Confirm modal hint */

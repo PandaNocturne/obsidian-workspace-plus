@@ -127,8 +127,21 @@ var SessionManagerModal = /** @class */ (function (_super) {
         };
         contentEl.addEventListener('focusin', this.contentFocusHandler, true);
 
-        // Footer with trash entry
+        // Footer: settings (left) | hints | trash/back (right)
         var footer = contentEl.createDiv({ cls: 'wpp-modal-footer wpp-modal-footer-bar' });
+
+        var footerLeft = footer.createDiv({ cls: 'wpp-modal-footer-left' });
+        this.settingsBtn = footerLeft.createDiv({
+            cls: 'wpp-icon-btn wpp-settings-btn',
+            attr: { role: 'button', tabindex: '0' },
+        });
+        obsidian.setIcon(this.settingsBtn, 'settings');
+        obsidian.setTooltip(this.settingsBtn, L.contextOpenSettings, { delay: 250 });
+        this.settingsBtn.addEventListener('click', function () {
+            self.app.setting.open();
+            self.app.setting.openTabById(self.plugin.manifest.id);
+        });
+
         var footerHints = footer.createDiv({ cls: 'wpp-modal-footer-hints' });
         this.footerHintsEl = footerHints;
         footerHints.createDiv({ text: L.footerDragReorder });

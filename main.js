@@ -12188,6 +12188,17 @@ var require_session_manager_modal = __commonJS({
           };
           contentEl.addEventListener("focusin", this.contentFocusHandler, true);
           var footer = contentEl.createDiv({ cls: "wpp-modal-footer wpp-modal-footer-bar" });
+          var footerLeft = footer.createDiv({ cls: "wpp-modal-footer-left" });
+          this.settingsBtn = footerLeft.createDiv({
+            cls: "wpp-icon-btn wpp-settings-btn",
+            attr: { role: "button", tabindex: "0" }
+          });
+          obsidian2.setIcon(this.settingsBtn, "settings");
+          obsidian2.setTooltip(this.settingsBtn, L.contextOpenSettings, { delay: 250 });
+          this.settingsBtn.addEventListener("click", function() {
+            self.app.setting.open();
+            self.app.setting.openTabById(self.plugin.manifest.id);
+          });
           var footerHints = footer.createDiv({ cls: "wpp-modal-footer-hints" });
           this.footerHintsEl = footerHints;
           footerHints.createDiv({ text: L.footerDragReorder });
