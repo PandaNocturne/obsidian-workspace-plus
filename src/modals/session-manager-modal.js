@@ -224,7 +224,7 @@ var SessionManagerModal = /** @class */ (function (_super) {
         }
         var self = this;
         var nextGroupId = groupId || null;
-        return this.plugin.resolveGroupSelection(nextGroupId).then(function (result) {
+        return this.plugin.resolveGroupViewSelection(nextGroupId).then(function (result) {
             self.modalGroupId = result.resolvedGroupId || null;
             self.renderGroupTabs();
             self.renderList();

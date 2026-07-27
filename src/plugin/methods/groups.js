@@ -235,6 +235,31 @@ function attachGroupMethods(WorkspacePlusPlus) {
         return ordered[nextIdx].id;
     };
 
+    WorkspacePlusPlus.prototype.resolveGroupViewSelection = function (groupId) {
+        if (!this.isGroupFeatureEnabled()) {
+            return Promise.resolve({
+                switched: false,
+                targetGroupId: null,
+                resolvedGroupId: null,
+                sessions: this.getOrderedSessionsUnfiltered(),
+            });
+        }
+
+        var targetGroupId = groupId || null;
+        var groups = this.data.groups || {};
+        var resolvedGroupId = targetGroupId;
+        if (resolvedGroupId && !groups[resolvedGroupId]) {
+            resolvedGroupId = null;
+        }
+
+        return Promise.resolve({
+            switched: false,
+            targetGroupId: targetGroupId,
+            resolvedGroupId: resolvedGroupId,
+            sessions: this.getOrderedSessionsForGroup(resolvedGroupId),
+        });
+    };
+
     WorkspacePlusPlus.prototype.resolveGroupSelection = function (groupId) {
         if (!this.isGroupFeatureEnabled()) {
             return Promise.resolve({

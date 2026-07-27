@@ -151,3 +151,37 @@ test('group methods move a session to one group exclusively', async function () 
     assert.equal(plugin.commandSyncs, 1);
     assert.equal(plugin.persistCalls, 0);
 });
+
+test('group view selection filters sessions without switching workspace', async function () {
+    const plugin = createPlugin({
+        activeGroupId: 'g1',
+        activeSessionId: 's1',
+        groups: {
+            g1: { id: 'g1', name: 'One' },
+            g2: { id: 'g2', name: 'Two' },
+        },
+        sessions: {
+            s1: { id: 's1', name: 'Session One' },
+            s2: { id: 's2', name: 'Session Two' },
+        },
+        sessionOrder: ['s1', 's2'],
+        sessionGroups: {
+            s1: ['g1'],
+            s2: ['g2'],
+        },
+    });
+
+    let switchCalls = 0;
+    plugin.switchSession = function () {
+        switchCalls += 1;
+        return Promise.resolve(true);
+    };
+
+    const result = await plugin.resolveGroupViewSelection('g2');
+
+    assert.equal(switchCalls, 0);
+    assert.equal(plugin.data.activeGroupId, 'g1');
+    assert.equal(plugin.data.activeSessionId, 's1');
+    assert.equal(result.resolvedGroupId, 'g2');
+    assert.deepEqual(result.sessions.map(function (session) { return session.id; }), ['s2']);
+});

@@ -60,7 +60,7 @@ function attachOverlayMethods(WorkspacePlusPlus) {
         }
 
         function applyOverlayGroupSelection(groupId) {
-            return self.resolveGroupSelection(groupId).then(function (result) {
+            return self.resolveGroupViewSelection(groupId).then(function (result) {
                 overlayGroupId = result.resolvedGroupId || null;
                 self.searchOverlayViewGroupId = overlayGroupId;
                 renderGroupTabs();
@@ -1091,7 +1091,7 @@ function attachOverlayMethods(WorkspacePlusPlus) {
                 e.preventDefault();
                 e.stopPropagation();
             }
-            self.resolveGroupSelection(targetGroupId || null).then(reopenOverlayForGroup);
+            self.resolveGroupViewSelection(targetGroupId || null).then(reopenOverlayForGroup);
         }
 
         function onSessionItemClick(sessionId, e) {
@@ -1320,7 +1320,7 @@ function attachOverlayMethods(WorkspacePlusPlus) {
                 var nextGroupId = self.getRelativeGroupId(overlayGroupId, e.shiftKey ? -1 : 1);
                 if (typeof nextGroupId === 'undefined') return;
 
-                self.resolveGroupSelection(nextGroupId).then(function (result) {
+                self.resolveGroupViewSelection(nextGroupId).then(function (result) {
                     var newOrdered = result.sessions;
                     var newActiveIndex = self.getActiveSessionIndex(newOrdered);
                     self.showSwitchOverlay(newOrdered, newActiveIndex, result.resolvedGroupId);

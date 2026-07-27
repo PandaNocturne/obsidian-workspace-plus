@@ -11589,7 +11589,7 @@ var require_session_manager_modal = __commonJS({
           }
           var self = this;
           var nextGroupId = groupId || null;
-          return this.plugin.resolveGroupSelection(nextGroupId).then(function(result) {
+          return this.plugin.resolveGroupViewSelection(nextGroupId).then(function(result) {
             self.modalGroupId = result.resolvedGroupId || null;
             self.renderGroupTabs();
             self.renderList();
@@ -14162,7 +14162,7 @@ var require_overlays = __commonJS({
           return overlayGroupId || null;
         }
         function applyOverlayGroupSelection(groupId) {
-          return self.resolveGroupSelection(groupId).then(function(result) {
+          return self.resolveGroupViewSelection(groupId).then(function(result) {
             overlayGroupId = result.resolvedGroupId || null;
             self.searchOverlayViewGroupId = overlayGroupId;
             renderGroupTabs();
@@ -15031,7 +15031,7 @@ var require_overlays = __commonJS({
             e.preventDefault();
             e.stopPropagation();
           }
-          self.resolveGroupSelection(targetGroupId || null).then(reopenOverlayForGroup);
+          self.resolveGroupViewSelection(targetGroupId || null).then(reopenOverlayForGroup);
         }
         function onSessionItemClick(sessionId, e) {
           if (e) {
@@ -15216,7 +15216,7 @@ var require_overlays = __commonJS({
             e.stopImmediatePropagation();
             var nextGroupId = self.getRelativeGroupId(overlayGroupId, e.shiftKey ? -1 : 1);
             if (typeof nextGroupId === "undefined") return;
-            self.resolveGroupSelection(nextGroupId).then(function(result) {
+            self.resolveGroupViewSelection(nextGroupId).then(function(result) {
               var newOrdered = result.sessions;
               var newActiveIndex = self.getActiveSessionIndex(newOrdered);
               self.showSwitchOverlay(newOrdered, newActiveIndex, result.resolvedGroupId);
@@ -17161,6 +17161,28 @@ var require_groups = __commonJS({
         var nextIdx = currentIdx + offset;
         if (nextIdx < 0 || nextIdx >= ordered.length) return null;
         return ordered[nextIdx].id;
+      };
+      WorkspacePlusPlus2.prototype.resolveGroupViewSelection = function(groupId) {
+        if (!this.isGroupFeatureEnabled()) {
+          return Promise.resolve({
+            switched: false,
+            targetGroupId: null,
+            resolvedGroupId: null,
+            sessions: this.getOrderedSessionsUnfiltered()
+          });
+        }
+        var targetGroupId = groupId || null;
+        var groups = this.data.groups || {};
+        var resolvedGroupId = targetGroupId;
+        if (resolvedGroupId && !groups[resolvedGroupId]) {
+          resolvedGroupId = null;
+        }
+        return Promise.resolve({
+          switched: false,
+          targetGroupId,
+          resolvedGroupId,
+          sessions: this.getOrderedSessionsForGroup(resolvedGroupId)
+        });
       };
       WorkspacePlusPlus2.prototype.resolveGroupSelection = function(groupId) {
         if (!this.isGroupFeatureEnabled()) {
