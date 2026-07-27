@@ -4,6 +4,7 @@ var obsidian = require('obsidian');
 var i18n = require('../i18n');
 var ConfirmModal = require('./confirm-modal');
 var HistoryModal = require('./history-modal');
+var HistoryEntryModal = require('./history-entry-modal');
 var formatRelativeTime = require('./format-relative-time');
 var groupTabUi = require('../group-tab-ui');
 var navigationUtils = require('../navigation-utils');
@@ -705,6 +706,20 @@ var SessionManagerModal = /** @class */ (function (_super) {
             saveCurrentBtn.style.width = loadBtn.offsetWidth + 'px';
         }
 
+        // Manual named history save
+        if (self.plugin.isVersionHistoryEnabled()) {
+            var manualSaveBtn = actions.createDiv({
+                cls: 'wpp-icon-btn',
+                attr: { role: 'button', tabindex: '-1', 'data-action-key': 'manual-save' },
+            });
+            obsidian.setIcon(manualSaveBtn, 'save');
+            obsidian.setTooltip(manualSaveBtn, L.historyManualSave, { delay: 250 });
+            manualSaveBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                self.onManualSave(session);
+            });
+        }
+
         // Version history button
         if (self.plugin.isVersionHistoryEnabled()) {
             var historyBtn = actions.createDiv({
@@ -967,6 +982,23 @@ var SessionManagerModal = /** @class */ (function (_super) {
         this.plugin.duplicateSession(session.id).then(function () {
             self.renderList();
         });
+    };
+
+    SessionManagerModal.prototype.onManualSave = function (session) {
+        var L = i18n.L;
+        var self = this;
+        new HistoryEntryModal(this.app, {
+            mode: 'create',
+            title: L.historyManualSaveTitle,
+            placeholder: L.historyEntryTitlePlaceholder,
+            buttonText: L.historyManualSave,
+            emptyNotice: L.historyTitleRequired,
+            onSubmit: function (title) {
+                self.plugin.saveManualHistoryEntry(session.id, title).then(function (ok) {
+                    if (ok) self.renderList();
+                });
+            },
+        }).open();
     };
 
     SessionManagerModal.prototype.onDelete = function (session) {

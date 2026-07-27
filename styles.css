@@ -902,6 +902,30 @@ body.wpp-session-list-dragging * {
 
 /* ── Version History Modal ── */
 
+.wpp-history-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.wpp-history-tab {
+    flex: 1;
+}
+
+.wpp-history-tab.is-active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.wpp-history-edit-layout-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 4px;
+    font-size: var(--font-ui-small);
+    color: var(--text-muted);
+}
+
 .wpp-history-modal .wpp-history-list {
     max-height: 60vh;
     overflow-y: auto;
@@ -923,6 +947,7 @@ body.wpp-session-list-dragging * {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     padding: 8px 12px;
     border-radius: 6px;
 }
@@ -949,9 +974,16 @@ body.wpp-session-list-dragging * {
     text-overflow: ellipsis;
 }
 
+.wpp-history-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
 .wpp-history-restore-btn {
     flex-shrink: 0;
-    margin-left: 8px;
+    margin-left: 4px;
 }
 
 .wpp-history-empty {

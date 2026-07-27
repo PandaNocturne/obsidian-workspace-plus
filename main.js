@@ -9932,7 +9932,35 @@ var require_i18n = __commonJS({
         sessionNotePlaceholder: "Add a note (optional)...",
         sessionNoteUpdated: function(n) {
           return 'Updated note for "' + n + '"';
-        }
+        },
+        historyTabManual: "Manual",
+        historyTabAuto: "Automatic",
+        historyManualEmpty: "No manual saves yet.",
+        historyAutoEmpty: "No automatic history for this session.",
+        historyManualSave: "Manual save",
+        historyManualSaveTitle: "Save layout snapshot",
+        historyEntryTitlePlaceholder: "Snapshot title...",
+        historyTitleRequired: "Please enter a title.",
+        historySaveFailed: "Could not save layout snapshot.",
+        historyManualSaved: function(t) {
+          return 'Saved snapshot "' + t + '"';
+        },
+        historyEditEntry: "Edit",
+        historyEditEntryTitle: "Edit history entry",
+        historyUpdateLayoutFromCurrent: "Replace layout with current workspace",
+        historyEntryRenamed: function(t) {
+          return 'Renamed to "' + t + '"';
+        },
+        historyEntryUpdated: function(t) {
+          return t ? 'Updated "' + t + '"' : "History entry updated";
+        },
+        historyEntryDeleted: function(t) {
+          return 'Deleted "' + t + '"';
+        },
+        historyDeleteConfirm: function(t) {
+          return 'Delete history entry "' + t + '"?';
+        },
+        historyUntitled: "Untitled"
       },
       zh: {
         editSessionTitle: "\u7F16\u8F91\u4F1A\u8BDD",
@@ -9940,7 +9968,35 @@ var require_i18n = __commonJS({
         sessionNotePlaceholder: "\u6DFB\u52A0\u5907\u6CE8\uFF08\u53EF\u9009\uFF09\u2026",
         sessionNoteUpdated: function(n) {
           return "\u5DF2\u66F4\u65B0\u201C" + n + "\u201D\u7684\u5907\u6CE8";
-        }
+        },
+        historyTabManual: "\u624B\u52A8\u4FDD\u5B58",
+        historyTabAuto: "\u81EA\u52A8\u4FDD\u5B58",
+        historyManualEmpty: "\u6682\u65E0\u624B\u52A8\u4FDD\u5B58\u8BB0\u5F55\u3002",
+        historyAutoEmpty: "\u6B64\u4F1A\u8BDD\u6682\u65E0\u81EA\u52A8\u5386\u53F2\u3002",
+        historyManualSave: "\u624B\u52A8\u4FDD\u5B58",
+        historyManualSaveTitle: "\u4FDD\u5B58\u5E03\u5C40\u5FEB\u7167",
+        historyEntryTitlePlaceholder: "\u5FEB\u7167\u6807\u9898\u2026",
+        historyTitleRequired: "\u8BF7\u8F93\u5165\u6807\u9898\u3002",
+        historySaveFailed: "\u65E0\u6CD5\u4FDD\u5B58\u5E03\u5C40\u5FEB\u7167\u3002",
+        historyManualSaved: function(t) {
+          return "\u5DF2\u4FDD\u5B58\u5FEB\u7167\u201C" + t + "\u201D";
+        },
+        historyEditEntry: "\u7F16\u8F91",
+        historyEditEntryTitle: "\u7F16\u8F91\u5386\u53F2\u8BB0\u5F55",
+        historyUpdateLayoutFromCurrent: "\u7528\u5F53\u524D\u5DE5\u4F5C\u533A\u5E03\u5C40\u66FF\u6362",
+        historyEntryRenamed: function(t) {
+          return "\u5DF2\u91CD\u547D\u540D\u4E3A\u201C" + t + "\u201D";
+        },
+        historyEntryUpdated: function(t) {
+          return t ? "\u5DF2\u66F4\u65B0\u201C" + t + "\u201D" : "\u5386\u53F2\u8BB0\u5F55\u5DF2\u66F4\u65B0";
+        },
+        historyEntryDeleted: function(t) {
+          return "\u5DF2\u5220\u9664\u201C" + t + "\u201D";
+        },
+        historyDeleteConfirm: function(t) {
+          return "\u786E\u5B9A\u5220\u9664\u5386\u53F2\u8BB0\u5F55\u201C" + t + "\u201D\uFF1F";
+        },
+        historyUntitled: "\u672A\u547D\u540D"
       },
       "zh-TW": {
         editSessionTitle: "\u7DE8\u8F2F\u5DE5\u4F5C\u968E\u6BB5",
@@ -9948,7 +10004,35 @@ var require_i18n = __commonJS({
         sessionNotePlaceholder: "\u65B0\u589E\u5099\u8A3B\uFF08\u9078\u586B\uFF09\u2026",
         sessionNoteUpdated: function(n) {
           return "\u5DF2\u66F4\u65B0\u300C" + n + "\u300D\u7684\u5099\u8A3B";
-        }
+        },
+        historyTabManual: "\u624B\u52D5\u5132\u5B58",
+        historyTabAuto: "\u81EA\u52D5\u5132\u5B58",
+        historyManualEmpty: "\u5C1A\u7121\u624B\u52D5\u5132\u5B58\u7D00\u9304\u3002",
+        historyAutoEmpty: "\u6B64\u5DE5\u4F5C\u968E\u6BB5\u5C1A\u7121\u81EA\u52D5\u6B77\u53F2\u3002",
+        historyManualSave: "\u624B\u52D5\u5132\u5B58",
+        historyManualSaveTitle: "\u5132\u5B58\u7248\u9762\u5FEB\u7167",
+        historyEntryTitlePlaceholder: "\u5FEB\u7167\u6A19\u984C\u2026",
+        historyTitleRequired: "\u8ACB\u8F38\u5165\u6A19\u984C\u3002",
+        historySaveFailed: "\u7121\u6CD5\u5132\u5B58\u7248\u9762\u5FEB\u7167\u3002",
+        historyManualSaved: function(t) {
+          return "\u5DF2\u5132\u5B58\u5FEB\u7167\u300C" + t + "\u300D";
+        },
+        historyEditEntry: "\u7DE8\u8F2F",
+        historyEditEntryTitle: "\u7DE8\u8F2F\u6B77\u53F2\u7D00\u9304",
+        historyUpdateLayoutFromCurrent: "\u4EE5\u76EE\u524D\u5DE5\u4F5C\u5340\u7248\u9762\u53D6\u4EE3",
+        historyEntryRenamed: function(t) {
+          return "\u5DF2\u91CD\u65B0\u547D\u540D\u70BA\u300C" + t + "\u300D";
+        },
+        historyEntryUpdated: function(t) {
+          return t ? "\u5DF2\u66F4\u65B0\u300C" + t + "\u300D" : "\u6B77\u53F2\u7D00\u9304\u5DF2\u66F4\u65B0";
+        },
+        historyEntryDeleted: function(t) {
+          return "\u5DF2\u522A\u9664\u300C" + t + "\u300D";
+        },
+        historyDeleteConfirm: function(t) {
+          return "\u78BA\u5B9A\u522A\u9664\u6B77\u53F2\u7D00\u9304\u300C" + t + "\u300D\uFF1F";
+        },
+        historyUntitled: "\u672A\u547D\u540D"
       },
       ja: {
         editSessionTitle: "\u30BB\u30C3\u30B7\u30E7\u30F3\u3092\u7DE8\u96C6",
@@ -9956,7 +10040,35 @@ var require_i18n = __commonJS({
         sessionNotePlaceholder: "\u30E1\u30E2\u3092\u8FFD\u52A0\uFF08\u4EFB\u610F\uFF09\u2026",
         sessionNoteUpdated: function(n) {
           return '"' + n + '" \u306E\u30E1\u30E2\u3092\u66F4\u65B0\u3057\u307E\u3057\u305F';
-        }
+        },
+        historyTabManual: "\u624B\u52D5\u4FDD\u5B58",
+        historyTabAuto: "\u81EA\u52D5\u4FDD\u5B58",
+        historyManualEmpty: "\u624B\u52D5\u4FDD\u5B58\u306F\u307E\u3060\u3042\u308A\u307E\u305B\u3093\u3002",
+        historyAutoEmpty: "\u3053\u306E\u30BB\u30C3\u30B7\u30E7\u30F3\u306E\u81EA\u52D5\u5C65\u6B74\u306F\u3042\u308A\u307E\u305B\u3093\u3002",
+        historyManualSave: "\u624B\u52D5\u4FDD\u5B58",
+        historyManualSaveTitle: "\u30EC\u30A4\u30A2\u30A6\u30C8\u3092\u4FDD\u5B58",
+        historyEntryTitlePlaceholder: "\u30B9\u30CA\u30C3\u30D7\u30B7\u30E7\u30C3\u30C8\u540D\u2026",
+        historyTitleRequired: "\u30BF\u30A4\u30C8\u30EB\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044\u3002",
+        historySaveFailed: "\u30EC\u30A4\u30A2\u30A6\u30C8\u3092\u4FDD\u5B58\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F\u3002",
+        historyManualSaved: function(t) {
+          return '\u30B9\u30CA\u30C3\u30D7\u30B7\u30E7\u30C3\u30C8 "' + t + '" \u3092\u4FDD\u5B58\u3057\u307E\u3057\u305F';
+        },
+        historyEditEntry: "\u7DE8\u96C6",
+        historyEditEntryTitle: "\u5C65\u6B74\u3092\u7DE8\u96C6",
+        historyUpdateLayoutFromCurrent: "\u73FE\u5728\u306E\u30EF\u30FC\u30AF\u30B9\u30DA\u30FC\u30B9\u3067\u30EC\u30A4\u30A2\u30A6\u30C8\u3092\u66F4\u65B0",
+        historyEntryRenamed: function(t) {
+          return '"' + t + '" \u306B\u6539\u540D\u3057\u307E\u3057\u305F';
+        },
+        historyEntryUpdated: function(t) {
+          return t ? '"' + t + '" \u3092\u66F4\u65B0\u3057\u307E\u3057\u305F' : "\u5C65\u6B74\u3092\u66F4\u65B0\u3057\u307E\u3057\u305F";
+        },
+        historyEntryDeleted: function(t) {
+          return '"' + t + '" \u3092\u524A\u9664\u3057\u307E\u3057\u305F';
+        },
+        historyDeleteConfirm: function(t) {
+          return '\u5C65\u6B74 "' + t + '" \u3092\u524A\u9664\u3057\u307E\u3059\u304B\uFF1F';
+        },
+        historyUntitled: "\u7121\u984C"
       }
     };
     var sessionEditLangs = Object.keys(STRINGS);
@@ -10191,6 +10303,105 @@ var require_confirm_modal = __commonJS({
   }
 });
 
+// src/modals/history-entry-modal.js
+var require_history_entry_modal = __commonJS({
+  "src/modals/history-entry-modal.js"(exports2, module2) {
+    "use strict";
+    var obsidian2 = require("obsidian");
+    var i18n2 = require_i18n();
+    var HistoryEntryModal = (
+      /** @class */
+      function(_super) {
+        function HistoryEntryModal2(app, options) {
+          var _this = _super.call(this, app) || this;
+          _this.modalOptions = options || {};
+          return _this;
+        }
+        HistoryEntryModal2.prototype = Object.create(_super.prototype);
+        HistoryEntryModal2.prototype.constructor = HistoryEntryModal2;
+        HistoryEntryModal2.prototype.onOpen = function() {
+          var L = i18n2.L;
+          var self = this;
+          var opts = this.modalOptions;
+          var contentEl = this.contentEl;
+          contentEl.empty();
+          contentEl.addClass("wpp-modal");
+          var isEdit = opts.mode === "edit";
+          this.titleEl.setText(opts.title || (isEdit ? L.historyEditEntryTitle : L.historyManualSaveTitle));
+          var input = contentEl.createEl("input", {
+            type: "text",
+            value: opts.initialTitle || "",
+            placeholder: opts.placeholder || L.historyEntryTitlePlaceholder,
+            cls: "wpp-rename-input"
+          });
+          input.select();
+          var updateLayoutToggle = null;
+          if (isEdit && opts.showUpdateLayout !== false) {
+            var toggleRow = contentEl.createDiv({ cls: "wpp-history-edit-layout-row" });
+            updateLayoutToggle = toggleRow.createEl("input", {
+              type: "checkbox",
+              attr: { id: "wpp-history-update-layout" }
+            });
+            toggleRow.createEl("label", {
+              text: opts.updateLayoutLabel || L.historyUpdateLayoutFromCurrent,
+              attr: { for: "wpp-history-update-layout" }
+            });
+          }
+          var btns = contentEl.createDiv({ cls: "wpp-confirm-buttons" });
+          var cancelBtn = btns.createEl("button", { text: L.cancel });
+          cancelBtn.addEventListener("click", function() {
+            self.close();
+          });
+          var submitBtn = btns.createEl("button", {
+            text: opts.buttonText || (isEdit ? L.saveChanges : L.historyManualSave),
+            cls: "mod-cta"
+          });
+          var doSubmit = function() {
+            var title = input.value.trim();
+            if (!title) {
+              if (opts.emptyNotice) new obsidian2.Notice(opts.emptyNotice);
+              else new obsidian2.Notice(L.historyTitleRequired);
+              return;
+            }
+            if (typeof opts.onSubmit === "function") {
+              opts.onSubmit(title, {
+                updateLayoutFromCurrent: !!(updateLayoutToggle && updateLayoutToggle.checked)
+              });
+            }
+            self.close();
+          };
+          submitBtn.addEventListener("click", doSubmit);
+          this.keyHandler = function(e) {
+            if (e.isComposing) return;
+            if (e.key === "Enter") {
+              e.preventDefault();
+              e.stopPropagation();
+              doSubmit();
+            } else if (e.key === "Escape") {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              self.close();
+            }
+          };
+          document.addEventListener("keydown", this.keyHandler, true);
+          setTimeout(function() {
+            input.focus();
+          }, 50);
+        };
+        HistoryEntryModal2.prototype.onClose = function() {
+          if (this.keyHandler) {
+            document.removeEventListener("keydown", this.keyHandler, true);
+            this.keyHandler = null;
+          }
+          this.contentEl.empty();
+        };
+        return HistoryEntryModal2;
+      }(obsidian2.Modal)
+    );
+    module2.exports = HistoryEntryModal;
+  }
+});
+
 // src/modals/history-modal.js
 var require_history_modal = __commonJS({
   "src/modals/history-modal.js"(exports2, module2) {
@@ -10198,6 +10409,7 @@ var require_history_modal = __commonJS({
     var obsidian2 = require("obsidian");
     var i18n2 = require_i18n();
     var ConfirmModal = require_confirm_modal();
+    var HistoryEntryModal = require_history_entry_modal();
     var DAY = 864e5;
     var HistoryModal = (
       /** @class */
@@ -10205,32 +10417,114 @@ var require_history_modal = __commonJS({
         function HistoryModal2(app, plugin, session) {
           var _this = _super.call(this, app) || this;
           _this.plugin = plugin;
-          _this.session = session;
+          _this.sessionId = session && session.id;
+          _this.activeTab = "manual";
           return _this;
         }
         HistoryModal2.prototype = Object.create(_super.prototype);
         HistoryModal2.prototype.constructor = HistoryModal2;
+        HistoryModal2.prototype.getSession = function() {
+          return (this.plugin.data.sessions || {})[this.sessionId] || null;
+        };
         HistoryModal2.prototype.onOpen = function() {
+          var session = this.getSession();
+          if (!session) {
+            this.close();
+            return;
+          }
+          var history = session.history || [];
+          var hasManual = history.some(function(e) {
+            return e && e.source === "manual";
+          });
+          var hasAuto = history.some(function(e) {
+            return !e || e.source !== "manual";
+          });
+          if (!hasManual && hasAuto) this.activeTab = "auto";
+          else this.activeTab = "manual";
+          this.render();
+        };
+        HistoryModal2.prototype.render = function() {
           var L = i18n2.L;
           var self = this;
+          var session = this.getSession();
           var contentEl = this.contentEl;
           contentEl.empty();
           contentEl.addClass("wpp-modal", "wpp-history-modal");
-          this.titleEl.setText(L.historyTitle + " \u2014 " + self.session.name);
-          var history = self.session.history || [];
-          if (history.length === 0) {
+          if (!session) {
             contentEl.createEl("p", { text: L.historyEmpty, cls: "wpp-history-empty" });
             return;
           }
-          var groups = self.groupByDate(history);
+          this.titleEl.setText(L.historyTitle + " \u2014 " + session.name);
+          var tabs = contentEl.createDiv({ cls: "wpp-history-tabs" });
+          var manualTab = tabs.createEl("button", {
+            text: L.historyTabManual,
+            cls: "wpp-history-tab" + (this.activeTab === "manual" ? " is-active" : "")
+          });
+          var autoTab = tabs.createEl("button", {
+            text: L.historyTabAuto,
+            cls: "wpp-history-tab" + (this.activeTab === "auto" ? " is-active" : "")
+          });
+          manualTab.addEventListener("click", function() {
+            self.activeTab = "manual";
+            self.render();
+          });
+          autoTab.addEventListener("click", function() {
+            self.activeTab = "auto";
+            self.render();
+          });
+          var allHistory = session.history || [];
+          var indexed = [];
+          for (var i = 0; i < allHistory.length; i++) {
+            var entry = allHistory[i];
+            var isManual = entry && entry.source === "manual";
+            if (this.activeTab === "manual" ? isManual : !isManual) {
+              indexed.push({ entry, index: i });
+            }
+          }
+          if (indexed.length === 0) {
+            var emptyText = this.activeTab === "manual" ? L.historyManualEmpty : L.historyAutoEmpty;
+            contentEl.createEl("p", { text: emptyText, cls: "wpp-history-empty" });
+            return;
+          }
+          var entries = indexed.map(function(item) {
+            return item.entry;
+          });
+          var groups = this.groupByDate(entries);
           var listEl = contentEl.createDiv({ cls: "wpp-history-list" });
           for (var gi = 0; gi < groups.length; gi++) {
             var group = groups[gi];
             listEl.createEl("h4", { text: group.label, cls: "wpp-history-date-label" });
             for (var ei = 0; ei < group.entries.length; ei++) {
-              self.renderEntry(listEl, group.entries[ei], group.indices[ei]);
+              var localIndex = group.indices[ei];
+              var globalIndex = indexed[localIndex].index;
+              this.renderEntry(listEl, group.entries[ei], globalIndex);
             }
           }
+        };
+        HistoryModal2.prototype.openEditEntry = function(entryIndex) {
+          var L = i18n2.L;
+          var self = this;
+          var session = this.getSession();
+          if (!session || !session.history || !session.history[entryIndex]) return;
+          var entry = session.history[entryIndex];
+          new HistoryEntryModal(this.app, {
+            mode: "edit",
+            title: L.historyEditEntryTitle,
+            initialTitle: entry.title || "",
+            placeholder: L.historyEntryTitlePlaceholder,
+            buttonText: L.saveChanges,
+            showUpdateLayout: true,
+            updateLayoutLabel: L.historyUpdateLayoutFromCurrent,
+            emptyNotice: L.historyTitleRequired,
+            onSubmit: function(title, result) {
+              self.plugin.updateHistoryEntry(session.id, entryIndex, {
+                title,
+                updateLayoutFromCurrent: !!(result && result.updateLayoutFromCurrent)
+              }).then(function(ok) {
+                if (ok) self.render();
+              });
+            }
+          }).open();
         };
         HistoryModal2.prototype.renderEntry = function(listEl, entry, originalIndex) {
           var L = i18n2.L;
@@ -10239,7 +10533,10 @@ var require_history_modal = __commonJS({
           var infoEl = itemEl.createDiv({ cls: "wpp-history-info" });
           var time = new Date(entry.savedAt);
           var timeStr = time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-          infoEl.createDiv({ text: timeStr, cls: "wpp-history-time" });
+          var titleText = entry.title ? entry.title : timeStr;
+          infoEl.createDiv({ text: titleText, cls: "wpp-history-time" });
+          var metaParts = [];
+          if (entry.title) metaParts.push(timeStr);
           var filePaths = self.plugin.extractFilePathsFromLayout(entry.layout);
           var paneCount = self.plugin.countPanesInLayout(entry.layout);
           var fileNames = filePaths.map(function(p) {
@@ -10252,27 +10549,61 @@ var require_history_modal = __commonJS({
             if (fileNames.length > 5) displayNames += " ...";
             summary += " \xB7 " + displayNames;
           }
-          infoEl.createDiv({ text: summary, cls: "wpp-history-summary" });
-          var btnEl = itemEl.createEl("button", {
+          metaParts.push(summary);
+          infoEl.createDiv({ text: metaParts.join(" \xB7 "), cls: "wpp-history-summary" });
+          var actionsEl = itemEl.createDiv({ cls: "wpp-history-item-actions" });
+          var editBtn = actionsEl.createDiv({
+            cls: "wpp-icon-btn",
+            attr: { role: "button", tabindex: "0" }
+          });
+          obsidian2.setIcon(editBtn, "pencil");
+          obsidian2.setTooltip(editBtn, L.historyEditEntry, { delay: 250 });
+          editBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            self.openEditEntry(originalIndex);
+          });
+          var deleteBtn = actionsEl.createDiv({
+            cls: "wpp-icon-btn",
+            attr: { role: "button", tabindex: "0" }
+          });
+          obsidian2.setIcon(deleteBtn, "trash-2");
+          obsidian2.setTooltip(deleteBtn, L.delete, { delay: 250 });
+          deleteBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            var label = entry.title || timeStr;
+            new ConfirmModal(
+              self.app,
+              L.historyDeleteConfirm(label),
+              function() {
+                return self.plugin.deleteHistoryEntry(self.sessionId, originalIndex).then(function(ok) {
+                  if (ok) self.render();
+                });
+              },
+              { confirmText: L.delete, confirmClass: "mod-warning" }
+            ).open();
+          });
+          var btnEl = actionsEl.createEl("button", {
             text: L.historyRestore,
             cls: "wpp-history-restore-btn"
           });
           btnEl.addEventListener("click", function() {
             var doRestore = function() {
               self.plugin.restoreFromHistoryEntry(
-                self.session.id,
+                self.sessionId,
                 originalIndex
               ).then(function(ok) {
                 if (ok) {
-                  new obsidian2.Notice(L.historyRestored(self.session.name));
+                  var session2 = self.getSession();
+                  new obsidian2.Notice(L.historyRestored(session2 ? session2.name : ""));
                 }
                 self.close();
               });
             };
             if (self.plugin.isVersionHistoryConfirmRestoreEnabled()) {
+              var session = self.getSession();
               new ConfirmModal(
                 self.app,
-                L.historyRestoreConfirm(self.session.name, timeStr),
+                L.historyRestoreConfirm(session ? session.name : "", timeStr),
                 doRestore,
                 { confirmText: L.historyRestore, confirmClass: "mod-cta" }
               ).open();
@@ -11537,6 +11868,7 @@ var require_session_manager_modal = __commonJS({
     var i18n2 = require_i18n();
     var ConfirmModal = require_confirm_modal();
     var HistoryModal = require_history_modal();
+    var HistoryEntryModal = require_history_entry_modal();
     var formatRelativeTime = require_format_relative_time();
     var groupTabUi = require_group_tab_ui();
     var navigationUtils = require_navigation_utils();
@@ -12141,6 +12473,18 @@ var require_session_manager_modal = __commonJS({
             saveCurrentBtn.style.width = loadBtn.offsetWidth + "px";
           }
           if (self.plugin.isVersionHistoryEnabled()) {
+            var manualSaveBtn = actions.createDiv({
+              cls: "wpp-icon-btn",
+              attr: { role: "button", tabindex: "-1", "data-action-key": "manual-save" }
+            });
+            obsidian2.setIcon(manualSaveBtn, "save");
+            obsidian2.setTooltip(manualSaveBtn, L.historyManualSave, { delay: 250 });
+            manualSaveBtn.addEventListener("click", function(e) {
+              e.stopPropagation();
+              self.onManualSave(session);
+            });
+          }
+          if (self.plugin.isVersionHistoryEnabled()) {
             var historyBtn = actions.createDiv({
               cls: "wpp-icon-btn",
               attr: { role: "button", tabindex: "-1", "data-action-key": "history" }
@@ -12360,6 +12704,22 @@ var require_session_manager_modal = __commonJS({
           this.plugin.duplicateSession(session.id).then(function() {
             self.renderList();
           });
+        };
+        SessionManagerModal2.prototype.onManualSave = function(session) {
+          var L = i18n2.L;
+          var self = this;
+          new HistoryEntryModal(this.app, {
+            mode: "create",
+            title: L.historyManualSaveTitle,
+            placeholder: L.historyEntryTitlePlaceholder,
+            buttonText: L.historyManualSave,
+            emptyNotice: L.historyTitleRequired,
+            onSubmit: function(title) {
+              self.plugin.saveManualHistoryEntry(session.id, title).then(function(ok) {
+                if (ok) self.renderList();
+              });
+            }
+          }).open();
         };
         SessionManagerModal2.prototype.onDelete = function(session) {
           var L = i18n2.L;
@@ -12622,12 +12982,14 @@ var require_modals = __commonJS({
     var RenameModal = require_rename_modal();
     var UnsavedSwitchModal = require_unsaved_switch_modal();
     var HistoryModal = require_history_modal();
+    var HistoryEntryModal = require_history_entry_modal();
     module2.exports = {
       SessionManagerModal,
       ConfirmModal,
       RenameModal,
       UnsavedSwitchModal,
-      HistoryModal
+      HistoryModal,
+      HistoryEntryModal
     };
   }
 });
@@ -17951,7 +18313,19 @@ var require_history = __commonJS({
     var DAY = 864e5;
     var WEEK = 7 * DAY;
     var MONTH = 30 * DAY;
-    var MAX_HISTORY = 45;
+    var MAX_AUTO_HISTORY = 45;
+    function isManualHistoryEntry(entry) {
+      return !!(entry && entry.source === "manual");
+    }
+    function isAutoHistoryEntry(entry) {
+      return !isManualHistoryEntry(entry);
+    }
+    function sortHistoryNewestFirst(history) {
+      history.sort(function(a, b) {
+        return b.savedAt - a.savedAt;
+      });
+      return history;
+    }
     function attachHistoryMethods(WorkspacePlusPlus2) {
       WorkspacePlusPlus2.prototype.isVersionHistoryEnabled = function() {
         return !!this.data.versionHistoryEnabled;
@@ -17967,6 +18341,8 @@ var require_history = __commonJS({
       WorkspacePlusPlus2.prototype.isVersionHistoryConfirmRestoreEnabled = function() {
         return this.data.versionHistoryConfirmRestore !== false;
       };
+      WorkspacePlusPlus2.prototype.isManualHistoryEntry = isManualHistoryEntry;
+      WorkspacePlusPlus2.prototype.isAutoHistoryEntry = isAutoHistoryEntry;
       WorkspacePlusPlus2.prototype.extractFilePathsFromLayout = function(layout) {
         var paths = [];
         function walk(node) {
@@ -18004,12 +18380,23 @@ var require_history = __commonJS({
         if (layout && layout.main) walk(layout.main);
         return count;
       };
-      WorkspacePlusPlus2.prototype.compactHistory = function(history) {
+      WorkspacePlusPlus2.prototype.getSessionHistory = function(session) {
+        if (!session) return [];
+        if (!Array.isArray(session.history)) session.history = [];
+        return session.history;
+      };
+      WorkspacePlusPlus2.prototype.filterHistoryBySource = function(history, source) {
+        var list = Array.isArray(history) ? history : [];
+        if (source === "manual") {
+          return list.filter(isManualHistoryEntry);
+        }
+        return list.filter(isAutoHistoryEntry);
+      };
+      WorkspacePlusPlus2.prototype.compactAutoHistory = function(history) {
         if (!history || history.length === 0) return [];
         var now = Date.now();
-        history.sort(function(a, b) {
-          return b.savedAt - a.savedAt;
-        });
+        history = history.slice();
+        sortHistoryNewestFirst(history);
         var result = [];
         var buckets = {};
         for (var i = 0; i < history.length; i++) {
@@ -18044,22 +18431,188 @@ var require_history = __commonJS({
             }
           }
         }
-        if (result.length > MAX_HISTORY) result.length = MAX_HISTORY;
+        if (result.length > MAX_AUTO_HISTORY) result.length = MAX_AUTO_HISTORY;
         return result;
+      };
+      WorkspacePlusPlus2.prototype.compactHistory = function(history) {
+        if (!history || history.length === 0) return [];
+        var manual = [];
+        var auto = [];
+        for (var i = 0; i < history.length; i++) {
+          if (isManualHistoryEntry(history[i])) manual.push(history[i]);
+          else auto.push(history[i]);
+        }
+        auto = this.compactAutoHistory(auto);
+        return sortHistoryNewestFirst(manual.concat(auto));
+      };
+      WorkspacePlusPlus2.prototype.captureLayoutForHistory = function(session) {
+        var isActive = session && session.id === this.data.activeSessionId;
+        var layout = null;
+        if (isActive) {
+          try {
+            layout = this.getCurrentWorkspaceLayout();
+          } catch (e) {
+            layout = null;
+          }
+        }
+        if (!layout && session) layout = session.layout;
+        return layoutUtils.cloneLayout(layout);
       };
       WorkspacePlusPlus2.prototype.pushLayoutToHistory = function(session) {
         if (!this.isVersionHistoryEnabled()) return;
         if (!session || !session.layout) return;
         if (!session.history) session.history = [];
-        var lastEntry = session.history.length > 0 ? session.history[0] : null;
+        var autoEntries = session.history.filter(isAutoHistoryEntry);
+        var lastEntry = autoEntries.length > 0 ? autoEntries[0] : null;
+        for (var i = 0; i < autoEntries.length; i++) {
+          if (!lastEntry || autoEntries[i].savedAt > lastEntry.savedAt) {
+            lastEntry = autoEntries[i];
+          }
+        }
         if (lastEntry && this.layoutsEqualStructural(session.layout, lastEntry.layout)) {
           return;
         }
         session.history.unshift({
           layout: layoutUtils.cloneLayout(session.layout),
-          savedAt: Date.now()
+          savedAt: Date.now(),
+          source: "auto"
         });
         session.history = this.compactHistory(session.history);
+      };
+      WorkspacePlusPlus2.prototype.saveManualHistoryEntry = function(sessionId, title, options) {
+        var L = i18n2.L;
+        options = options || {};
+        var session = this.data.sessions[sessionId];
+        if (!session) return Promise.resolve(false);
+        var normalizedTitle = typeof title === "string" ? title.trim() : "";
+        if (!normalizedTitle) {
+          if (options.notify !== false) {
+            new obsidian2.Notice(L.historyTitleRequired);
+          }
+          return Promise.resolve(false);
+        }
+        var layout = options.layout ? layoutUtils.cloneLayout(options.layout) : this.captureLayoutForHistory(session);
+        if (!layout) {
+          if (options.notify !== false) {
+            new obsidian2.Notice(L.historySaveFailed);
+          }
+          return Promise.resolve(false);
+        }
+        if (!session.history) session.history = [];
+        session.history.unshift({
+          layout,
+          savedAt: Date.now(),
+          source: "manual",
+          title: normalizedTitle
+        });
+        sortHistoryNewestFirst(session.history);
+        if (options.updateSessionLayout !== false) {
+          session.layout = layoutUtils.cloneLayout(layout);
+          session.modified = Date.now();
+        }
+        var self = this;
+        var isActive = session.id === this.data.activeSessionId;
+        var applyLayout = Promise.resolve();
+        if (options.applyToWorkspace && isActive) {
+          applyLayout = this.applyWorkspaceLayout(session.layout);
+        }
+        this.updateStatusBar();
+        return applyLayout.then(function() {
+          return self.persistData();
+        }).then(function() {
+          if (options.notify !== false) {
+            new obsidian2.Notice(L.historyManualSaved(normalizedTitle));
+          }
+          return true;
+        });
+      };
+      WorkspacePlusPlus2.prototype.renameHistoryEntry = function(sessionId, entryIndex, title, options) {
+        var L = i18n2.L;
+        options = options || {};
+        var session = this.data.sessions[sessionId];
+        if (!session || !session.history || !session.history[entryIndex]) {
+          return Promise.resolve(false);
+        }
+        var normalizedTitle = typeof title === "string" ? title.trim() : "";
+        if (!normalizedTitle) {
+          if (options.notify !== false) {
+            new obsidian2.Notice(L.historyTitleRequired);
+          }
+          return Promise.resolve(false);
+        }
+        session.history[entryIndex].title = normalizedTitle;
+        return this.persistData().then(function() {
+          if (options.notify !== false) {
+            new obsidian2.Notice(L.historyEntryRenamed(normalizedTitle));
+          }
+          return true;
+        });
+      };
+      WorkspacePlusPlus2.prototype.updateHistoryEntry = function(sessionId, entryIndex, changes, options) {
+        var L = i18n2.L;
+        options = options || {};
+        var session = this.data.sessions[sessionId];
+        if (!session || !session.history || !session.history[entryIndex]) {
+          return Promise.resolve(false);
+        }
+        var entry = session.history[entryIndex];
+        var changed = false;
+        if (changes && typeof changes.title === "string") {
+          var normalizedTitle = changes.title.trim();
+          if (!normalizedTitle) {
+            if (options.notify !== false) {
+              new obsidian2.Notice(L.historyTitleRequired);
+            }
+            return Promise.resolve(false);
+          }
+          if (normalizedTitle !== (entry.title || "")) {
+            entry.title = normalizedTitle;
+            changed = true;
+          }
+        }
+        if (changes && changes.updateLayoutFromCurrent) {
+          var layout = this.captureLayoutForHistory(session);
+          if (!layout) {
+            if (options.notify !== false) {
+              new obsidian2.Notice(L.historySaveFailed);
+            }
+            return Promise.resolve(false);
+          }
+          entry.layout = layout;
+          entry.savedAt = Date.now();
+          changed = true;
+        } else if (changes && changes.layout) {
+          entry.layout = layoutUtils.cloneLayout(changes.layout);
+          entry.savedAt = Date.now();
+          changed = true;
+        }
+        if (!changed) return Promise.resolve(false);
+        sortHistoryNewestFirst(session.history);
+        return this.persistData().then(function() {
+          if (options.notify !== false) {
+            new obsidian2.Notice(L.historyEntryUpdated(entry.title || ""));
+          }
+          return true;
+        });
+      };
+      WorkspacePlusPlus2.prototype.deleteHistoryEntry = function(sessionId, entryIndex, options) {
+        var L = i18n2.L;
+        options = options || {};
+        var session = this.data.sessions[sessionId];
+        if (!session || !session.history || !session.history[entryIndex]) {
+          return Promise.resolve(false);
+        }
+        var removed = session.history.splice(entryIndex, 1)[0];
+        if (session.history.length === 0) {
+          delete session.history;
+        }
+        return this.persistData().then(function() {
+          if (options.notify !== false) {
+            var label = removed && removed.title ? removed.title : L.historyUntitled;
+            new obsidian2.Notice(L.historyEntryDeleted(label));
+          }
+          return true;
+        });
       };
       WorkspacePlusPlus2.prototype.restoreFromHistoryEntry = function(sessionId, entryIndex) {
         var session = this.data.sessions[sessionId];
@@ -18068,6 +18621,9 @@ var require_history = __commonJS({
         }
         var entry = session.history[entryIndex];
         this.pushLayoutToHistory(session);
+        var nextIndex = session.history.indexOf(entry);
+        if (nextIndex === -1) {
+        }
         session.layout = layoutUtils.cloneLayout(entry.layout);
         session.modified = Date.now();
         var self = this;
@@ -18087,8 +18643,15 @@ var require_history = __commonJS({
           new obsidian2.Notice(L.historyNoEntries);
           return Promise.resolve(false);
         }
+        var auto = this.filterHistoryBySource(session.history, "auto");
+        var target = auto.length > 0 ? auto[0] : session.history[0];
+        var index = session.history.indexOf(target);
+        if (index < 0) {
+          new obsidian2.Notice(L.historyNoEntries);
+          return Promise.resolve(false);
+        }
         var self = this;
-        return this.restoreFromHistoryEntry(session.id, 0).then(function(ok) {
+        return this.restoreFromHistoryEntry(session.id, index).then(function(ok) {
           if (ok) {
             new obsidian2.Notice(L.historyQuickRestored(session.name));
           }
@@ -18120,7 +18683,7 @@ var require_history = __commonJS({
           }
           var session = self.getActiveSession();
           if (!session) return;
-          var currentLayout = self.getCurrentWorkspaceLayout();
+          var currentLayout = layoutUtils.cloneLayout(self.getCurrentWorkspaceLayout());
           if (self.layoutsEqualStructural(session.layout, currentLayout)) return;
           self.pushLayoutToHistory(session);
           session.layout = currentLayout;
