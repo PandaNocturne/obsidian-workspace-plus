@@ -10231,6 +10231,56 @@ var require_i18n = __commonJS({
     var sessionStorageKey;
     var sessionStorageKeyIndex;
     var sessionStorageLangIndex;
+    var TAB_SWITCHER_STRINGS = {
+      en: {
+        cmdTabSwitcher: "Switch tabs (mission control)",
+        tabSwitcherTitle: "Switch tab",
+        tabSwitcherEmpty: "No open tabs to switch.",
+        tabSwitcherHint: "Click a tab to switch \xB7 Click outside to cancel \xB7 Arrow keys to move \xB7 Enter to confirm"
+      },
+      zh: {
+        cmdTabSwitcher: "\u5207\u6362\u6807\u7B7E\u9875\uFF08\u4EFB\u52A1\u89C6\u56FE\uFF09",
+        tabSwitcherTitle: "\u5207\u6362\u6807\u7B7E\u9875",
+        tabSwitcherEmpty: "\u6CA1\u6709\u53EF\u5207\u6362\u7684\u6807\u7B7E\u9875\u3002",
+        tabSwitcherHint: "\u70B9\u51FB\u6807\u7B7E\u5207\u6362 \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88 \xB7 \u65B9\u5411\u952E\u79FB\u52A8 \xB7 Enter \u786E\u8BA4"
+      },
+      "zh-TW": {
+        cmdTabSwitcher: "\u5207\u63DB\u5206\u9801\uFF08\u4EFB\u52D9\u6AA2\u8996\uFF09",
+        tabSwitcherTitle: "\u5207\u63DB\u5206\u9801",
+        tabSwitcherEmpty: "\u6C92\u6709\u53EF\u5207\u63DB\u7684\u5206\u9801\u3002",
+        tabSwitcherHint: "\u9EDE\u64CA\u5206\u9801\u5207\u63DB \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88 \xB7 \u65B9\u5411\u9375\u79FB\u52D5 \xB7 Enter \u78BA\u8A8D"
+      },
+      ja: {
+        cmdTabSwitcher: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048\uFF08\u30DF\u30C3\u30B7\u30E7\u30F3\u30B3\u30F3\u30C8\u30ED\u30FC\u30EB\uFF09",
+        tabSwitcherTitle: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048",
+        tabSwitcherEmpty: "\u5207\u308A\u66FF\u3048\u53EF\u80FD\u306A\u30BF\u30D6\u304C\u3042\u308A\u307E\u305B\u3093\u3002",
+        tabSwitcherHint: "\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88 \xB7 \u77E2\u5370\u30AD\u30FC\u3067\u79FB\u52D5 \xB7 Enter\u3067\u78BA\u5B9A"
+      },
+      ko: {
+        cmdTabSwitcher: "\uD0ED \uC804\uD658 (\uBBF8\uC158 \uCEE8\uD2B8\uB864)",
+        tabSwitcherTitle: "\uD0ED \uC804\uD658",
+        tabSwitcherEmpty: "\uC804\uD658\uD560 \uD0ED\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
+        tabSwitcherHint: "\uD074\uB9AD\uD558\uC5EC \uC804\uD658 \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C \xB7 \uBC29\uD5A5\uD0A4\uB85C \uC774\uB3D9 \xB7 Enter\uB85C \uD655\uC778"
+      }
+    };
+    var tabSwitcherLangs = Object.keys(STRINGS);
+    for (tabSwitcherLangIndex = 0; tabSwitcherLangIndex < tabSwitcherLangs.length; tabSwitcherLangIndex++) {
+      tabSwitcherLang = tabSwitcherLangs[tabSwitcherLangIndex];
+      tabSwitcherStrings = TAB_SWITCHER_STRINGS[tabSwitcherLang] || TAB_SWITCHER_STRINGS.en;
+      tabSwitcherKeys = Object.keys(tabSwitcherStrings);
+      for (tabSwitcherKeyIndex = 0; tabSwitcherKeyIndex < tabSwitcherKeys.length; tabSwitcherKeyIndex++) {
+        tabSwitcherKey = tabSwitcherKeys[tabSwitcherKeyIndex];
+        if (STRINGS[tabSwitcherLang][tabSwitcherKey] === void 0) {
+          STRINGS[tabSwitcherLang][tabSwitcherKey] = tabSwitcherStrings[tabSwitcherKey];
+        }
+      }
+    }
+    var tabSwitcherLang;
+    var tabSwitcherStrings;
+    var tabSwitcherKeys;
+    var tabSwitcherKey;
+    var tabSwitcherKeyIndex;
+    var tabSwitcherLangIndex;
     var LANG_OPTIONS = {
       en: "English",
       zh: "\u7B80\u4F53\u4E2D\u6587",
@@ -13441,6 +13491,308 @@ var require_unsaved_switch_modal = __commonJS({
   }
 });
 
+// src/modals/tab-switcher-modal.js
+var require_tab_switcher_modal = __commonJS({
+  "src/modals/tab-switcher-modal.js"(exports2, module2) {
+    "use strict";
+    var obsidian2 = require("obsidian");
+    var i18n2 = require_i18n();
+    function isWorkspaceLeaf(node) {
+      return !!(node && typeof node.getViewState === "function" && node.view);
+    }
+    function isRootLeaf(app, leaf) {
+      if (!leaf || typeof leaf.getRoot !== "function") return false;
+      return leaf.getRoot() === app.workspace.rootSplit;
+    }
+    function getActiveLeaf(app) {
+      var active = app.workspace.activeLeaf;
+      if (!active && typeof app.workspace.getMostRecentLeaf === "function") {
+        active = app.workspace.getMostRecentLeaf();
+      }
+      return active || null;
+    }
+    function getLeafTitle(leaf) {
+      if (!leaf) return "";
+      if (typeof leaf.getDisplayText === "function") {
+        var text = leaf.getDisplayText();
+        if (text) return text;
+      }
+      if (leaf.view && typeof leaf.view.getDisplayText === "function") {
+        var viewText = leaf.view.getDisplayText();
+        if (viewText) return viewText;
+      }
+      return leaf.view && leaf.view.getViewType && leaf.view.getViewType() || "Tab";
+    }
+    function collectGroupLeaves(app) {
+      var leaves = [];
+      var active = getActiveLeaf(app);
+      var parent = active && active.parent;
+      if (parent && Array.isArray(parent.children) && isRootLeaf(app, active)) {
+        for (var i = 0; i < parent.children.length; i++) {
+          var child = parent.children[i];
+          if (isWorkspaceLeaf(child)) leaves.push(child);
+        }
+        return { group: parent, leaves, active };
+      }
+      if (typeof app.workspace.iterateRootLeaves === "function") {
+        app.workspace.iterateRootLeaves(function(leaf) {
+          if (isWorkspaceLeaf(leaf)) leaves.push(leaf);
+        });
+      } else {
+        app.workspace.iterateAllLeaves(function(leaf) {
+          if (isWorkspaceLeaf(leaf) && isRootLeaf(app, leaf)) leaves.push(leaf);
+        });
+      }
+      return {
+        group: active && active.parent || null,
+        leaves,
+        active
+      };
+    }
+    function getDoc() {
+      return typeof activeDocument !== "undefined" && activeDocument || document;
+    }
+    var TabSwitcherModal = (
+      /** @class */
+      function() {
+        function TabSwitcherModal2(app, plugin) {
+          this.app = app;
+          this.plugin = plugin;
+          this.leaves = [];
+          this.placements = [];
+          this.cardEls = [];
+          this.focusedIndex = 0;
+          this.open = this.open.bind(this);
+          this.close = this.close.bind(this);
+          this._onKeyDown = this._onKeyDown.bind(this);
+          this._onBackdropClick = this._onBackdropClick.bind(this);
+          this._onPanelClick = this._onPanelClick.bind(this);
+          this._onPanelMove = this._onPanelMove.bind(this);
+        }
+        TabSwitcherModal2.prototype.open = function() {
+          if (getDoc().body.classList.contains("wpp-mission-control-open")) {
+            this.close();
+            return;
+          }
+          var collected = collectGroupLeaves(this.app);
+          this.leaves = collected.leaves.slice();
+          this.activeLeaf = collected.active;
+          if (this.leaves.length === 0) {
+            new obsidian2.Notice(i18n2.L.tabSwitcherEmpty);
+            return;
+          }
+          var activeIndex = this.leaves.indexOf(this.activeLeaf);
+          if (activeIndex < 0) activeIndex = 0;
+          this.focusedIndex = this.leaves.length <= 1 ? 0 : (activeIndex + 1) % this.leaves.length;
+          var doc = getDoc();
+          doc.body.addClass("wpp-mission-control-open");
+          this.backdropEl = doc.body.createDiv({ cls: "wpp-tab-switcher-backdrop" });
+          this.backdropEl.addEventListener("click", this._onBackdropClick);
+          this.panelEl = doc.body.createDiv({
+            cls: "wpp-tab-switcher-panel",
+            attr: { role: "dialog", "aria-modal": "true", "aria-label": i18n2.L.tabSwitcherTitle }
+          });
+          this.gridEl = this.panelEl.createDiv({ cls: "wpp-tab-switcher-grid" });
+          this.hintEl = doc.body.createDiv({ cls: "wpp-tab-switcher-floating-hint" });
+          this.hintEl.setText(i18n2.L.tabSwitcherHint);
+          this.placements = [];
+          this.cardEls = [];
+          for (var i = 0; i < this.leaves.length; i++) {
+            this.mountLeafCard(this.leaves[i], i);
+          }
+          this.panelEl.addEventListener("click", this._onPanelClick);
+          this.panelEl.addEventListener("mousemove", this._onPanelMove);
+          doc.addEventListener("keydown", this._onKeyDown, true);
+          this.updateFocus(true);
+        };
+        TabSwitcherModal2.prototype.mountLeafCard = function(leaf, index) {
+          var self = this;
+          if (leaf && typeof leaf.loadIfDeferred === "function") {
+            try {
+              leaf.loadIfDeferred();
+            } catch (err) {
+            }
+          }
+          var card = this.gridEl.createDiv({
+            cls: "wpp-tab-switcher-card" + (leaf === this.activeLeaf ? " is-active-tab" : ""),
+            attr: {
+              role: "option",
+              "data-index": String(index),
+              "aria-selected": "false"
+            }
+          });
+          var viewport = card.createDiv({ cls: "wpp-tab-switcher-viewport" });
+          var scale = viewport.createDiv({ cls: "wpp-tab-switcher-scale" });
+          var leafEl = leaf.containerEl;
+          if (leafEl && leafEl.parentElement) {
+            this.placements.push({
+              leaf,
+              parent: leafEl.parentElement,
+              nextSibling: leafEl.nextSibling
+            });
+            scale.appendChild(leafEl);
+            leafEl.addClass("wpp-mc-leaf");
+          } else {
+            var fallback = scale.createDiv({ cls: "wpp-tab-switcher-fallback" });
+            fallback.setText(getLeafTitle(leaf));
+          }
+          var meta = card.createDiv({ cls: "wpp-tab-switcher-meta" });
+          meta.createDiv({
+            cls: "wpp-tab-switcher-title",
+            text: getLeafTitle(leaf),
+            attr: { title: getLeafTitle(leaf) }
+          });
+          card.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.focusedIndex = index;
+            self.activateFocused();
+          });
+          this.cardEls.push(card);
+        };
+        TabSwitcherModal2.prototype.restoreLeaves = function() {
+          for (var i = 0; i < this.placements.length; i++) {
+            var item = this.placements[i];
+            var leafEl = item.leaf && item.leaf.containerEl;
+            if (!leafEl || !item.parent) continue;
+            leafEl.removeClass("wpp-mc-leaf");
+            leafEl.removeClass("wpp-mc-focused");
+            try {
+              if (item.nextSibling && item.nextSibling.parentElement === item.parent) {
+                item.parent.insertBefore(leafEl, item.nextSibling);
+              } else {
+                item.parent.appendChild(leafEl);
+              }
+            } catch (err) {
+              try {
+                item.parent.appendChild(leafEl);
+              } catch (e2) {
+              }
+            }
+          }
+          this.placements = [];
+        };
+        TabSwitcherModal2.prototype._onBackdropClick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.close();
+        };
+        TabSwitcherModal2.prototype._onPanelClick = function(e) {
+          if (e.target === this.panelEl || e.target === this.gridEl) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.close();
+          }
+        };
+        TabSwitcherModal2.prototype._onPanelMove = function(e) {
+          var card = e.target && e.target.closest && e.target.closest(".wpp-tab-switcher-card");
+          if (!card) return;
+          var index = parseInt(card.getAttribute("data-index"), 10);
+          if (isNaN(index) || index === this.focusedIndex) return;
+          this.focusedIndex = index;
+          this.updateFocus(false);
+        };
+        TabSwitcherModal2.prototype._onKeyDown = function(e) {
+          if (e.isComposing) return;
+          var key = e.key;
+          if (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown") {
+            e.preventDefault();
+            e.stopPropagation();
+            this.moveFocus(key);
+          } else if (key === "Enter" || key === " ") {
+            e.preventDefault();
+            e.stopPropagation();
+            this.activateFocused();
+          } else if (key === "Escape") {
+            e.preventDefault();
+            e.stopPropagation();
+            this.close();
+          } else if (key === "Tab") {
+            e.preventDefault();
+            e.stopPropagation();
+            this.moveFocus(e.shiftKey ? "ArrowLeft" : "ArrowRight");
+          }
+        };
+        TabSwitcherModal2.prototype.getColumnCount = function() {
+          if (!this.gridEl || !this.cardEls.length) return 1;
+          var first = this.cardEls[0];
+          if (!first || !first.offsetWidth) return 1;
+          var styles = window.getComputedStyle(this.gridEl);
+          var gap = parseFloat(styles.columnGap || styles.gap || "20") || 20;
+          return Math.max(1, Math.floor((this.gridEl.clientWidth + gap) / (first.offsetWidth + gap)));
+        };
+        TabSwitcherModal2.prototype.moveFocus = function(key) {
+          var count = this.leaves.length;
+          if (count <= 0) return;
+          var cols = this.getColumnCount();
+          var idx = this.focusedIndex;
+          if (key === "ArrowLeft") idx = (idx - 1 + count) % count;
+          else if (key === "ArrowRight") idx = (idx + 1) % count;
+          else if (key === "ArrowUp") idx = (idx - cols + count) % count;
+          else if (key === "ArrowDown") idx = (idx + cols) % count;
+          this.focusedIndex = idx;
+          this.updateFocus(true);
+        };
+        TabSwitcherModal2.prototype.updateFocus = function(scrollIntoView) {
+          var self = this;
+          this.cardEls.forEach(function(card, i) {
+            var focused = i === self.focusedIndex;
+            card.classList.toggle("is-focused", focused);
+            card.setAttribute("aria-selected", focused ? "true" : "false");
+            var leaf = self.leaves[i];
+            if (leaf && leaf.containerEl) {
+              leaf.containerEl.classList.toggle("wpp-mc-focused", focused);
+            }
+            if (focused && scrollIntoView && typeof card.scrollIntoView === "function") {
+              card.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+            }
+          });
+        };
+        TabSwitcherModal2.prototype.activateFocused = function() {
+          var leaf = this.leaves[this.focusedIndex];
+          this.close();
+          if (!leaf) return;
+          if (typeof this.app.workspace.setActiveLeaf === "function") {
+            this.app.workspace.setActiveLeaf(leaf, { focus: true });
+          }
+          if (typeof this.app.workspace.revealLeaf === "function") {
+            this.app.workspace.revealLeaf(leaf);
+          }
+        };
+        TabSwitcherModal2.prototype.close = function() {
+          var doc = getDoc();
+          doc.removeEventListener("keydown", this._onKeyDown, true);
+          if (this.panelEl) {
+            this.panelEl.removeEventListener("click", this._onPanelClick);
+            this.panelEl.removeEventListener("mousemove", this._onPanelMove);
+          }
+          this.restoreLeaves();
+          if (this.panelEl) {
+            this.panelEl.remove();
+            this.panelEl = null;
+          }
+          this.gridEl = null;
+          if (this.backdropEl) {
+            this.backdropEl.removeEventListener("click", this._onBackdropClick);
+            this.backdropEl.remove();
+            this.backdropEl = null;
+          }
+          if (this.hintEl) {
+            this.hintEl.remove();
+            this.hintEl = null;
+          }
+          doc.body.removeClass("wpp-mission-control-open");
+          this.leaves = [];
+          this.cardEls = [];
+          this.focusedIndex = 0;
+        };
+        return TabSwitcherModal2;
+      }()
+    );
+    module2.exports = TabSwitcherModal;
+  }
+});
+
 // src/modals/index.js
 var require_modals = __commonJS({
   "src/modals/index.js"(exports2, module2) {
@@ -13451,6 +13803,7 @@ var require_modals = __commonJS({
     var UnsavedSwitchModal = require_unsaved_switch_modal();
     var HistoryModal = require_history_modal();
     var HistoryEntryModal = require_history_entry_modal();
+    var TabSwitcherModal = require_tab_switcher_modal();
     module2.exports = {
       SessionManagerModal,
       ConfirmModal,
@@ -13458,7 +13811,8 @@ var require_modals = __commonJS({
       UnsavedSwitchModal,
       HistoryModal,
       HistoryEntryModal,
-      DeleteOrArchiveModal: require_delete_or_archive_modal()
+      DeleteOrArchiveModal: require_delete_or_archive_modal(),
+      TabSwitcherModal
     };
   }
 });
@@ -14246,6 +14600,9 @@ var require_register_commands = __commonJS({
       }
       addSimpleCommand("manage-sessions", L.cmdManage, function() {
         new modals2.SessionManagerModal(plugin.app, plugin).open();
+      });
+      addSimpleCommand("switch-tabs", L.cmdTabSwitcher, function() {
+        new modals2.TabSwitcherModal(plugin.app, plugin).open();
       });
       addSimpleCommand("save-current-session", L.cmdSaveCurrent, function() {
         plugin.saveActiveSession();

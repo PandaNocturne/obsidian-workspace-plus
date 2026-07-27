@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### 新增
+
+- 标签页切换（命令：`切换标签页（任务视图）`）：参考 Vertical Tabs Mission Control，就地网格展示当前分组的真实页面内容；半透明蒙版；点击标签切换，点击蒙版/空白处取消
+
 ## 0.8.0 — 2026-07-28
 
 Workspace++ Beta 功能修改版。基于 [Workspace++](https://github.com/s1m4ne/obsidian-workspace-plus)，灵感与工作区能力溯源自 [Workspaces Plus](https://github.com/jsmorabito/obsidian-workspaces-plus)。

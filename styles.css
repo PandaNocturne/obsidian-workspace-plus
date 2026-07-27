@@ -13,11 +13,11 @@
     overflow: hidden;
 }
 
-.modal.wpp-session-manager-modal > .modal-title {
+.modal.wpp-session-manager-modal>.modal-title {
     flex-shrink: 0;
 }
 
-.modal.wpp-session-manager-modal > .modal-content {
+.modal.wpp-session-manager-modal>.modal-content {
     flex: 1 1 auto;
     min-height: 0;
     min-width: 0;
@@ -366,7 +366,9 @@
 }
 
 @keyframes wpp-badge-spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .wpp-session-badge svg {
@@ -651,7 +653,7 @@ body.wpp-session-list-dragging * {
 
 .wpp-confirm-buttons button.wpp-btn-focused,
 .wpp-session-actions .wpp-btn-focused {
-    background: var(--background-modifier-hover);
+    background: var(--interactive-accent);
     outline: none;
     box-shadow: none;
 }
@@ -935,20 +937,67 @@ body.wpp-session-list-dragging * {
     z-index: 1;
 }
 
-.wpp-resize-tl { top: 0; left: 0; cursor: nwse-resize; }
-.wpp-resize-tr { top: 0; right: 0; cursor: nesw-resize; }
-.wpp-resize-bl { bottom: 0; left: 0; cursor: nesw-resize; }
-.wpp-resize-br { bottom: 0; right: 0; cursor: nwse-resize; }
+.wpp-resize-tl {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+}
+
+.wpp-resize-tr {
+    top: 0;
+    right: 0;
+    cursor: nesw-resize;
+}
+
+.wpp-resize-bl {
+    bottom: 0;
+    left: 0;
+    cursor: nesw-resize;
+}
+
+.wpp-resize-br {
+    bottom: 0;
+    right: 0;
+    cursor: nwse-resize;
+}
 
 /* Edge resize handles */
 .wpp-resize-edge {
     position: absolute;
     z-index: 1;
 }
-.wpp-resize-top    { top: 0; left: 12px; right: 12px; height: 6px; cursor: n-resize; }
-.wpp-resize-bottom { bottom: 0; left: 12px; right: 12px; height: 6px; cursor: s-resize; }
-.wpp-resize-left   { left: 0; top: 12px; bottom: 12px; width: 6px; cursor: w-resize; }
-.wpp-resize-right  { right: 0; top: 12px; bottom: 12px; width: 6px; cursor: e-resize; }
+
+.wpp-resize-top {
+    top: 0;
+    left: 12px;
+    right: 12px;
+    height: 6px;
+    cursor: n-resize;
+}
+
+.wpp-resize-bottom {
+    bottom: 0;
+    left: 12px;
+    right: 12px;
+    height: 6px;
+    cursor: s-resize;
+}
+
+.wpp-resize-left {
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 6px;
+    cursor: w-resize;
+}
+
+.wpp-resize-right {
+    right: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 6px;
+    cursor: e-resize;
+}
 
 .wpp-search-overlay .wpp-switch-item {
     width: 100%;
@@ -1459,4 +1508,153 @@ body.wpp-session-list-dragging * {
     color: var(--text-muted);
     text-align: center;
     padding: 24px 0;
+}
+
+/* ============================================================
+   Tab switcher — centered overlay with live page previews
+   ============================================================ */
+
+body.wpp-mission-control-open {
+    --wpp-mc-leaf-gap: 20px;
+    --wpp-mc-zoom: 0.5;
+    --wpp-mc-leaf-height: 600px;
+    --wpp-mc-leaf-width: 800px;
+    --wpp-mc-panel-max-width: 60vw;
+    --wpp-mc-panel-max-height: 70vh;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    cursor: default;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-panel {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    box-sizing: border-box;
+    width: var(--wpp-mc-panel-max-width);
+    max-width: var(--wpp-mc-panel-max-width);
+    height: auto;
+    max-height: var(--wpp-mc-panel-max-height);
+    overflow: auto;
+    padding: 30px;
+    border-radius: 12px;
+    background: var(--modal-background, var(--background-primary));
+    border: 1px solid var(--background-modifier-border);
+    box-shadow: var(--shadow-l);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-grid {
+    display: grid;
+    gap: var(--wpp-mc-leaf-gap);
+    grid-template-columns: repeat(auto-fill,
+            minmax(calc(var(--wpp-mc-leaf-width) * var(--wpp-mc-zoom)), 1fr));
+    justify-content: center;
+    align-content: start;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    justify-self: center;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-viewport {
+    box-sizing: border-box;
+    width: 100%;
+    height: calc(var(--wpp-mc-leaf-height) * var(--wpp-mc-zoom));
+    overflow: hidden;
+    border-radius: 10px;
+    border: 2px solid var(--background-modifier-border);
+    background: var(--background-primary);
+    box-shadow: var(--shadow-s);
+    position: relative;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-tab-switcher-viewport,
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-mc-leaf {
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 4px var(--interactive-accent);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-scale {
+    width: var(--wpp-mc-leaf-width);
+    height: var(--wpp-mc-leaf-height);
+    transform: scale(var(--wpp-mc-zoom));
+    transform-origin: top left;
+    pointer-events: none;
+}
+
+body.wpp-mission-control-open .wpp-mc-leaf {
+    display: block !important;
+    width: var(--wpp-mc-leaf-width) !important;
+    height: var(--wpp-mc-leaf-height) !important;
+    min-width: var(--wpp-mc-leaf-width) !important;
+    min-height: var(--wpp-mc-leaf-height) !important;
+    max-width: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+body.wpp-mission-control-open .wpp-mc-leaf .view-header,
+body.wpp-mission-control-open .wpp-mc-leaf .cg-note-toolbar-container {
+    display: none !important;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--text-muted);
+    padding: 16px;
+    text-align: center;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-meta {
+    min-width: 0;
+    padding: 0 2px;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-title {
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-normal);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-floating-hint {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    z-index: 1002;
+    padding: 6px 14px;
+    border-radius: var(--radius-m);
+    background: rgba(0, 0, 0, 0.45);
+    color: var(--text-on-accent, #fff);
+    font-size: var(--font-ui-smaller);
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 90vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

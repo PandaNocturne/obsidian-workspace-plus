@@ -23,6 +23,10 @@ function registerCommands(plugin) {
         new modals.SessionManagerModal(plugin.app, plugin).open();
     });
 
+    addSimpleCommand('switch-tabs', L.cmdTabSwitcher, function () {
+        new modals.TabSwitcherModal(plugin.app, plugin).open();
+    });
+
     addSimpleCommand('save-current-session', L.cmdSaveCurrent, function () {
         plugin.saveActiveSession();
     });
