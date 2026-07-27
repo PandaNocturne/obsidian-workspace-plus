@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    Workspace++ Styles
    Matches the core Workspace plugin modal design
    ============================================================ */
@@ -1511,25 +1511,27 @@ body.wpp-session-list-dragging * {
 }
 
 /* ============================================================
-   Tab switcher — centered overlay with live page previews
+   Tab switcher — overlay panel (workspace tabs stay visible underneath)
    ============================================================ */
 
 body.wpp-mission-control-open {
     --wpp-mc-leaf-gap: 20px;
     --wpp-mc-zoom: 0.5;
-    --wpp-mc-leaf-height: 600px;
-    --wpp-mc-leaf-width: 800px;
-    --wpp-mc-panel-max-width: 60vw;
-    --wpp-mc-panel-max-height: 70vh;
+    --wpp-mc-source-width: 650px;
+    --wpp-mc-source-height: 450px;
+    --wpp-mc-leaf-width: calc(var(--wpp-mc-source-width) * var(--wpp-mc-zoom));
+    --wpp-mc-leaf-height: calc(var(--wpp-mc-source-height) * var(--wpp-mc-zoom));
+    --wpp-mc-panel-max-width: 80vw;
+    --wpp-mc-panel-max-height: 80vh;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-backdrop {
     position: fixed;
     inset: 0;
     z-index: 1000;
-    background-color: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
     cursor: default;
 }
 
@@ -1540,9 +1542,10 @@ body.wpp-mission-control-open .wpp-tab-switcher-panel {
     transform: translate(-50%, -50%);
     z-index: 1001;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     width: var(--wpp-mc-panel-max-width);
     max-width: var(--wpp-mc-panel-max-width);
-    height: auto;
     max-height: var(--wpp-mc-panel-max-height);
     overflow: auto;
     padding: 30px;
@@ -1553,92 +1556,167 @@ body.wpp-mission-control-open .wpp-tab-switcher-panel {
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-grid {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--wpp-mc-leaf-gap);
-    grid-template-columns: repeat(auto-fill,
-            minmax(calc(var(--wpp-mc-leaf-width) * var(--wpp-mc-zoom)), 1fr));
     justify-content: center;
-    align-content: start;
+    align-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    min-height: 0;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-card {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    width: 100%;
-    min-width: 0;
-    justify-self: center;
+    flex: 0 0 auto;
+    width: var(--wpp-mc-leaf-width);
+    max-width: 100%;
     cursor: pointer;
     border-radius: 10px;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-viewport {
+    position: relative;
     box-sizing: border-box;
-    width: 100%;
-    height: calc(var(--wpp-mc-leaf-height) * var(--wpp-mc-zoom));
+    width: var(--wpp-mc-leaf-width);
+    height: var(--wpp-mc-leaf-height);
     overflow: hidden;
     border-radius: 10px;
     border: 2px solid var(--background-modifier-border);
     background: var(--background-primary);
     box-shadow: var(--shadow-s);
-    position: relative;
 }
 
-body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-tab-switcher-viewport,
-body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-mc-leaf {
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-tab-switcher-viewport {
     border-color: var(--interactive-accent);
     box-shadow: 0 0 0 4px var(--interactive-accent);
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-scale {
-    width: var(--wpp-mc-leaf-width);
-    height: var(--wpp-mc-leaf-height);
+    width: var(--wpp-mc-source-width);
+    height: var(--wpp-mc-source-height);
     transform: scale(var(--wpp-mc-zoom));
     transform-origin: top left;
     pointer-events: none;
+    overflow: hidden;
+    background: var(--background-primary);
 }
 
-body.wpp-mission-control-open .wpp-mc-leaf {
-    display: block !important;
-    width: var(--wpp-mc-leaf-width) !important;
-    height: var(--wpp-mc-leaf-height) !important;
-    min-width: var(--wpp-mc-leaf-width) !important;
-    min-height: var(--wpp-mc-leaf-height) !important;
+body.wpp-mission-control-open .wpp-tab-switcher-clone {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
     max-width: none !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
     overflow: hidden !important;
+    pointer-events: none !important;
+    box-sizing: border-box;
 }
 
-body.wpp-mission-control-open .wpp-mc-leaf .view-header,
-body.wpp-mission-control-open .wpp-mc-leaf .cg-note-toolbar-container {
+body.wpp-mission-control-open .wpp-tab-switcher-clone .view-header,
+body.wpp-mission-control-open .wpp-tab-switcher-clone .cg-note-toolbar-container {
     display: none !important;
 }
 
-body.wpp-mission-control-open .wpp-tab-switcher-fallback {
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback {
+    padding: 16px 18px;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-normal);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-preview-text {
+    margin: 0;
+    padding: 12px 14px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-text);
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+    word-break: break-word;
+    pointer-events: none;
+    user-select: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-preview-icon {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     height: 100%;
-    color: var(--text-muted);
-    padding: 16px;
-    text-align: center;
+    color: var(--text-faint);
+    opacity: 0.7;
+    --icon-size: 40px;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--background-modifier-cover, rgba(0, 0, 0, 0.45));
+    color: var(--text-on-accent, #fff);
+    opacity: 0;
+    pointer-events: none;
+    cursor: pointer;
+    transition: opacity 0.12s ease, background 0.12s ease;
+    --icon-size: 14px;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-card:hover .wpp-tab-switcher-close,
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-tab-switcher-close {
+    opacity: 0.9;
+    pointer-events: auto;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-close:hover {
+    opacity: 1;
+    background: var(--background-modifier-error, #e93147);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-close:focus,
+body.wpp-mission-control-open .wpp-tab-switcher-close:focus-visible {
+    outline: none;
+    box-shadow: none;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     min-width: 0;
     padding: 0 2px;
+    text-align: center;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-icon {
+    flex-shrink: 0;
+    display: flex;
+    color: var(--text-muted);
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-title {
+    min-width: 0;
     font-size: var(--font-ui-small);
     font-weight: var(--font-medium);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--text-normal);
+    text-align: center;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-floating-hint {

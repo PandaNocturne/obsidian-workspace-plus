@@ -33,6 +33,83 @@ function getLeafTitle(leaf) {
     return (leaf.view && leaf.view.getViewType && leaf.view.getViewType()) || 'Tab';
 }
 
+function getLeafIcon(leaf) {
+    if (leaf && leaf.view && typeof leaf.view.getIcon === 'function') {
+        var icon = leaf.view.getIcon();
+        if (icon) return icon;
+    }
+    return 'file-text';
+}
+
+function getLeafPreviewText(leaf) {
+    var view = leaf && leaf.view;
+    if (!view) return '';
+    try {
+        if (view.editor && typeof view.editor.getValue === 'function') {
+            return String(view.editor.getValue() || '').trim();
+        }
+        if (typeof view.data === 'string') {
+            return view.data.trim();
+        }
+        if (view.file && view.file.path) {
+            return view.file.path;
+        }
+    } catch (err) { /* ignore */ }
+    return '';
+}
+
+function getCloneSourceEl(leaf) {
+    var root = (leaf && leaf.view && leaf.view.containerEl) || (leaf && leaf.containerEl);
+    if (!root) return null;
+    return root.querySelector('.view-content')
+        || root.querySelector('.workspace-leaf-content')
+        || root;
+}
+
+function sanitizeClone(clone) {
+    if (!clone) return clone;
+    try {
+        clone.removeAttribute('id');
+        var withIds = clone.querySelectorAll('[id]');
+        for (var i = 0; i < withIds.length; i++) {
+            withIds[i].removeAttribute('id');
+        }
+        var editables = clone.querySelectorAll('[contenteditable]');
+        for (var j = 0; j < editables.length; j++) {
+            editables[j].setAttribute('contenteditable', 'false');
+            editables[j].setAttribute('tabindex', '-1');
+        }
+        var media = clone.querySelectorAll('video, audio');
+        for (var m = 0; m < media.length; m++) {
+            try { media[m].pause && media[m].pause(); } catch (e) { /* ignore */ }
+            media[m].removeAttribute('autoplay');
+        }
+    } catch (err) { /* ignore */ }
+    return clone;
+}
+
+function cloneLooksEmpty(clone) {
+    if (!clone) return true;
+    var text = String(clone.textContent || '').replace(/\s+/g, ' ').trim();
+    if (text.length >= 2) return false;
+    return !clone.querySelector('img, canvas, svg, iframe, video, .cm-editor, .markdown-preview-view');
+}
+
+/** Deep-clone a tab's view DOM for thumbnail preview (does not touch the live leaf). */
+function buildLeafViewClone(leaf) {
+    var source = getCloneSourceEl(leaf);
+    if (!source) return null;
+    try {
+        var clone = source.cloneNode(true);
+        sanitizeClone(clone);
+        clone.classList.add('wpp-tab-switcher-clone');
+        if (cloneLooksEmpty(clone)) return null;
+        return clone;
+    } catch (err) {
+        return null;
+    }
+}
+
 function collectGroupLeaves(app) {
     var leaves = [];
     var active = getActiveLeaf(app);
@@ -68,14 +145,14 @@ function getDoc() {
 }
 
 // ============================================================
-// Tab Switcher — centered overlay with live page previews
+// Tab Switcher — overlay only (workspace tabs stay as-is underneath)
 // ============================================================
 var TabSwitcherModal = /** @class */ (function () {
     function TabSwitcherModal(app, plugin) {
         this.app = app;
         this.plugin = plugin;
         this.leaves = [];
-        this.placements = [];
+        this.group = null;
         this.cardEls = [];
         this.focusedIndex = 0;
         this.open = this.open.bind(this);
@@ -93,6 +170,7 @@ var TabSwitcherModal = /** @class */ (function () {
         }
 
         var collected = collectGroupLeaves(this.app);
+        this.group = collected.group;
         this.leaves = collected.leaves.slice();
         this.activeLeaf = collected.active;
 
@@ -115,19 +193,19 @@ var TabSwitcherModal = /** @class */ (function () {
 
         this.panelEl = doc.body.createDiv({
             cls: 'wpp-tab-switcher-panel',
-            attr: { role: 'dialog', 'aria-modal': 'true', 'aria-label': i18n.L.tabSwitcherTitle },
+            attr: {
+                role: 'dialog',
+                'aria-modal': 'true',
+                'aria-label': i18n.L.tabSwitcherTitle,
+            },
         });
         this.gridEl = this.panelEl.createDiv({ cls: 'wpp-tab-switcher-grid' });
 
         this.hintEl = doc.body.createDiv({ cls: 'wpp-tab-switcher-floating-hint' });
         this.hintEl.setText(i18n.L.tabSwitcherHint);
 
-        this.placements = [];
         this.cardEls = [];
-
-        for (var i = 0; i < this.leaves.length; i++) {
-            this.mountLeafCard(this.leaves[i], i);
-        }
+        this.renderCards();
 
         this.panelEl.addEventListener('click', this._onPanelClick);
         this.panelEl.addEventListener('mousemove', this._onPanelMove);
@@ -136,14 +214,26 @@ var TabSwitcherModal = /** @class */ (function () {
         this.updateFocus(true);
     };
 
-    TabSwitcherModal.prototype.mountLeafCard = function (leaf, index) {
+    TabSwitcherModal.prototype.renderCards = function () {
+        if (!this.gridEl) return;
+        this.gridEl.empty();
+        this.cardEls = [];
+
+        for (var i = 0; i < this.leaves.length; i++) {
+            this.mountCard(this.leaves[i], i);
+        }
+    };
+
+    TabSwitcherModal.prototype.mountCard = function (leaf, index) {
         var self = this;
+        var isActive = leaf === this.activeLeaf;
+
         if (leaf && typeof leaf.loadIfDeferred === 'function') {
             try { leaf.loadIfDeferred(); } catch (err) { /* ignore */ }
         }
 
         var card = this.gridEl.createDiv({
-            cls: 'wpp-tab-switcher-card' + (leaf === this.activeLeaf ? ' is-active-tab' : ''),
+            cls: 'wpp-tab-switcher-card' + (isActive ? ' is-active-tab' : ''),
             attr: {
                 role: 'option',
                 'data-index': String(index),
@@ -152,23 +242,76 @@ var TabSwitcherModal = /** @class */ (function () {
         });
 
         var viewport = card.createDiv({ cls: 'wpp-tab-switcher-viewport' });
-        var scale = viewport.createDiv({ cls: 'wpp-tab-switcher-scale' });
 
-        var leafEl = leaf.containerEl;
-        if (leafEl && leafEl.parentElement) {
-            this.placements.push({
-                leaf: leaf,
-                parent: leafEl.parentElement,
-                nextSibling: leafEl.nextSibling,
-            });
-            scale.appendChild(leafEl);
-            leafEl.addClass('wpp-mc-leaf');
+        var closeBtn = viewport.createDiv({
+            cls: 'wpp-tab-switcher-close',
+            attr: {
+                role: 'button',
+                tabindex: '-1',
+                'aria-label': i18n.L.tabSwitcherCloseTab,
+            },
+        });
+        obsidian.setIcon(closeBtn, 'x');
+        if (typeof obsidian.setTooltip === 'function') {
+            obsidian.setTooltip(closeBtn, i18n.L.tabSwitcherCloseTab, { delay: 250 });
+        }
+        closeBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var currentIndex = self.cardEls.indexOf(card);
+            if (currentIndex < 0) return;
+            self.closeLeafAt(currentIndex);
+        });
+
+        var scale = viewport.createDiv({ cls: 'wpp-tab-switcher-scale' });
+        var clone = buildLeafViewClone(leaf);
+        if (clone) {
+            scale.appendChild(clone);
         } else {
-            var fallback = scale.createDiv({ cls: 'wpp-tab-switcher-fallback' });
-            fallback.setText(getLeafTitle(leaf));
+            // Fallback: markdown render / plain text if DOM clone is empty
+            var file = leaf.view && leaf.view.file;
+            var previewHost = scale.createDiv({ cls: 'wpp-tab-switcher-clone wpp-tab-switcher-md-fallback' });
+            if (file && obsidian.MarkdownRenderer && typeof obsidian.MarkdownRenderer.render === 'function') {
+                self.app.vault.cachedRead(file).then(function (md) {
+                    if (!previewHost.isConnected) return;
+                    previewHost.empty();
+                    return obsidian.MarkdownRenderer.render(
+                        self.app,
+                        String(md || '').slice(0, 5000),
+                        previewHost,
+                        file.path,
+                        self.plugin
+                    );
+                }).catch(function () {
+                    if (!previewHost.isConnected) return;
+                    var text = getLeafPreviewText(leaf);
+                    if (text) {
+                        previewHost.createEl('pre', {
+                            cls: 'wpp-tab-switcher-preview-text',
+                            text: text.slice(0, 1200),
+                        });
+                    } else {
+                        var iconWrap = previewHost.createDiv({ cls: 'wpp-tab-switcher-preview-icon' });
+                        obsidian.setIcon(iconWrap, getLeafIcon(leaf));
+                    }
+                });
+            } else {
+                var previewText = getLeafPreviewText(leaf);
+                if (previewText) {
+                    previewHost.createEl('pre', {
+                        cls: 'wpp-tab-switcher-preview-text',
+                        text: previewText.slice(0, 1200),
+                    });
+                } else {
+                    var iconWrap2 = previewHost.createDiv({ cls: 'wpp-tab-switcher-preview-icon' });
+                    obsidian.setIcon(iconWrap2, getLeafIcon(leaf));
+                }
+            }
         }
 
         var meta = card.createDiv({ cls: 'wpp-tab-switcher-meta' });
+        var iconEl = meta.createDiv({ cls: 'wpp-tab-switcher-icon' });
+        obsidian.setIcon(iconEl, getLeafIcon(leaf));
         meta.createDiv({
             cls: 'wpp-tab-switcher-title',
             text: getLeafTitle(leaf),
@@ -176,34 +319,51 @@ var TabSwitcherModal = /** @class */ (function () {
         });
 
         card.addEventListener('click', function (e) {
+            if (e.target && e.target.closest && e.target.closest('.wpp-tab-switcher-close')) {
+                return;
+            }
             e.preventDefault();
             e.stopPropagation();
-            self.focusedIndex = index;
+            var currentIndex = self.cardEls.indexOf(card);
+            if (currentIndex < 0) currentIndex = index;
+            self.focusedIndex = currentIndex;
             self.activateFocused();
         });
 
         this.cardEls.push(card);
     };
 
-    TabSwitcherModal.prototype.restoreLeaves = function () {
-        // Restore in original order
-        for (var i = 0; i < this.placements.length; i++) {
-            var item = this.placements[i];
-            var leafEl = item.leaf && item.leaf.containerEl;
-            if (!leafEl || !item.parent) continue;
-            leafEl.removeClass('wpp-mc-leaf');
-            leafEl.removeClass('wpp-mc-focused');
-            try {
-                if (item.nextSibling && item.nextSibling.parentElement === item.parent) {
-                    item.parent.insertBefore(leafEl, item.nextSibling);
-                } else {
-                    item.parent.appendChild(leafEl);
-                }
-            } catch (err) {
-                try { item.parent.appendChild(leafEl); } catch (e2) { /* ignore */ }
-            }
+    TabSwitcherModal.prototype.syncLeavesFromGroup = function () {
+        var collected = collectGroupLeaves(this.app);
+        this.group = collected.group;
+        this.leaves = collected.leaves.slice();
+        this.activeLeaf = collected.active;
+        return this.leaves;
+    };
+
+    TabSwitcherModal.prototype.closeLeafAt = function (index) {
+        if (index < 0 || index >= this.leaves.length) return;
+        var leaf = this.leaves[index];
+
+        // Leaf stays in the real workspace tree — safe to detach.
+        try {
+            if (leaf && typeof leaf.detach === 'function') leaf.detach();
+        } catch (err) { /* ignore */ }
+
+        this.syncLeavesFromGroup();
+        if (this.leaves.length === 0) {
+            this.close();
+            return;
         }
-        this.placements = [];
+
+        if (this.focusedIndex >= this.leaves.length) {
+            this.focusedIndex = this.leaves.length - 1;
+        } else if (this.focusedIndex > index) {
+            this.focusedIndex -= 1;
+        }
+
+        this.renderCards();
+        this.updateFocus(false);
     };
 
     TabSwitcherModal.prototype._onBackdropClick = function (e) {
@@ -213,7 +373,6 @@ var TabSwitcherModal = /** @class */ (function () {
     };
 
     TabSwitcherModal.prototype._onPanelClick = function (e) {
-        // Clicks on empty panel chrome (not a card) dismiss
         if (e.target === this.panelEl || e.target === this.gridEl) {
             e.preventDefault();
             e.stopPropagation();
@@ -282,10 +441,6 @@ var TabSwitcherModal = /** @class */ (function () {
             var focused = i === self.focusedIndex;
             card.classList.toggle('is-focused', focused);
             card.setAttribute('aria-selected', focused ? 'true' : 'false');
-            var leaf = self.leaves[i];
-            if (leaf && leaf.containerEl) {
-                leaf.containerEl.classList.toggle('wpp-mc-focused', focused);
-            }
             if (focused && scrollIntoView && typeof card.scrollIntoView === 'function') {
                 card.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
             }
@@ -311,15 +466,11 @@ var TabSwitcherModal = /** @class */ (function () {
         if (this.panelEl) {
             this.panelEl.removeEventListener('click', this._onPanelClick);
             this.panelEl.removeEventListener('mousemove', this._onPanelMove);
-        }
-
-        this.restoreLeaves();
-
-        if (this.panelEl) {
             this.panelEl.remove();
             this.panelEl = null;
         }
         this.gridEl = null;
+        this.cardEls = [];
 
         if (this.backdropEl) {
             this.backdropEl.removeEventListener('click', this._onBackdropClick);
@@ -333,7 +484,7 @@ var TabSwitcherModal = /** @class */ (function () {
 
         doc.body.removeClass('wpp-mission-control-open');
         this.leaves = [];
-        this.cardEls = [];
+        this.group = null;
         this.focusedIndex = 0;
     };
 

@@ -10236,31 +10236,36 @@ var require_i18n = __commonJS({
         cmdTabSwitcher: "Switch tabs (mission control)",
         tabSwitcherTitle: "Switch tab",
         tabSwitcherEmpty: "No open tabs to switch.",
-        tabSwitcherHint: "Click a tab to switch \xB7 Click outside to cancel \xB7 Arrow keys to move \xB7 Enter to confirm"
+        tabSwitcherHint: "Click a tab to switch \xB7 Click outside to cancel \xB7 Arrow keys to move \xB7 Enter to confirm",
+        tabSwitcherCloseTab: "Close tab"
       },
       zh: {
         cmdTabSwitcher: "\u5207\u6362\u6807\u7B7E\u9875\uFF08\u4EFB\u52A1\u89C6\u56FE\uFF09",
         tabSwitcherTitle: "\u5207\u6362\u6807\u7B7E\u9875",
         tabSwitcherEmpty: "\u6CA1\u6709\u53EF\u5207\u6362\u7684\u6807\u7B7E\u9875\u3002",
-        tabSwitcherHint: "\u70B9\u51FB\u6807\u7B7E\u5207\u6362 \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88 \xB7 \u65B9\u5411\u952E\u79FB\u52A8 \xB7 Enter \u786E\u8BA4"
+        tabSwitcherHint: "\u70B9\u51FB\u6807\u7B7E\u5207\u6362 \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88 \xB7 \u65B9\u5411\u952E\u79FB\u52A8 \xB7 Enter \u786E\u8BA4",
+        tabSwitcherCloseTab: "\u5173\u95ED\u6807\u7B7E\u9875"
       },
       "zh-TW": {
         cmdTabSwitcher: "\u5207\u63DB\u5206\u9801\uFF08\u4EFB\u52D9\u6AA2\u8996\uFF09",
         tabSwitcherTitle: "\u5207\u63DB\u5206\u9801",
         tabSwitcherEmpty: "\u6C92\u6709\u53EF\u5207\u63DB\u7684\u5206\u9801\u3002",
-        tabSwitcherHint: "\u9EDE\u64CA\u5206\u9801\u5207\u63DB \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88 \xB7 \u65B9\u5411\u9375\u79FB\u52D5 \xB7 Enter \u78BA\u8A8D"
+        tabSwitcherHint: "\u9EDE\u64CA\u5206\u9801\u5207\u63DB \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88 \xB7 \u65B9\u5411\u9375\u79FB\u52D5 \xB7 Enter \u78BA\u8A8D",
+        tabSwitcherCloseTab: "\u95DC\u9589\u5206\u9801"
       },
       ja: {
         cmdTabSwitcher: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048\uFF08\u30DF\u30C3\u30B7\u30E7\u30F3\u30B3\u30F3\u30C8\u30ED\u30FC\u30EB\uFF09",
         tabSwitcherTitle: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048",
         tabSwitcherEmpty: "\u5207\u308A\u66FF\u3048\u53EF\u80FD\u306A\u30BF\u30D6\u304C\u3042\u308A\u307E\u305B\u3093\u3002",
-        tabSwitcherHint: "\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88 \xB7 \u77E2\u5370\u30AD\u30FC\u3067\u79FB\u52D5 \xB7 Enter\u3067\u78BA\u5B9A"
+        tabSwitcherHint: "\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88 \xB7 \u77E2\u5370\u30AD\u30FC\u3067\u79FB\u52D5 \xB7 Enter\u3067\u78BA\u5B9A",
+        tabSwitcherCloseTab: "\u30BF\u30D6\u3092\u9589\u3058\u308B"
       },
       ko: {
         cmdTabSwitcher: "\uD0ED \uC804\uD658 (\uBBF8\uC158 \uCEE8\uD2B8\uB864)",
         tabSwitcherTitle: "\uD0ED \uC804\uD658",
         tabSwitcherEmpty: "\uC804\uD658\uD560 \uD0ED\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
-        tabSwitcherHint: "\uD074\uB9AD\uD558\uC5EC \uC804\uD658 \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C \xB7 \uBC29\uD5A5\uD0A4\uB85C \uC774\uB3D9 \xB7 Enter\uB85C \uD655\uC778"
+        tabSwitcherHint: "\uD074\uB9AD\uD558\uC5EC \uC804\uD658 \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C \xB7 \uBC29\uD5A5\uD0A4\uB85C \uC774\uB3D9 \xB7 Enter\uB85C \uD655\uC778",
+        tabSwitcherCloseTab: "\uD0ED \uB2EB\uAE30"
       }
     };
     var tabSwitcherLangs = Object.keys(STRINGS);
@@ -13523,6 +13528,79 @@ var require_tab_switcher_modal = __commonJS({
       }
       return leaf.view && leaf.view.getViewType && leaf.view.getViewType() || "Tab";
     }
+    function getLeafIcon(leaf) {
+      if (leaf && leaf.view && typeof leaf.view.getIcon === "function") {
+        var icon = leaf.view.getIcon();
+        if (icon) return icon;
+      }
+      return "file-text";
+    }
+    function getLeafPreviewText(leaf) {
+      var view = leaf && leaf.view;
+      if (!view) return "";
+      try {
+        if (view.editor && typeof view.editor.getValue === "function") {
+          return String(view.editor.getValue() || "").trim();
+        }
+        if (typeof view.data === "string") {
+          return view.data.trim();
+        }
+        if (view.file && view.file.path) {
+          return view.file.path;
+        }
+      } catch (err) {
+      }
+      return "";
+    }
+    function getCloneSourceEl(leaf) {
+      var root = leaf && leaf.view && leaf.view.containerEl || leaf && leaf.containerEl;
+      if (!root) return null;
+      return root.querySelector(".view-content") || root.querySelector(".workspace-leaf-content") || root;
+    }
+    function sanitizeClone(clone) {
+      if (!clone) return clone;
+      try {
+        clone.removeAttribute("id");
+        var withIds = clone.querySelectorAll("[id]");
+        for (var i = 0; i < withIds.length; i++) {
+          withIds[i].removeAttribute("id");
+        }
+        var editables = clone.querySelectorAll("[contenteditable]");
+        for (var j = 0; j < editables.length; j++) {
+          editables[j].setAttribute("contenteditable", "false");
+          editables[j].setAttribute("tabindex", "-1");
+        }
+        var media = clone.querySelectorAll("video, audio");
+        for (var m = 0; m < media.length; m++) {
+          try {
+            media[m].pause && media[m].pause();
+          } catch (e) {
+          }
+          media[m].removeAttribute("autoplay");
+        }
+      } catch (err) {
+      }
+      return clone;
+    }
+    function cloneLooksEmpty(clone) {
+      if (!clone) return true;
+      var text = String(clone.textContent || "").replace(/\s+/g, " ").trim();
+      if (text.length >= 2) return false;
+      return !clone.querySelector("img, canvas, svg, iframe, video, .cm-editor, .markdown-preview-view");
+    }
+    function buildLeafViewClone(leaf) {
+      var source = getCloneSourceEl(leaf);
+      if (!source) return null;
+      try {
+        var clone = source.cloneNode(true);
+        sanitizeClone(clone);
+        clone.classList.add("wpp-tab-switcher-clone");
+        if (cloneLooksEmpty(clone)) return null;
+        return clone;
+      } catch (err) {
+        return null;
+      }
+    }
     function collectGroupLeaves(app) {
       var leaves = [];
       var active = getActiveLeaf(app);
@@ -13559,7 +13637,7 @@ var require_tab_switcher_modal = __commonJS({
           this.app = app;
           this.plugin = plugin;
           this.leaves = [];
-          this.placements = [];
+          this.group = null;
           this.cardEls = [];
           this.focusedIndex = 0;
           this.open = this.open.bind(this);
@@ -13575,6 +13653,7 @@ var require_tab_switcher_modal = __commonJS({
             return;
           }
           var collected = collectGroupLeaves(this.app);
+          this.group = collected.group;
           this.leaves = collected.leaves.slice();
           this.activeLeaf = collected.active;
           if (this.leaves.length === 0) {
@@ -13590,23 +13669,33 @@ var require_tab_switcher_modal = __commonJS({
           this.backdropEl.addEventListener("click", this._onBackdropClick);
           this.panelEl = doc.body.createDiv({
             cls: "wpp-tab-switcher-panel",
-            attr: { role: "dialog", "aria-modal": "true", "aria-label": i18n2.L.tabSwitcherTitle }
+            attr: {
+              role: "dialog",
+              "aria-modal": "true",
+              "aria-label": i18n2.L.tabSwitcherTitle
+            }
           });
           this.gridEl = this.panelEl.createDiv({ cls: "wpp-tab-switcher-grid" });
           this.hintEl = doc.body.createDiv({ cls: "wpp-tab-switcher-floating-hint" });
           this.hintEl.setText(i18n2.L.tabSwitcherHint);
-          this.placements = [];
           this.cardEls = [];
-          for (var i = 0; i < this.leaves.length; i++) {
-            this.mountLeafCard(this.leaves[i], i);
-          }
+          this.renderCards();
           this.panelEl.addEventListener("click", this._onPanelClick);
           this.panelEl.addEventListener("mousemove", this._onPanelMove);
           doc.addEventListener("keydown", this._onKeyDown, true);
           this.updateFocus(true);
         };
-        TabSwitcherModal2.prototype.mountLeafCard = function(leaf, index) {
+        TabSwitcherModal2.prototype.renderCards = function() {
+          if (!this.gridEl) return;
+          this.gridEl.empty();
+          this.cardEls = [];
+          for (var i = 0; i < this.leaves.length; i++) {
+            this.mountCard(this.leaves[i], i);
+          }
+        };
+        TabSwitcherModal2.prototype.mountCard = function(leaf, index) {
           var self = this;
+          var isActive = leaf === this.activeLeaf;
           if (leaf && typeof leaf.loadIfDeferred === "function") {
             try {
               leaf.loadIfDeferred();
@@ -13614,7 +13703,7 @@ var require_tab_switcher_modal = __commonJS({
             }
           }
           var card = this.gridEl.createDiv({
-            cls: "wpp-tab-switcher-card" + (leaf === this.activeLeaf ? " is-active-tab" : ""),
+            cls: "wpp-tab-switcher-card" + (isActive ? " is-active-tab" : ""),
             attr: {
               role: "option",
               "data-index": String(index),
@@ -13622,55 +13711,116 @@ var require_tab_switcher_modal = __commonJS({
             }
           });
           var viewport = card.createDiv({ cls: "wpp-tab-switcher-viewport" });
+          var closeBtn = viewport.createDiv({
+            cls: "wpp-tab-switcher-close",
+            attr: {
+              role: "button",
+              tabindex: "-1",
+              "aria-label": i18n2.L.tabSwitcherCloseTab
+            }
+          });
+          obsidian2.setIcon(closeBtn, "x");
+          if (typeof obsidian2.setTooltip === "function") {
+            obsidian2.setTooltip(closeBtn, i18n2.L.tabSwitcherCloseTab, { delay: 250 });
+          }
+          closeBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var currentIndex = self.cardEls.indexOf(card);
+            if (currentIndex < 0) return;
+            self.closeLeafAt(currentIndex);
+          });
           var scale = viewport.createDiv({ cls: "wpp-tab-switcher-scale" });
-          var leafEl = leaf.containerEl;
-          if (leafEl && leafEl.parentElement) {
-            this.placements.push({
-              leaf,
-              parent: leafEl.parentElement,
-              nextSibling: leafEl.nextSibling
-            });
-            scale.appendChild(leafEl);
-            leafEl.addClass("wpp-mc-leaf");
+          var clone = buildLeafViewClone(leaf);
+          if (clone) {
+            scale.appendChild(clone);
           } else {
-            var fallback = scale.createDiv({ cls: "wpp-tab-switcher-fallback" });
-            fallback.setText(getLeafTitle(leaf));
+            var file = leaf.view && leaf.view.file;
+            var previewHost = scale.createDiv({ cls: "wpp-tab-switcher-clone wpp-tab-switcher-md-fallback" });
+            if (file && obsidian2.MarkdownRenderer && typeof obsidian2.MarkdownRenderer.render === "function") {
+              self.app.vault.cachedRead(file).then(function(md) {
+                if (!previewHost.isConnected) return;
+                previewHost.empty();
+                return obsidian2.MarkdownRenderer.render(
+                  self.app,
+                  String(md || "").slice(0, 5e3),
+                  previewHost,
+                  file.path,
+                  self.plugin
+                );
+              }).catch(function() {
+                if (!previewHost.isConnected) return;
+                var text = getLeafPreviewText(leaf);
+                if (text) {
+                  previewHost.createEl("pre", {
+                    cls: "wpp-tab-switcher-preview-text",
+                    text: text.slice(0, 1200)
+                  });
+                } else {
+                  var iconWrap = previewHost.createDiv({ cls: "wpp-tab-switcher-preview-icon" });
+                  obsidian2.setIcon(iconWrap, getLeafIcon(leaf));
+                }
+              });
+            } else {
+              var previewText = getLeafPreviewText(leaf);
+              if (previewText) {
+                previewHost.createEl("pre", {
+                  cls: "wpp-tab-switcher-preview-text",
+                  text: previewText.slice(0, 1200)
+                });
+              } else {
+                var iconWrap2 = previewHost.createDiv({ cls: "wpp-tab-switcher-preview-icon" });
+                obsidian2.setIcon(iconWrap2, getLeafIcon(leaf));
+              }
+            }
           }
           var meta = card.createDiv({ cls: "wpp-tab-switcher-meta" });
+          var iconEl = meta.createDiv({ cls: "wpp-tab-switcher-icon" });
+          obsidian2.setIcon(iconEl, getLeafIcon(leaf));
           meta.createDiv({
             cls: "wpp-tab-switcher-title",
             text: getLeafTitle(leaf),
             attr: { title: getLeafTitle(leaf) }
           });
           card.addEventListener("click", function(e) {
+            if (e.target && e.target.closest && e.target.closest(".wpp-tab-switcher-close")) {
+              return;
+            }
             e.preventDefault();
             e.stopPropagation();
-            self.focusedIndex = index;
+            var currentIndex = self.cardEls.indexOf(card);
+            if (currentIndex < 0) currentIndex = index;
+            self.focusedIndex = currentIndex;
             self.activateFocused();
           });
           this.cardEls.push(card);
         };
-        TabSwitcherModal2.prototype.restoreLeaves = function() {
-          for (var i = 0; i < this.placements.length; i++) {
-            var item = this.placements[i];
-            var leafEl = item.leaf && item.leaf.containerEl;
-            if (!leafEl || !item.parent) continue;
-            leafEl.removeClass("wpp-mc-leaf");
-            leafEl.removeClass("wpp-mc-focused");
-            try {
-              if (item.nextSibling && item.nextSibling.parentElement === item.parent) {
-                item.parent.insertBefore(leafEl, item.nextSibling);
-              } else {
-                item.parent.appendChild(leafEl);
-              }
-            } catch (err) {
-              try {
-                item.parent.appendChild(leafEl);
-              } catch (e2) {
-              }
-            }
+        TabSwitcherModal2.prototype.syncLeavesFromGroup = function() {
+          var collected = collectGroupLeaves(this.app);
+          this.group = collected.group;
+          this.leaves = collected.leaves.slice();
+          this.activeLeaf = collected.active;
+          return this.leaves;
+        };
+        TabSwitcherModal2.prototype.closeLeafAt = function(index) {
+          if (index < 0 || index >= this.leaves.length) return;
+          var leaf = this.leaves[index];
+          try {
+            if (leaf && typeof leaf.detach === "function") leaf.detach();
+          } catch (err) {
           }
-          this.placements = [];
+          this.syncLeavesFromGroup();
+          if (this.leaves.length === 0) {
+            this.close();
+            return;
+          }
+          if (this.focusedIndex >= this.leaves.length) {
+            this.focusedIndex = this.leaves.length - 1;
+          } else if (this.focusedIndex > index) {
+            this.focusedIndex -= 1;
+          }
+          this.renderCards();
+          this.updateFocus(false);
         };
         TabSwitcherModal2.prototype._onBackdropClick = function(e) {
           e.preventDefault();
@@ -13739,10 +13889,6 @@ var require_tab_switcher_modal = __commonJS({
             var focused = i === self.focusedIndex;
             card.classList.toggle("is-focused", focused);
             card.setAttribute("aria-selected", focused ? "true" : "false");
-            var leaf = self.leaves[i];
-            if (leaf && leaf.containerEl) {
-              leaf.containerEl.classList.toggle("wpp-mc-focused", focused);
-            }
             if (focused && scrollIntoView && typeof card.scrollIntoView === "function") {
               card.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
             }
@@ -13765,13 +13911,11 @@ var require_tab_switcher_modal = __commonJS({
           if (this.panelEl) {
             this.panelEl.removeEventListener("click", this._onPanelClick);
             this.panelEl.removeEventListener("mousemove", this._onPanelMove);
-          }
-          this.restoreLeaves();
-          if (this.panelEl) {
             this.panelEl.remove();
             this.panelEl = null;
           }
           this.gridEl = null;
+          this.cardEls = [];
           if (this.backdropEl) {
             this.backdropEl.removeEventListener("click", this._onBackdropClick);
             this.backdropEl.remove();
@@ -13783,7 +13927,7 @@ var require_tab_switcher_modal = __commonJS({
           }
           doc.body.removeClass("wpp-mission-control-open");
           this.leaves = [];
-          this.cardEls = [];
+          this.group = null;
           this.focusedIndex = 0;
         };
         return TabSwitcherModal2;

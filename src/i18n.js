@@ -7825,30 +7825,35 @@ var TAB_SWITCHER_STRINGS = {
         tabSwitcherTitle: 'Switch tab',
         tabSwitcherEmpty: 'No open tabs to switch.',
         tabSwitcherHint: 'Click a tab to switch · Click outside to cancel · Arrow keys to move · Enter to confirm',
+        tabSwitcherCloseTab: 'Close tab',
     },
     zh: {
         cmdTabSwitcher: '切换标签页（任务视图）',
         tabSwitcherTitle: '切换标签页',
         tabSwitcherEmpty: '没有可切换的标签页。',
         tabSwitcherHint: '点击标签切换 · 点击外部取消 · 方向键移动 · Enter 确认',
+        tabSwitcherCloseTab: '关闭标签页',
     },
     'zh-TW': {
         cmdTabSwitcher: '切換分頁（任務檢視）',
         tabSwitcherTitle: '切換分頁',
         tabSwitcherEmpty: '沒有可切換的分頁。',
         tabSwitcherHint: '點擊分頁切換 · 點擊外部取消 · 方向鍵移動 · Enter 確認',
+        tabSwitcherCloseTab: '關閉分頁',
     },
     ja: {
         cmdTabSwitcher: 'タブを切り替え（ミッションコントロール）',
         tabSwitcherTitle: 'タブを切り替え',
         tabSwitcherEmpty: '切り替え可能なタブがありません。',
         tabSwitcherHint: 'クリックで切り替え · 外側クリックで取消 · 矢印キーで移動 · Enterで確定',
+        tabSwitcherCloseTab: 'タブを閉じる',
     },
     ko: {
         cmdTabSwitcher: '탭 전환 (미션 컨트롤)',
         tabSwitcherTitle: '탭 전환',
         tabSwitcherEmpty: '전환할 탭이 없습니다.',
         tabSwitcherHint: '클릭하여 전환 · 바깥 클릭으로 취소 · 방향키로 이동 · Enter로 확인',
+        tabSwitcherCloseTab: '탭 닫기',
     },
 };
 
