@@ -185,3 +185,68 @@ test('layout utils full structural comparison keeps sidebar branches but ignores
     assert.equal(layoutUtils.layoutsEqualStructural({ layout: 'saved' }, { layout: 'saved', left: 10, top: 20 }), true);
     assert.equal(layoutUtils.layoutsEqualStructural({ layout: 'saved', left: 10 }, sameContentWithNumericLeft), false);
 });
+
+test('findVaultPathByBasename matches by filename like QuickAdd rename helper', function () {
+    const files = [
+        { path: 'Inbox/Alpha.md' },
+        { path: 'Notes/Beta.md' },
+        'Archive/Gamma.excalidraw.md',
+    ];
+    assert.equal(layoutUtils.findVaultPathByBasename(files, 'Old/Alpha.md'), 'Inbox/Alpha.md');
+    assert.equal(layoutUtils.findVaultPathByBasename(files, 'Beta'), 'Notes/Beta.md');
+    assert.equal(layoutUtils.findVaultPathByBasename(files, 'Gone/Missing.md'), null);
+    assert.equal(
+        layoutUtils.findVaultPathByBasename(files, 'Moved/Gamma.excalidraw.md'),
+        'Archive/Gamma.excalidraw.md'
+    );
+});
+
+test('remapMissingLayoutFilePaths rewrites missing leaf and lastOpenFiles paths', function () {
+    const layout = {
+        main: {
+            id: 'main',
+            type: 'split',
+            children: [{
+                id: 'leaf-a',
+                type: 'leaf',
+                state: {
+                    type: 'markdown',
+                    state: { file: 'Old Folder/Note.md', mode: 'source' },
+                },
+            }],
+        },
+        lastOpenFiles: ['Old Folder/Note.md', 'Still Here.md'],
+    };
+    const existing = {
+        'New Folder/Note.md': true,
+        'Still Here.md': true,
+    };
+    const result = layoutUtils.remapMissingLayoutFilePaths(layout, {
+        pathExists: function (p) { return !!existing[p]; },
+        getFiles: function () {
+            return Object.keys(existing).map(function (p) { return { path: p }; });
+        },
+    });
+
+    assert.equal(result.changed, true);
+    assert.equal(result.layout.main.children[0].state.state.file, 'New Folder/Note.md');
+    assert.deepEqual(result.layout.lastOpenFiles, ['New Folder/Note.md', 'Still Here.md']);
+    assert.equal(layout.main.children[0].state.state.file, 'Old Folder/Note.md');
+});
+
+test('remapMissingLayoutFilePaths can mutate layout in place', function () {
+    const layout = {
+        main: {
+            type: 'leaf',
+            state: { type: 'markdown', state: { file: 'A/Doc.md' } },
+        },
+    };
+    const result = layoutUtils.remapMissingLayoutFilePaths(layout, {
+        pathExists: function () { return false; },
+        getFiles: function () { return [{ path: 'B/Doc.md' }]; },
+    }, { inPlace: true });
+
+    assert.equal(result.changed, true);
+    assert.equal(layout.main.state.state.file, 'B/Doc.md');
+    assert.equal(result.layout, layout);
+});

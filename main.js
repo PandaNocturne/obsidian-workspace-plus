@@ -17068,13 +17068,115 @@ var require_layout_utils = __commonJS({
         return layoutsEqual(a, b);
       }
     }
+    function getPathBasename(filePath) {
+      var normalized = String(filePath || "").replace(/\\/g, "/");
+      var parts = normalized.split("/");
+      return parts[parts.length - 1] || "";
+    }
+    function stripMdExtension(name) {
+      return String(name || "").replace(/\.md$/i, "");
+    }
+    function findVaultPathByBasename(files, baseName) {
+      var targetBase = getPathBasename(baseName);
+      var targetStem = stripMdExtension(targetBase);
+      if (!targetBase && !targetStem) return null;
+      var filesList = Array.isArray(files) ? files : [];
+      var exact = [];
+      var stem = [];
+      for (var i = 0; i < filesList.length; i++) {
+        var entry = filesList[i];
+        var path = typeof entry === "string" ? entry : entry && entry.path;
+        if (!path || typeof path !== "string") continue;
+        var bn = getPathBasename(path);
+        if (bn === targetBase) {
+          exact.push(path);
+        } else if (stripMdExtension(bn) === targetStem) {
+          stem.push(path);
+        }
+      }
+      if (exact.length > 0) return exact[0];
+      if (stem.length > 0) return stem[0];
+      return null;
+    }
+    function remapMissingLayoutFilePaths(layout, vaultApi, options) {
+      options = options || {};
+      vaultApi = vaultApi || {};
+      if (!layout || typeof layout !== "object") {
+        return { layout, changed: false, remaps: [] };
+      }
+      var working = options.inPlace ? layout : cloneLayout(layout);
+      var remaps = [];
+      var seenFrom = {};
+      var filesCache = null;
+      function ensureFiles() {
+        if (filesCache) return filesCache;
+        try {
+          filesCache = typeof vaultApi.getFiles === "function" ? vaultApi.getFiles() || [] : [];
+        } catch (e) {
+          filesCache = [];
+        }
+        return filesCache;
+      }
+      function resolvePath(filePath) {
+        if (!filePath || typeof filePath !== "string") return filePath;
+        var exists = false;
+        try {
+          exists = typeof vaultApi.pathExists === "function" && !!vaultApi.pathExists(filePath);
+        } catch (e) {
+          exists = false;
+        }
+        if (exists) return filePath;
+        var found = findVaultPathByBasename(ensureFiles(), filePath);
+        if (found && found !== filePath) {
+          if (!seenFrom[filePath]) {
+            seenFrom[filePath] = true;
+            remaps.push({ from: filePath, to: found });
+          }
+          return found;
+        }
+        return filePath;
+      }
+      function walk(node) {
+        if (!node) return;
+        if (Array.isArray(node)) {
+          for (var i = 0; i < node.length; i++) walk(node[i]);
+          return;
+        }
+        if (typeof node !== "object") return;
+        if (node.state && typeof node.state === "object") {
+          if (node.state.state && typeof node.state.state === "object" && typeof node.state.state.file === "string") {
+            node.state.state.file = resolvePath(node.state.state.file);
+          }
+          if (typeof node.state.file === "string") {
+            node.state.file = resolvePath(node.state.file);
+          }
+        }
+        if (Array.isArray(node.children)) walk(node.children);
+        if (node.main) walk(node.main);
+        if (node.left) walk(node.left);
+        if (node.right) walk(node.right);
+        if (node.floating) walk(node.floating);
+      }
+      walk(working);
+      if (Array.isArray(working.lastOpenFiles)) {
+        working.lastOpenFiles = working.lastOpenFiles.map(resolvePath);
+      }
+      return {
+        layout: working,
+        changed: remaps.length > 0,
+        remaps
+      };
+    }
     module2.exports = {
       serializeLayout,
       layoutsEqual,
       cloneLayout,
       mergeMainLayoutIntoCurrent,
       normalizeLayoutForComparison,
-      layoutsEqualStructural
+      layoutsEqualStructural,
+      getPathBasename,
+      findVaultPathByBasename,
+      remapMissingLayoutFilePaths
     };
   }
 });
@@ -17251,10 +17353,46 @@ var require_layout_restore = __commonJS({
         }
         return layoutUtils.mergeMainLayoutIntoCurrent(layout, currentLayout);
       };
+      WorkspacePlusPlus2.prototype.createLayoutPathVaultApi = function() {
+        var vault = this.app && this.app.vault;
+        return {
+          pathExists: function(filePath) {
+            if (!vault || typeof vault.getAbstractFileByPath !== "function") return false;
+            try {
+              return !!vault.getAbstractFileByPath(filePath);
+            } catch (e) {
+              return false;
+            }
+          },
+          getFiles: function() {
+            if (!vault || typeof vault.getFiles !== "function") return [];
+            try {
+              return vault.getFiles() || [];
+            } catch (e) {
+              return [];
+            }
+          }
+        };
+      };
+      WorkspacePlusPlus2.prototype.remapMissingLayoutPaths = function(layout) {
+        if (!layout) {
+          return { layout, changed: false, remaps: [] };
+        }
+        return layoutUtils.remapMissingLayoutFilePaths(
+          layout,
+          this.createLayoutPathVaultApi(),
+          { inPlace: true }
+        );
+      };
       WorkspacePlusPlus2.prototype.applyWorkspaceLayout = function(layout, options) {
         options = options || {};
         if (!layout) return Promise.resolve();
         var nextLayout = this.buildLayoutForRestore(layout);
+        var remapResult = this.remapMissingLayoutPaths(nextLayout);
+        nextLayout = remapResult.layout || nextLayout;
+        if (remapResult.changed && layout && layout !== nextLayout) {
+          this.remapMissingLayoutPaths(layout);
+        }
         var apply = Promise.resolve(this.app.workspace.changeLayout(nextLayout));
         if (options.catchErrors === false) return apply;
         return apply.catch(function() {

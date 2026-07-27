@@ -26,10 +26,55 @@ function attachLayoutRestoreMethods(WorkspacePlusPlus) {
         return layoutUtils.mergeMainLayoutIntoCurrent(layout, currentLayout);
     };
 
+    WorkspacePlusPlus.prototype.createLayoutPathVaultApi = function () {
+        var vault = this.app && this.app.vault;
+        return {
+            pathExists: function (filePath) {
+                if (!vault || typeof vault.getAbstractFileByPath !== 'function') return false;
+                try {
+                    return !!vault.getAbstractFileByPath(filePath);
+                } catch (e) {
+                    return false;
+                }
+            },
+            getFiles: function () {
+                if (!vault || typeof vault.getFiles !== 'function') return [];
+                try {
+                    return vault.getFiles() || [];
+                } catch (e) {
+                    return [];
+                }
+            },
+        };
+    };
+
+    /**
+     * If layout references missing notes, remap paths by basename match in the vault.
+     * Mutates `layout` in place when remaps are found so session/history storage updates.
+     */
+    WorkspacePlusPlus.prototype.remapMissingLayoutPaths = function (layout) {
+        if (!layout) {
+            return { layout: layout, changed: false, remaps: [] };
+        }
+        return layoutUtils.remapMissingLayoutFilePaths(
+            layout,
+            this.createLayoutPathVaultApi(),
+            { inPlace: true }
+        );
+    };
+
     WorkspacePlusPlus.prototype.applyWorkspaceLayout = function (layout, options) {
         options = options || {};
         if (!layout) return Promise.resolve();
         var nextLayout = this.buildLayoutForRestore(layout);
+        var remapResult = this.remapMissingLayoutPaths(nextLayout);
+        nextLayout = remapResult.layout || nextLayout;
+
+        // Keep stored session/history layout paths in sync when files were relocated.
+        if (remapResult.changed && layout && layout !== nextLayout) {
+            this.remapMissingLayoutPaths(layout);
+        }
+
         var apply = Promise.resolve(this.app.workspace.changeLayout(nextLayout));
         if (options.catchErrors === false) return apply;
         return apply.catch(function () {});
