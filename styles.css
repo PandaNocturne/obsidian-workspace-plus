@@ -1604,6 +1604,28 @@ body.wpp-mission-control-open .wpp-tab-switcher-scale {
     background: var(--background-primary);
 }
 
+body.wpp-mission-control-open .wpp-tab-switcher-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-loading-spinner {
+    width: 28px;
+    height: 28px;
+    box-sizing: border-box;
+    border: 2px solid color-mix(in srgb, var(--text-muted) 30%, transparent);
+    border-top-color: var(--text-muted);
+    border-radius: 50%;
+    animation: wpp-tab-switcher-spin 0.72s linear infinite;
+}
+
+@keyframes wpp-tab-switcher-spin {
+    to { transform: rotate(360deg); }
+}
+
 body.wpp-mission-control-open .wpp-tab-switcher-clone {
     width: 100% !important;
     height: 100% !important;
@@ -1625,6 +1647,18 @@ body.wpp-mission-control-open .wpp-tab-switcher-md-fallback {
     overflow: hidden;
     font-size: 14px;
     line-height: 1.5;
+    color: var(--text-normal);
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background: var(--background-primary);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback p,
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback li,
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback h1,
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback h2,
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback h3 {
     color: var(--text-normal);
 }
 

@@ -91,8 +91,18 @@ function sanitizeClone(clone) {
 function cloneLooksEmpty(clone) {
     if (!clone) return true;
     var text = String(clone.textContent || '').replace(/\s+/g, ' ').trim();
-    if (text.length >= 2) return false;
-    return !clone.querySelector('img, canvas, svg, iframe, video, .cm-editor, .markdown-preview-view');
+    if (text.length >= 8) return false;
+    if (clone.querySelector('img, canvas, iframe, video')) return false;
+    var preview = clone.querySelector('.markdown-preview-view, .markdown-rendered');
+    if (preview && String(preview.textContent || '').replace(/\s+/g, ' ').trim().length >= 2) {
+        return false;
+    }
+    var cmContent = clone.querySelector('.cm-content');
+    if (cmContent && String(cmContent.textContent || '').replace(/\s+/g, ' ').trim().length >= 2) {
+        return false;
+    }
+    // Empty .cm-editor shells must NOT count as content
+    return true;
 }
 
 /** Deep-clone a tab's view DOM for thumbnail preview (does not touch the live leaf). */
@@ -108,6 +118,105 @@ function buildLeafViewClone(leaf) {
     } catch (err) {
         return null;
     }
+}
+
+function isTFile(file) {
+    return !!(file
+        && typeof file.path === 'string'
+        && typeof file.extension === 'string'
+        && !file.children);
+}
+
+function getLeafFile(app, leaf) {
+    if (!app || !leaf) return null;
+
+    if (leaf.view && isTFile(leaf.view.file)) return leaf.view.file;
+
+    try {
+        if (leaf.view && typeof leaf.view.getState === 'function') {
+            var viewState = leaf.view.getState();
+            if (viewState && typeof viewState.file === 'string') {
+                var fromView = app.vault.getAbstractFileByPath(viewState.file);
+                if (isTFile(fromView)) return fromView;
+            }
+        }
+    } catch (err) { /* ignore */ }
+
+    try {
+        var vs = typeof leaf.getViewState === 'function' ? leaf.getViewState() : null;
+        var path = vs && vs.state && (vs.state.file || vs.state.path);
+        if (!path && vs && typeof vs.file === 'string') path = vs.file;
+        if (typeof path === 'string') {
+            var fromLeaf = app.vault.getAbstractFileByPath(path);
+            if (isTFile(fromLeaf)) return fromLeaf;
+        }
+    } catch (err2) { /* ignore */ }
+
+    return null;
+}
+
+function waitFrames(count) {
+    return new Promise(function (resolve) {
+        var left = Math.max(1, count || 1);
+        function step() {
+            left -= 1;
+            if (left <= 0) resolve();
+            else requestAnimationFrame(step);
+        }
+        if (typeof requestAnimationFrame === 'function') requestAnimationFrame(step);
+        else setTimeout(resolve, 32);
+    });
+}
+
+function ensureLeafLoaded(leaf) {
+    if (!leaf) return Promise.resolve();
+    try {
+        if (typeof leaf.loadIfDeferred === 'function') {
+            return Promise.resolve(leaf.loadIfDeferred()).catch(function () { /* ignore */ });
+        }
+    } catch (err) { /* ignore */ }
+    return Promise.resolve();
+}
+
+function fillTextOrIcon(host, leaf) {
+    var previewText = getLeafPreviewText(leaf);
+    if (previewText) {
+        host.createEl('pre', {
+            cls: 'wpp-tab-switcher-preview-text',
+            text: previewText.slice(0, 1200),
+        });
+        return;
+    }
+    var iconWrap = host.createDiv({ cls: 'wpp-tab-switcher-preview-icon' });
+    obsidian.setIcon(iconWrap, getLeafIcon(leaf));
+}
+
+function renderMarkdownInto(app, plugin, host, file, markdown) {
+    host.empty();
+    host.addClass('wpp-tab-switcher-clone');
+    host.addClass('wpp-tab-switcher-md-fallback');
+
+    var renderer = obsidian.MarkdownRenderer;
+    if (!renderer) return Promise.resolve(false);
+
+    var source = String(markdown || '').slice(0, 5000);
+    var path = file.path || '';
+
+    // Prefer modern API; fall back to deprecated renderMarkdown
+    if (typeof renderer.render === 'function') {
+        return Promise.resolve(renderer.render(app, source, host, path, plugin))
+            .then(function () { return true; })
+            .catch(function () { return false; });
+    }
+    if (typeof renderer.renderMarkdown === 'function') {
+        try {
+            renderer.renderMarkdown(source, host, path, plugin);
+            return Promise.resolve(true);
+        } catch (err) {
+            return Promise.resolve(false);
+        }
+    }
+    return Promise.resolve(false);
 }
 
 function collectGroupLeaves(app) {
@@ -228,10 +337,6 @@ var TabSwitcherModal = /** @class */ (function () {
         var self = this;
         var isActive = leaf === this.activeLeaf;
 
-        if (leaf && typeof leaf.loadIfDeferred === 'function') {
-            try { leaf.loadIfDeferred(); } catch (err) { /* ignore */ }
-        }
-
         var card = this.gridEl.createDiv({
             cls: 'wpp-tab-switcher-card' + (isActive ? ' is-active-tab' : ''),
             attr: {
@@ -264,50 +369,8 @@ var TabSwitcherModal = /** @class */ (function () {
         });
 
         var scale = viewport.createDiv({ cls: 'wpp-tab-switcher-scale' });
-        var clone = buildLeafViewClone(leaf);
-        if (clone) {
-            scale.appendChild(clone);
-        } else {
-            // Fallback: markdown render / plain text if DOM clone is empty
-            var file = leaf.view && leaf.view.file;
-            var previewHost = scale.createDiv({ cls: 'wpp-tab-switcher-clone wpp-tab-switcher-md-fallback' });
-            if (file && obsidian.MarkdownRenderer && typeof obsidian.MarkdownRenderer.render === 'function') {
-                self.app.vault.cachedRead(file).then(function (md) {
-                    if (!previewHost.isConnected) return;
-                    previewHost.empty();
-                    return obsidian.MarkdownRenderer.render(
-                        self.app,
-                        String(md || '').slice(0, 5000),
-                        previewHost,
-                        file.path,
-                        self.plugin
-                    );
-                }).catch(function () {
-                    if (!previewHost.isConnected) return;
-                    var text = getLeafPreviewText(leaf);
-                    if (text) {
-                        previewHost.createEl('pre', {
-                            cls: 'wpp-tab-switcher-preview-text',
-                            text: text.slice(0, 1200),
-                        });
-                    } else {
-                        var iconWrap = previewHost.createDiv({ cls: 'wpp-tab-switcher-preview-icon' });
-                        obsidian.setIcon(iconWrap, getLeafIcon(leaf));
-                    }
-                });
-            } else {
-                var previewText = getLeafPreviewText(leaf);
-                if (previewText) {
-                    previewHost.createEl('pre', {
-                        cls: 'wpp-tab-switcher-preview-text',
-                        text: previewText.slice(0, 1200),
-                    });
-                } else {
-                    var iconWrap2 = previewHost.createDiv({ cls: 'wpp-tab-switcher-preview-icon' });
-                    obsidian.setIcon(iconWrap2, getLeafIcon(leaf));
-                }
-            }
-        }
+        var loading = scale.createDiv({ cls: 'wpp-tab-switcher-loading' });
+        loading.createDiv({ cls: 'wpp-tab-switcher-loading-spinner' });
 
         var meta = card.createDiv({ cls: 'wpp-tab-switcher-meta' });
         var iconEl = meta.createDiv({ cls: 'wpp-tab-switcher-icon' });
@@ -331,6 +394,71 @@ var TabSwitcherModal = /** @class */ (function () {
         });
 
         this.cardEls.push(card);
+        this.fillCardPreview(leaf, scale);
+    };
+
+    TabSwitcherModal.prototype.fillCardPreview = function (leaf, scaleEl) {
+        var self = this;
+        var file = getLeafFile(this.app, leaf);
+
+        // Markdown notes: always render from vault first — works for never-opened / deferred tabs
+        if (file && file.extension === 'md') {
+            return this.app.vault.cachedRead(file).then(function (md) {
+                if (!scaleEl || !scaleEl.isConnected) return;
+                scaleEl.empty();
+                var host = scaleEl.createDiv();
+                return renderMarkdownInto(self.app, self.plugin, host, file, md).then(function (ok) {
+                    if (ok || !scaleEl.isConnected) return;
+                    scaleEl.empty();
+                    fillTextOrIcon(scaleEl, leaf);
+                });
+            }).catch(function () {
+                if (!scaleEl || !scaleEl.isConnected) return;
+                // Last resort: load leaf then try clone / text
+                return self.fillCardPreviewFromLeaf(leaf, scaleEl);
+            });
+        }
+
+        return this.fillCardPreviewFromLeaf(leaf, scaleEl);
+    };
+
+    TabSwitcherModal.prototype.fillCardPreviewFromLeaf = function (leaf, scaleEl) {
+        var self = this;
+        return ensureLeafLoaded(leaf)
+            .then(function () { return waitFrames(3); })
+            .then(function () {
+                if (!scaleEl || !scaleEl.isConnected) return;
+
+                var clone = buildLeafViewClone(leaf);
+                if (clone) {
+                    scaleEl.empty();
+                    scaleEl.appendChild(clone);
+                    return;
+                }
+
+                // After load, file may now be available
+                var file = getLeafFile(self.app, leaf);
+                if (file && file.extension === 'md') {
+                    return self.app.vault.cachedRead(file).then(function (md) {
+                        if (!scaleEl.isConnected) return;
+                        scaleEl.empty();
+                        var host = scaleEl.createDiv();
+                        return renderMarkdownInto(self.app, self.plugin, host, file, md).then(function (ok) {
+                            if (ok || !scaleEl.isConnected) return;
+                            scaleEl.empty();
+                            fillTextOrIcon(scaleEl, leaf);
+                        });
+                    });
+                }
+
+                scaleEl.empty();
+                fillTextOrIcon(scaleEl, leaf);
+            })
+            .catch(function () {
+                if (!scaleEl || !scaleEl.isConnected) return;
+                scaleEl.empty();
+                fillTextOrIcon(scaleEl, leaf);
+            });
     };
 
     TabSwitcherModal.prototype.syncLeavesFromGroup = function () {
