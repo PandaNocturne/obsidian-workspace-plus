@@ -29,6 +29,21 @@ function attachSettingsStateMethods(WorkspacePlusPlus) {
         return persistIfNeeded(this, options);
     };
 
+    WorkspacePlusPlus.prototype.migrateRemovedStatusBarActions = function () {
+        var removedActionMap = {
+            quickSwitcher: 'sessionManager',
+            previousSession: 'none',
+            nextSession: 'none',
+        };
+        var actions = this.data.statusBarActions || {};
+        var slotKeys = Object.keys(actions);
+        for (var i = 0; i < slotKeys.length; i++) {
+            var slotKey = slotKeys[i];
+            var mapped = removedActionMap[actions[slotKey]];
+            if (mapped) actions[slotKey] = mapped;
+        }
+    };
+
     WorkspacePlusPlus.prototype.setWarnOnUnsavedSwitch = function (enabled, options) {
         this.data.warnOnUnsavedSwitch = !!enabled;
         return persistIfNeeded(this, options);

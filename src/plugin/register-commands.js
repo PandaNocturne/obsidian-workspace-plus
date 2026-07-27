@@ -11,131 +11,20 @@ function registerCommands(plugin) {
         plugin.addCommand(command);
     }
 
-    function addSimpleCommand(id, name, callback, hotkeys) {
-        var command = {
+    function addSimpleCommand(id, name, callback) {
+        addCommand({
             id: id,
             name: name,
             callback: callback,
-        };
-        if (hotkeys) command.hotkeys = hotkeys;
-        addCommand(command);
-    }
-
-    function runWithFailureNotice(operation, failureNotice) {
-        operation().catch(function () {
-            new obsidian.Notice(failureNotice);
         });
-    }
-
-    function openSaveCurrentLayoutToSessionModal() {
-        var sessions = plugin.getOrderedSessionsUnfiltered();
-        if (!sessions || sessions.length === 0) {
-            new obsidian.Notice(L.noSession);
-            return;
-        }
-
-        var modal = new obsidian.FuzzySuggestModal(plugin.app);
-        modal.setPlaceholder(L.saveCurrentLayoutToSessionPlaceholder);
-        modal.getItems = function () {
-            return sessions;
-        };
-        modal.getItemText = function (session) {
-            return session.name || '';
-        };
-        modal.onChooseItem = function (session) {
-            plugin.confirmOverwriteSessionWithCurrentLayout(session.id);
-        };
-        modal.open();
     }
 
     addSimpleCommand('manage-sessions', L.cmdManage, function () {
         new modals.SessionManagerModal(plugin.app, plugin).open();
     });
 
-    addSimpleCommand('create-session', L.cmdCreate, function () {
-        var modal = new modals.SessionManagerModal(plugin.app, plugin);
-        modal.open();
-        setTimeout(function () {
-            if (modal.nameInput) modal.nameInput.focus();
-        }, 100);
-    });
-
-    addSimpleCommand('rename-session', L.cmdRename, function () {
-        plugin.renameCurrentSession();
-    }, [{ modifiers: ['Mod', 'Shift'], key: 'R' }]);
-
-    addSimpleCommand('delete-session', L.cmdDelete, function () {
-        plugin.deleteCurrentSession();
-    }, [{ modifiers: ['Mod', 'Shift'], key: 'Backspace' }]);
-
-    addSimpleCommand('new-empty-session', L.cmdNewEmpty, function () {
-        plugin.createEmptySession();
-    });
-
-    addSimpleCommand('duplicate-session', L.cmdDuplicate, function () {
-        plugin.duplicateCurrentSession();
-    }, [{ modifiers: ['Mod', 'Shift'], key: 'M' }]);
-
-    // Numbered session switching (Mod+Shift+1 through 9)
-    if (plugin.data.numberedSwitchCommands) {
-        for (var n = 1; n <= 9; n++) {
-            (function (num) {
-                addCommand({
-                    id: 'switch-to-' + num,
-                    name: L.cmdSwitchTo(num),
-                    checkCallback: function (checking) {
-                        if (!plugin.data.showActiveSwitchCommand) {
-                            var ordered = plugin.getOrderedSessions();
-                            var session = ordered[num - 1];
-                            if (session && session.id === plugin.data.activeSessionId) return false;
-                        }
-                        if (!checking) plugin.switchToIndex(num - 1);
-                        return true;
-                    },
-                });
-            })(n);
-        }
-    }
-
-    // Track dynamic command IDs for named session switching
-    plugin._dynamicSessionCommandIds = [];
-
-    // Previous / Next session
-    addSimpleCommand('previous-session', L.cmdPrevious, function () {
-        plugin.switchRelativeFromCommand(-1);
-    }, [{ modifiers: ['Mod', 'Shift'], key: ',' }]);
-
-    addSimpleCommand('next-session', L.cmdNext, function () {
-        plugin.switchRelativeFromCommand(1);
-    }, [
-        { modifiers: ['Mod', 'Shift'], key: 'Enter' },
-        { modifiers: ['Mod', 'Shift'], key: '.' },
-    ]);
-
     addSimpleCommand('save-current-session', L.cmdSaveCurrent, function () {
         plugin.saveActiveSession();
-    }, [{ modifiers: ['Mod', 'Shift'], key: 'S' }]);
-
-    addSimpleCommand('save-as-session', L.cmdSaveAs, function () {
-        plugin.saveAsSession();
-    });
-
-    addSimpleCommand('save-current-note-name-as-session', L.cmdSaveCurrentNoteNameAsSession, function () {
-        plugin.saveCurrentNoteNameAsSession();
-    });
-
-    addCommand({
-        id: 'save-current-layout-to-session',
-        name: L.cmdSaveCurrentLayoutToSession,
-        checkCallback: function (checking) {
-            if (plugin.isAutoSaveOnSwitchEnabled()) return false;
-            if (!checking) openSaveCurrentLayoutToSessionModal();
-            return true;
-        },
-    });
-
-    addSimpleCommand('reload-current-session-without-saving', L.cmdReloadCurrentWithoutSaving, function () {
-        plugin.reloadCurrentSessionWithoutSaving();
     });
 
     addSimpleCommand('toggle-auto-save-on-switch', L.cmdToggleAutoSave, function () {
@@ -164,10 +53,6 @@ function registerCommands(plugin) {
         },
     });
 
-    addSimpleCommand('search-session-overlay', L.cmdSearchOverlay, function () {
-        plugin.openSearchOverlay();
-    });
-
     addCommand({
         id: 'version-history',
         name: L.cmdVersionHistory,
@@ -181,83 +66,6 @@ function registerCommands(plugin) {
             return true;
         },
     });
-
-    addSimpleCommand('export-sessions-snapshot', L.cmdExportSessions, function () {
-        runWithFailureNotice(function () {
-            return plugin.exportSessionsSnapshot();
-        }, L.exportSessionsFailed);
-    });
-
-    addSimpleCommand('import-latest-sessions-snapshot', L.cmdImportSessions, function () {
-        new modals.ConfirmModal(plugin.app, L.confirmImportSessions, function () {
-            return plugin.importSessionsFromLatestExport().catch(function () {
-                new obsidian.Notice(L.importSessionsFailed);
-            });
-        }, {
-            confirmText: L.settingsImportSessionsBtn || L.cmdImportSessions,
-            confirmClass: 'mod-cta',
-        }).open();
-    });
-
-    // --- Group commands ---
-
-    function getCurrentGroupViewId() {
-        if (plugin.switchOverlayEl) return plugin.switchOverlayViewGroupId || null;
-        if (plugin.searchOverlayEl) return plugin.searchOverlayViewGroupId || null;
-        return plugin.data.activeGroupId || null;
-    }
-
-    function showSwitchOverlayForGroup(groupId) {
-        var ordered = plugin.getOrderedSessionsForGroup(groupId || null);
-        var activeIndex = plugin.getActiveSessionIndex(ordered);
-        plugin.showSwitchOverlay(ordered, activeIndex, groupId || null);
-    }
-
-    function switchGroupAndShowOverlay(step) {
-        if (!plugin.isGroupFeatureEnabled()) return;
-        var targetGroupId = plugin.getRelativeGroupId(getCurrentGroupViewId(), step);
-        if (typeof targetGroupId === 'undefined') {
-            showSwitchOverlayForGroup(plugin.data.activeGroupId || null);
-            return;
-        }
-
-        plugin.resolveGroupSelection(targetGroupId).then(function (result) {
-            showSwitchOverlayForGroup(result.resolvedGroupId);
-        });
-    }
-
-    addCommand({
-        id: 'switch-group',
-        name: L.cmdSwitchGroup,
-        callback: function () {
-            switchGroupAndShowOverlay(1);
-        },
-    });
-
-    addCommand({
-        id: 'exit-group',
-        name: L.cmdExitGroup,
-        checkCallback: function (checking) {
-            if (!plugin.isGroupFeatureEnabled()) return false;
-            if (!plugin.data.activeGroupId) return false;
-            if (!checking) plugin.exitGroup();
-            return true;
-        },
-    });
-
-    addCommand({
-        id: 'next-group',
-        name: L.cmdNextGroup,
-        hotkeys: [{ modifiers: ['Mod', 'Shift'], key: 'Tab' }],
-        callback: function () {
-            switchGroupAndShowOverlay(1);
-        },
-    });
-
-    addSimpleCommand('previous-group', L.cmdPreviousGroup, function () {
-        plugin.switchGroupRelative(-1);
-    });
-
 }
 
 module.exports = registerCommands;

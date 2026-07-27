@@ -123,12 +123,8 @@ var SessionManagerModal = /** @class */ (function (_super) {
         };
         contentEl.addEventListener('focusin', this.contentFocusHandler, true);
 
-        // Hotkey footer
-        var nextKey = this.plugin.getCommandHotkey('next-session');
+        // Footer
         var footer = contentEl.createDiv({ cls: 'wpp-modal-footer' });
-        if (nextKey) {
-            footer.createDiv({ text: L.cmdNext + '  ' + nextKey });
-        }
         footer.createDiv({ text: L.footerDragReorder });
         if (this.plugin.getOrderedGroups().length > 0) {
             footer.createDiv({ text: L.footerDragToGroup });
@@ -663,10 +659,9 @@ var SessionManagerModal = /** @class */ (function (_super) {
             });
         });
 
-        // Hotkey hint
+        // Index label
         var hintIndex = typeof orderIndex === 'number' ? orderIndex : index;
-        var hk = hintIndex <= 8 ? self.plugin.getCommandHotkey('switch-to-' + (hintIndex + 1)) : '';
-        item.createSpan({ text: hk || String(hintIndex + 1), cls: 'wpp-session-index' });
+        item.createSpan({ text: String(hintIndex + 1), cls: 'wpp-session-index' });
 
         // Info section
         var info = item.createDiv({ cls: 'wpp-session-info' });
@@ -880,8 +875,7 @@ var SessionManagerModal = /** @class */ (function (_super) {
                     items.forEach(function (el, i) {
                         var indexEl = el.querySelector('.wpp-session-index');
                         if (indexEl) {
-                            var hk = i <= 8 ? self.plugin.getCommandHotkey('switch-to-' + (i + 1)) : '';
-                            indexEl.textContent = hk || String(i + 1);
+                            indexEl.textContent = String(i + 1);
                         }
                     });
 

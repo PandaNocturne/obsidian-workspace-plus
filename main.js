@@ -11505,11 +11505,7 @@ var require_session_manager_modal = __commonJS({
             self.syncKeyboardTargetFromElement(e.target);
           };
           contentEl.addEventListener("focusin", this.contentFocusHandler, true);
-          var nextKey = this.plugin.getCommandHotkey("next-session");
           var footer = contentEl.createDiv({ cls: "wpp-modal-footer" });
-          if (nextKey) {
-            footer.createDiv({ text: L.cmdNext + "  " + nextKey });
-          }
           footer.createDiv({ text: L.footerDragReorder });
           if (this.plugin.getOrderedGroups().length > 0) {
             footer.createDiv({ text: L.footerDragToGroup });
@@ -11978,8 +11974,7 @@ var require_session_manager_modal = __commonJS({
             });
           });
           var hintIndex = typeof orderIndex === "number" ? orderIndex : index;
-          var hk = hintIndex <= 8 ? self.plugin.getCommandHotkey("switch-to-" + (hintIndex + 1)) : "";
-          item.createSpan({ text: hk || String(hintIndex + 1), cls: "wpp-session-index" });
+          item.createSpan({ text: String(hintIndex + 1), cls: "wpp-session-index" });
           var info = item.createDiv({ cls: "wpp-session-info" });
           var nameRow = info.createDiv({ cls: "wpp-session-name-row" });
           nameRow.createSpan({ text: session.name, cls: "wpp-session-name" });
@@ -12157,8 +12152,7 @@ var require_session_manager_modal = __commonJS({
                 items.forEach(function(el, i) {
                   var indexEl = el.querySelector(".wpp-session-index");
                   if (indexEl) {
-                    var hk = i <= 8 ? self.plugin.getCommandHotkey("switch-to-" + (i + 1)) : "";
-                    indexEl.textContent = hk || String(i + 1);
+                    indexEl.textContent = String(i + 1);
                   }
                 });
                 draggedEl.classList.add("wpp-just-moved");
@@ -12484,242 +12478,6 @@ var require_modals2 = __commonJS({
   }
 });
 
-// src/statusbar-actions.js
-var require_statusbar_actions = __commonJS({
-  "src/statusbar-actions.js"(exports2, module2) {
-    "use strict";
-    var obsidian2 = require("obsidian");
-    var i18n2 = require_i18n();
-    var modals2 = require_modals2();
-    var sessionContextActions = require_session_context_actions();
-    var settingsContextMenu = require_settings_context_menu();
-    function openSessionMenuAction(plugin, event) {
-      var app = plugin.app;
-      var sess = plugin.getActiveSession();
-      if (!sess) return;
-      sessionContextActions.openSessionContextMenu({
-        plugin,
-        app,
-        session: sess,
-        isActive: true,
-        event,
-        showSaveAs: true,
-        showSwitch: false,
-        showRemoveFromGroup: false,
-        showMoveToGroup: plugin.isGroupFeatureEnabled() && plugin.getOrderedGroups().length > 0,
-        showCustomizeClicks: true,
-        forceDeleteConfirm: true,
-        notifyDeleted: false,
-        onSessionsChanged: function() {
-          plugin.updateStatusBar();
-        }
-      });
-    }
-    function openSettingsMenuAction(plugin, event) {
-      var app = plugin.app;
-      settingsContextMenu.openSettingsContextMenu({
-        plugin,
-        app,
-        event,
-        onChanged: function() {
-          plugin.updateStatusBar();
-        }
-      });
-    }
-    function resolveLabel(L, labelKey) {
-      var label = L[labelKey];
-      return typeof label === "function" ? label() : label;
-    }
-    var ACTIONS = [
-      {
-        id: "quickSwitcher",
-        labelKey: "statusBarActionQuickSwitcher",
-        run: function(plugin) {
-          if (plugin.searchOverlayEl) {
-            plugin.hideSearchOverlay();
-          } else {
-            plugin.openSearchOverlay(plugin.statusBarEl);
-          }
-        }
-      },
-      {
-        id: "sessionManager",
-        labelKey: "statusBarActionSessionManager",
-        run: function(plugin) {
-          new modals2.SessionManagerModal(plugin.app, plugin).open();
-        }
-      },
-      {
-        id: "saveSession",
-        labelKey: "statusBarActionSaveSession",
-        run: function(plugin) {
-          return plugin.saveActiveSession();
-        }
-      },
-      {
-        id: "saveAsSession",
-        labelKey: "cmdSaveAs",
-        run: function(plugin) {
-          return plugin.saveAsSession();
-        }
-      },
-      {
-        id: "saveCurrentNoteNameAsSession",
-        labelKey: "cmdSaveCurrentNoteNameAsSession",
-        run: function(plugin) {
-          return plugin.saveCurrentNoteNameAsSession();
-        }
-      },
-      {
-        id: "reloadWithoutSaving",
-        labelKey: "statusBarActionReloadWithoutSaving",
-        run: function(plugin) {
-          return plugin.reloadCurrentSessionWithoutSaving();
-        }
-      },
-      {
-        id: "renameSession",
-        labelKey: "cmdRename",
-        run: function(plugin) {
-          plugin.renameCurrentSession();
-        }
-      },
-      {
-        id: "duplicateSession",
-        labelKey: "cmdDuplicate",
-        run: function(plugin) {
-          return plugin.duplicateCurrentSession();
-        }
-      },
-      {
-        id: "previousSession",
-        labelKey: "cmdPrevious",
-        run: function(plugin) {
-          return plugin.switchRelativeFromStatusBar(-1);
-        }
-      },
-      {
-        id: "nextSession",
-        labelKey: "cmdNext",
-        run: function(plugin) {
-          return plugin.switchRelativeFromStatusBar(1);
-        }
-      },
-      {
-        id: "newEmptySession",
-        labelKey: "cmdNewEmpty",
-        run: function(plugin) {
-          return plugin.createEmptySession();
-        }
-      },
-      {
-        id: "toggleAutoSaveOnSwitch",
-        labelKey: "cmdToggleAutoSave",
-        run: function(plugin) {
-          return plugin.toggleAutoSaveOnSwitch({ notify: true });
-        }
-      },
-      {
-        id: "versionHistory",
-        labelKey: "statusBarActionVersionHistory",
-        run: function(plugin) {
-          var session = plugin.getActiveSession();
-          if (session) {
-            new modals2.HistoryModal(plugin.app, plugin, session).open();
-          }
-        }
-      },
-      {
-        id: "restoreLatestHistory",
-        labelKey: "statusBarActionRestoreLatestHistory",
-        run: function(plugin) {
-          var L = i18n2.L;
-          if (!plugin.isVersionHistoryEnabled()) {
-            new obsidian2.Notice(L.historyNoEntries);
-            return;
-          }
-          var activeSession = plugin.getActiveSession();
-          if (!activeSession || !activeSession.history || activeSession.history.length === 0) {
-            new obsidian2.Notice(L.historyNoEntries);
-            return;
-          }
-          if (plugin.isVersionHistoryConfirmRestoreEnabled()) {
-            var latestTime = new Date(activeSession.history[0].savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-            new modals2.ConfirmModal(
-              plugin.app,
-              L.historyRestoreConfirm(activeSession.name, latestTime),
-              function() {
-                plugin.quickRestoreLatestHistory();
-              },
-              { confirmText: L.historyRestore, confirmClass: "mod-cta" }
-            ).open();
-          } else {
-            plugin.quickRestoreLatestHistory();
-          }
-        }
-      },
-      {
-        id: "sessionMenu",
-        labelKey: "statusBarActionSessionMenu",
-        run: function(plugin, event) {
-          openSessionMenuAction(plugin, event);
-        }
-      },
-      {
-        id: "settingsMenu",
-        labelKey: "statusBarActionSettingsMenu",
-        run: function(plugin, event) {
-          openSettingsMenuAction(plugin, event);
-        }
-      },
-      {
-        id: "none",
-        labelKey: "statusBarActionNone",
-        run: function() {
-        }
-      }
-    ];
-    var ACTION_INDEX = {};
-    for (actionIndex = 0; actionIndex < ACTIONS.length; actionIndex++) {
-      ACTION_INDEX[ACTIONS[actionIndex].id] = ACTIONS[actionIndex];
-    }
-    var actionIndex;
-    function executeStatusBarAction(plugin, actionId, event) {
-      if (!actionId || actionId === "none") return;
-      var action = ACTION_INDEX[actionId];
-      if (!action) return;
-      return action.run(plugin, event);
-    }
-    function getActionLabel(L, actionId) {
-      var action = ACTION_INDEX[actionId] || ACTION_INDEX.none;
-      return resolveLabel(L, action.labelKey);
-    }
-    var ACTION_IDS = ACTIONS.map(function(action) {
-      return action.id;
-    });
-    var SLOT_KEYS = [
-      "click",
-      "altClick",
-      "modClick",
-      "shiftClick",
-      "middleClick",
-      "altMiddleClick",
-      "modMiddleClick",
-      "shiftMiddleClick",
-      "rightClick",
-      "altRightClick",
-      "modRightClick",
-      "shiftRightClick"
-    ];
-    module2.exports = {
-      executeStatusBarAction,
-      getActionLabel,
-      ACTION_IDS,
-      SLOT_KEYS
-    };
-  }
-});
-
 // src/settings-ui.js
 var require_settings_ui = __commonJS({
   "src/settings-ui.js"(exports2, module2) {
@@ -12887,7 +12645,6 @@ var require_settings = __commonJS({
     var i18n2 = require_i18n();
     var modals2 = require_modals2();
     var formatRelativeTime = require_format_relative_time();
-    var statusBarActions = require_statusbar_actions();
     var settingsUi = require_settings_ui();
     var GroupSessionsModal = settingsUi.GroupSessionsModal;
     var resolveSettingText = settingsUi.resolveSettingText;
@@ -12959,39 +12716,6 @@ var require_settings = __commonJS({
                 sc.inputEl.dispatchEvent(new Event("input"));
               });
             });
-            addSection(L.settingsSectionStatusBar);
-            var slotKeys = statusBarActions.SLOT_KEYS;
-            var actionIds = statusBarActions.ACTION_IDS;
-            var slotLabelMap = {
-              click: "statusBarSlotClick",
-              altClick: "statusBarSlotAltClick",
-              modClick: "statusBarSlotModClick",
-              shiftClick: "statusBarSlotShiftClick",
-              middleClick: "statusBarSlotMiddleClick",
-              altMiddleClick: "statusBarSlotAltMiddleClick",
-              modMiddleClick: "statusBarSlotModMiddleClick",
-              shiftMiddleClick: "statusBarSlotShiftMiddleClick",
-              rightClick: "statusBarSlotRightClick",
-              altRightClick: "statusBarSlotAltRightClick",
-              modRightClick: "statusBarSlotModRightClick",
-              shiftRightClick: "statusBarSlotShiftRightClick"
-            };
-            for (var si = 0; si < slotKeys.length; si++) {
-              (function(slotKey) {
-                var labelKey = slotLabelMap[slotKey];
-                var slotLabel = typeof L[labelKey] === "function" ? L[labelKey]() : L[labelKey];
-                new obsidian2.Setting(contentEl).setName(slotLabel).addDropdown(function(dropdown) {
-                  for (var ai = 0; ai < actionIds.length; ai++) {
-                    var aid = actionIds[ai];
-                    dropdown.addOption(aid, statusBarActions.getActionLabel(L, aid));
-                  }
-                  dropdown.setValue((self.plugin.data.statusBarActions || {})[slotKey] || "none");
-                  dropdown.onChange(function(value) {
-                    self.plugin.setStatusBarAction(slotKey, value);
-                  });
-                });
-              })(slotKeys[si]);
-            }
           }
           if (self.activeTab === "sessions") {
             addSubsection(contentEl, L.settingsSubsectionAutoSaveMode);
@@ -13038,152 +12762,6 @@ var require_settings = __commonJS({
               onChange: function(value) {
                 self.plugin.setRestoreSidebars(value);
               }
-            });
-            addSubsection(contentEl, L.settingsSubsectionScrollSwitch);
-            addToggleSetting(contentEl, {
-              name: L.settingsStatusBarModScrollSwitch,
-              desc: L.settingsStatusBarModScrollSwitchDesc,
-              value: !!self.plugin.data.statusBarModScrollSwitch,
-              onChange: function(value) {
-                self.plugin.setStatusBarModScrollSwitch(value).then(function() {
-                  self.display();
-                });
-              }
-            });
-            if (self.plugin.data.statusBarModScrollSwitch) {
-              addDropdownSetting(contentEl, {
-                name: L.settingsStatusBarScrollPreset,
-                desc: L.settingsStatusBarScrollPresetDesc,
-                value: self.plugin.data.statusBarScrollPreset || "trackpad",
-                items: {
-                  trackpad: L.settingsStatusBarScrollPresetTrackpad,
-                  notchedWheel: L.settingsStatusBarScrollPresetNotchedWheel,
-                  freeSpinWheel: L.settingsStatusBarScrollPresetFreeSpinWheel,
-                  custom: L.settingsStatusBarScrollPresetCustom
-                },
-                onChange: function(value) {
-                  self.plugin.setStatusBarScrollPreset(value).then(function() {
-                    self.display();
-                  });
-                }
-              });
-              addDropdownSetting(contentEl, {
-                name: L.settingsStatusBarScrollModifier,
-                desc: L.settingsStatusBarScrollModifierDesc,
-                value: self.plugin.data.statusBarScrollModifierMode === "recommended" ? "modOrAlt" : self.plugin.data.statusBarScrollModifierMode || "none",
-                items: {
-                  none: L.settingsStatusBarScrollModifierNone,
-                  modOnly: L.settingsStatusBarScrollModifierModOnly,
-                  altOnly: L.settingsStatusBarScrollModifierAltOnly,
-                  modOrAlt: L.settingsStatusBarScrollModifierModOrAlt
-                },
-                onChange: function(value) {
-                  self.plugin.setStatusBarScrollModifierMode(value);
-                }
-              });
-              var useCustomScroll = (self.plugin.data.statusBarScrollPreset || "trackpad") === "custom";
-              addDropdownSetting(contentEl, {
-                name: L.settingsStatusBarScrollThreshold,
-                desc: L.settingsStatusBarScrollThresholdDesc,
-                value: String(self.plugin.data.statusBarScrollThreshold || 30),
-                disabled: !useCustomScroll,
-                items: {
-                  "12": "12",
-                  "16": "16",
-                  "24": "24",
-                  "30": "30",
-                  "40": "40",
-                  "60": "60",
-                  "90": "90"
-                },
-                onChange: function(value) {
-                  self.plugin.setStatusBarScrollThreshold(value);
-                }
-              });
-              addDropdownSetting(contentEl, {
-                name: L.settingsStatusBarScrollCooldown,
-                desc: L.settingsStatusBarScrollCooldownDesc,
-                value: String(self.plugin.data.statusBarScrollCooldownMs || 500),
-                disabled: !useCustomScroll,
-                items: {
-                  "200": "200 ms",
-                  "350": "350 ms",
-                  "500": "500 ms",
-                  "750": "750 ms",
-                  "1000": "1000 ms"
-                },
-                onChange: function(value) {
-                  self.plugin.setStatusBarScrollCooldownMs(value);
-                }
-              });
-              addDropdownSetting(contentEl, {
-                name: L.settingsStatusBarScrollResetWindow,
-                desc: L.settingsStatusBarScrollResetWindowDesc,
-                value: String(self.plugin.data.statusBarScrollResetMs || 250),
-                disabled: !useCustomScroll,
-                items: {
-                  "150": "150 ms",
-                  "250": "250 ms",
-                  "400": "400 ms",
-                  "600": "600 ms"
-                },
-                onChange: function(value) {
-                  self.plugin.setStatusBarScrollResetMs(value);
-                }
-              });
-              addToggleSetting(contentEl, {
-                name: L.settingsStatusBarScrollInvert,
-                desc: L.settingsStatusBarScrollInvertDesc,
-                value: !!self.plugin.data.statusBarScrollInvert,
-                onChange: function(value) {
-                  self.plugin.setStatusBarScrollInvert(value);
-                }
-              });
-            }
-            addSubsection(contentEl, L.settingsSubsectionSwitchCommands);
-            addToggleSetting(contentEl, {
-              name: L.settingsShowActiveSwitchCommand,
-              desc: L.settingsShowActiveSwitchCommandDesc,
-              value: !!self.plugin.data.showActiveSwitchCommand,
-              onChange: function(value) {
-                self.plugin.setShowActiveSwitchCommand(value);
-              }
-            });
-            addToggleSetting(contentEl, {
-              name: L.settingsNumberedSwitchCommands,
-              desc: L.settingsNumberedSwitchCommandsDesc,
-              value: !!self.plugin.data.numberedSwitchCommands,
-              onChange: function(value) {
-                self.plugin.setNumberedSwitchCommands(value);
-              }
-            });
-            addSubsection(contentEl, L.settingsSubsectionSwitchPreview);
-            var allOn = !!self.plugin.data.previewNext && !!self.plugin.data.previewPrevious;
-            var masterSetting = new obsidian2.Setting(contentEl).setName(L.settingsPreviewHeading).setDesc(L.settingsPreviewDesc).addToggle(function(toggle) {
-              toggle.setValue(allOn);
-              toggle.onChange(function(value) {
-                self.plugin.setSwitchPreviewEnabled(value).then(function() {
-                  self.display();
-                });
-              });
-            });
-            masterSetting.settingEl.addClass("wpp-has-nested");
-            var nestedDiv = masterSetting.settingEl.createDiv({ cls: "wpp-nested-settings" });
-            new obsidian2.Setting(nestedDiv).setName(L.settingsPreviewNext).addToggle(function(toggle) {
-              toggle.setValue(!!self.plugin.data.previewNext);
-              toggle.onChange(function(value) {
-                self.plugin.setPreviewNext(value).then(function() {
-                  self.display();
-                });
-              });
-            });
-            new obsidian2.Setting(nestedDiv).setName(L.settingsPreviewPrevious).addToggle(function(toggle) {
-              toggle.setValue(!!self.plugin.data.previewPrevious);
-              toggle.onChange(function(value) {
-                self.plugin.setPreviewPrevious(value).then(function() {
-                  self.display();
-                });
-              });
             });
             addSection(L.settingsSectionSessionListSearch);
             addToggleSetting(contentEl, {
@@ -13602,20 +13180,20 @@ var require_default_data = __commonJS({
       sessionOrder: [],
       sessionStorageLocation: "plugin-folder",
       language: "auto",
-      previewNext: true,
-      previewPrevious: true,
+      previewNext: false,
+      previewPrevious: false,
       confirmDeleteByHotkey: true,
       confirmQuickActions: false,
       autoSaveOnSwitch: true,
       warnOnUnsavedSwitch: true,
       highlightUnsavedSessionChanges: true,
       restoreSidebars: true,
-      statusBarQuickSwitcher: true,
+      statusBarQuickSwitcher: false,
       groupFeatureEnabled: true,
       showFilterInput: false,
       overlayDefaultFocus: "current-session",
       showActiveSwitchCommand: false,
-      numberedSwitchCommands: true,
+      numberedSwitchCommands: false,
       searchOverlayPosition: null,
       searchOverlaySize: null,
       groups: {},
@@ -13634,7 +13212,7 @@ var require_default_data = __commonJS({
       statusBarScrollResetMs: 250,
       statusBarScrollInvert: false,
       statusBarActions: {
-        click: "quickSwitcher",
+        click: "sessionManager",
         altClick: "reloadWithoutSaving",
         modClick: "saveSession",
         shiftClick: "none",
@@ -13663,110 +13241,18 @@ var require_register_commands = __commonJS({
       function addCommand(command) {
         plugin.addCommand(command);
       }
-      function addSimpleCommand(id, name, callback, hotkeys) {
-        var command = {
+      function addSimpleCommand(id, name, callback) {
+        addCommand({
           id,
           name,
           callback
-        };
-        if (hotkeys) command.hotkeys = hotkeys;
-        addCommand(command);
-      }
-      function runWithFailureNotice(operation, failureNotice) {
-        operation().catch(function() {
-          new obsidian2.Notice(failureNotice);
         });
-      }
-      function openSaveCurrentLayoutToSessionModal() {
-        var sessions = plugin.getOrderedSessionsUnfiltered();
-        if (!sessions || sessions.length === 0) {
-          new obsidian2.Notice(L.noSession);
-          return;
-        }
-        var modal = new obsidian2.FuzzySuggestModal(plugin.app);
-        modal.setPlaceholder(L.saveCurrentLayoutToSessionPlaceholder);
-        modal.getItems = function() {
-          return sessions;
-        };
-        modal.getItemText = function(session) {
-          return session.name || "";
-        };
-        modal.onChooseItem = function(session) {
-          plugin.confirmOverwriteSessionWithCurrentLayout(session.id);
-        };
-        modal.open();
       }
       addSimpleCommand("manage-sessions", L.cmdManage, function() {
         new modals2.SessionManagerModal(plugin.app, plugin).open();
       });
-      addSimpleCommand("create-session", L.cmdCreate, function() {
-        var modal = new modals2.SessionManagerModal(plugin.app, plugin);
-        modal.open();
-        setTimeout(function() {
-          if (modal.nameInput) modal.nameInput.focus();
-        }, 100);
-      });
-      addSimpleCommand("rename-session", L.cmdRename, function() {
-        plugin.renameCurrentSession();
-      }, [{ modifiers: ["Mod", "Shift"], key: "R" }]);
-      addSimpleCommand("delete-session", L.cmdDelete, function() {
-        plugin.deleteCurrentSession();
-      }, [{ modifiers: ["Mod", "Shift"], key: "Backspace" }]);
-      addSimpleCommand("new-empty-session", L.cmdNewEmpty, function() {
-        plugin.createEmptySession();
-      });
-      addSimpleCommand("duplicate-session", L.cmdDuplicate, function() {
-        plugin.duplicateCurrentSession();
-      }, [{ modifiers: ["Mod", "Shift"], key: "M" }]);
-      if (plugin.data.numberedSwitchCommands) {
-        for (var n = 1; n <= 9; n++) {
-          (function(num) {
-            addCommand({
-              id: "switch-to-" + num,
-              name: L.cmdSwitchTo(num),
-              checkCallback: function(checking) {
-                if (!plugin.data.showActiveSwitchCommand) {
-                  var ordered = plugin.getOrderedSessions();
-                  var session = ordered[num - 1];
-                  if (session && session.id === plugin.data.activeSessionId) return false;
-                }
-                if (!checking) plugin.switchToIndex(num - 1);
-                return true;
-              }
-            });
-          })(n);
-        }
-      }
-      plugin._dynamicSessionCommandIds = [];
-      addSimpleCommand("previous-session", L.cmdPrevious, function() {
-        plugin.switchRelativeFromCommand(-1);
-      }, [{ modifiers: ["Mod", "Shift"], key: "," }]);
-      addSimpleCommand("next-session", L.cmdNext, function() {
-        plugin.switchRelativeFromCommand(1);
-      }, [
-        { modifiers: ["Mod", "Shift"], key: "Enter" },
-        { modifiers: ["Mod", "Shift"], key: "." }
-      ]);
       addSimpleCommand("save-current-session", L.cmdSaveCurrent, function() {
         plugin.saveActiveSession();
-      }, [{ modifiers: ["Mod", "Shift"], key: "S" }]);
-      addSimpleCommand("save-as-session", L.cmdSaveAs, function() {
-        plugin.saveAsSession();
-      });
-      addSimpleCommand("save-current-note-name-as-session", L.cmdSaveCurrentNoteNameAsSession, function() {
-        plugin.saveCurrentNoteNameAsSession();
-      });
-      addCommand({
-        id: "save-current-layout-to-session",
-        name: L.cmdSaveCurrentLayoutToSession,
-        checkCallback: function(checking) {
-          if (plugin.isAutoSaveOnSwitchEnabled()) return false;
-          if (!checking) openSaveCurrentLayoutToSessionModal();
-          return true;
-        }
-      });
-      addSimpleCommand("reload-current-session-without-saving", L.cmdReloadCurrentWithoutSaving, function() {
-        plugin.reloadCurrentSessionWithoutSaving();
       });
       addSimpleCommand("toggle-auto-save-on-switch", L.cmdToggleAutoSave, function() {
         plugin.toggleAutoSaveOnSwitch({ notify: true });
@@ -13791,9 +13277,6 @@ var require_register_commands = __commonJS({
           return true;
         }
       });
-      addSimpleCommand("search-session-overlay", L.cmdSearchOverlay, function() {
-        plugin.openSearchOverlay();
-      });
       addCommand({
         id: "version-history",
         name: L.cmdVersionHistory,
@@ -13806,70 +13289,6 @@ var require_register_commands = __commonJS({
           }
           return true;
         }
-      });
-      addSimpleCommand("export-sessions-snapshot", L.cmdExportSessions, function() {
-        runWithFailureNotice(function() {
-          return plugin.exportSessionsSnapshot();
-        }, L.exportSessionsFailed);
-      });
-      addSimpleCommand("import-latest-sessions-snapshot", L.cmdImportSessions, function() {
-        new modals2.ConfirmModal(plugin.app, L.confirmImportSessions, function() {
-          return plugin.importSessionsFromLatestExport().catch(function() {
-            new obsidian2.Notice(L.importSessionsFailed);
-          });
-        }, {
-          confirmText: L.settingsImportSessionsBtn || L.cmdImportSessions,
-          confirmClass: "mod-cta"
-        }).open();
-      });
-      function getCurrentGroupViewId() {
-        if (plugin.switchOverlayEl) return plugin.switchOverlayViewGroupId || null;
-        if (plugin.searchOverlayEl) return plugin.searchOverlayViewGroupId || null;
-        return plugin.data.activeGroupId || null;
-      }
-      function showSwitchOverlayForGroup(groupId) {
-        var ordered = plugin.getOrderedSessionsForGroup(groupId || null);
-        var activeIndex = plugin.getActiveSessionIndex(ordered);
-        plugin.showSwitchOverlay(ordered, activeIndex, groupId || null);
-      }
-      function switchGroupAndShowOverlay(step) {
-        if (!plugin.isGroupFeatureEnabled()) return;
-        var targetGroupId = plugin.getRelativeGroupId(getCurrentGroupViewId(), step);
-        if (typeof targetGroupId === "undefined") {
-          showSwitchOverlayForGroup(plugin.data.activeGroupId || null);
-          return;
-        }
-        plugin.resolveGroupSelection(targetGroupId).then(function(result) {
-          showSwitchOverlayForGroup(result.resolvedGroupId);
-        });
-      }
-      addCommand({
-        id: "switch-group",
-        name: L.cmdSwitchGroup,
-        callback: function() {
-          switchGroupAndShowOverlay(1);
-        }
-      });
-      addCommand({
-        id: "exit-group",
-        name: L.cmdExitGroup,
-        checkCallback: function(checking) {
-          if (!plugin.isGroupFeatureEnabled()) return false;
-          if (!plugin.data.activeGroupId) return false;
-          if (!checking) plugin.exitGroup();
-          return true;
-        }
-      });
-      addCommand({
-        id: "next-group",
-        name: L.cmdNextGroup,
-        hotkeys: [{ modifiers: ["Mod", "Shift"], key: "Tab" }],
-        callback: function() {
-          switchGroupAndShowOverlay(1);
-        }
-      });
-      addSimpleCommand("previous-group", L.cmdPreviousGroup, function() {
-        plugin.switchGroupRelative(-1);
       });
     }
     module2.exports = registerCommands2;
@@ -18289,62 +17708,23 @@ var require_session_switching = __commonJS({
 var require_session_commands = __commonJS({
   "src/plugin/methods/session-commands.js"(exports2, module2) {
     "use strict";
-    var i18n2 = require_i18n();
     function attachSessionCommandMethods(WorkspacePlusPlus2) {
       WorkspacePlusPlus2.prototype.syncSessionCommands = function() {
-        var L = i18n2.L;
-        var ordered = this.getOrderedSessions();
-        var self = this;
         var oldIds = this._dynamicSessionCommandIds || [];
         for (var i = 0; i < oldIds.length; i++) {
           this.removeCommand(oldIds[i]);
         }
         this._dynamicSessionCommandIds = [];
-        var dynamicStart;
-        if (self.data.numberedSwitchCommands) {
-          for (var n = 1; n <= 9; n++) {
-            (function(num) {
-              self.removeCommand("switch-to-" + num);
-              var session = ordered[num - 1];
-              self.addCommand({
-                id: "switch-to-" + num,
-                name: L.cmdSwitchTo(num, session ? session.name : void 0),
-                checkCallback: function(checking) {
-                  if (!self.data.showActiveSwitchCommand) {
-                    var currentOrdered = self.getOrderedSessions();
-                    var targetSession = currentOrdered[num - 1];
-                    if (targetSession && targetSession.id === self.data.activeSessionId) return false;
-                  }
-                  if (!checking) self.switchToIndex(num - 1);
-                  return true;
-                }
-              });
-            })(n);
-          }
-          dynamicStart = 9;
-        } else {
-          for (var n = 1; n <= 9; n++) {
-            self.removeCommand("switch-to-" + n);
-          }
-          dynamicStart = 0;
+        for (var n = 1; n <= 9; n++) {
+          this.removeCommand("switch-to-" + n);
         }
-        for (var j = dynamicStart; j < ordered.length; j++) {
-          (function(session) {
-            var cmdId = "switch-to-named-" + session.id;
-            self.addCommand({
-              id: cmdId,
-              name: L.cmdSwitchToNamed(session.name),
-              checkCallback: function(checking) {
-                if (!self.data.showActiveSwitchCommand) {
-                  if (session.id === self.data.activeSessionId) return false;
-                }
-                if (!checking) self.switchSessionByIdFromCommand(session.id);
-                return true;
-              }
-            });
-            self._dynamicSessionCommandIds.push(cmdId);
-          })(ordered[j]);
-        }
+        this.removeCommand("previous-session");
+        this.removeCommand("next-session");
+        this.removeCommand("search-session-overlay");
+        this.removeCommand("switch-group");
+        this.removeCommand("exit-group");
+        this.removeCommand("next-group");
+        this.removeCommand("previous-group");
       };
     }
     module2.exports = attachSessionCommandMethods;
@@ -18747,6 +18127,20 @@ var require_settings_state = __commonJS({
         this.data.statusBarActions[slotKey] = actionId;
         return persistIfNeeded(this, options);
       };
+      WorkspacePlusPlus2.prototype.migrateRemovedStatusBarActions = function() {
+        var removedActionMap = {
+          quickSwitcher: "sessionManager",
+          previousSession: "none",
+          nextSession: "none"
+        };
+        var actions = this.data.statusBarActions || {};
+        var slotKeys = Object.keys(actions);
+        for (var i = 0; i < slotKeys.length; i++) {
+          var slotKey = slotKeys[i];
+          var mapped = removedActionMap[actions[slotKey]];
+          if (mapped) actions[slotKey] = mapped;
+        }
+      };
       WorkspacePlusPlus2.prototype.setWarnOnUnsavedSwitch = function(enabled, options) {
         this.data.warnOnUnsavedSwitch = !!enabled;
         return persistIfNeeded(this, options);
@@ -18897,133 +18291,20 @@ var require_methods = __commonJS({
 var require_statusbar_controller = __commonJS({
   "src/statusbar-controller.js"(exports2, module2) {
     "use strict";
-    var utils = require_utils();
-    var statusBarActions = require_statusbar_actions();
-    var STATUS_BAR_SCROLL_PRESETS = {
-      trackpad: {
-        threshold: 30,
-        cooldownMs: 500,
-        resetMs: 250
-      },
-      notchedWheel: {
-        threshold: 16,
-        cooldownMs: 350,
-        resetMs: 220
-      },
-      freeSpinWheel: {
-        threshold: 48,
-        cooldownMs: 650,
-        resetMs: 320
-      }
-    };
-    function getStatusBarScrollConfig(data) {
-      var presetId = data && data.statusBarScrollPreset || "trackpad";
-      if (presetId === "custom") {
-        return {
-          threshold: Number(data && data.statusBarScrollThreshold || 30) || 30,
-          cooldownMs: Number(data && data.statusBarScrollCooldownMs || 500) || 500,
-          resetMs: Number(data && data.statusBarScrollResetMs || 250) || 250
-        };
-      }
-      return STATUS_BAR_SCROLL_PRESETS[presetId] || STATUS_BAR_SCROLL_PRESETS.trackpad;
-    }
-    function matchesStatusBarScrollModifier(evt, isMac, mode) {
-      mode = mode || "none";
-      var modPressed = isMac ? !!evt.metaKey : !!evt.ctrlKey;
-      var altPressed = !!evt.altKey;
-      if (mode === "none") return !modPressed && !altPressed;
-      if (mode === "modOnly") return modPressed;
-      if (mode === "altOnly") return altPressed;
-      if (mode === "modOrAlt") return modPressed || altPressed;
-      return modPressed || altPressed;
-    }
-    function getModifiedStatusBarSlot(evt, baseSlot) {
-      var baseName = baseSlot.charAt(0).toUpperCase() + baseSlot.slice(1);
-      if (evt.altKey) return "alt" + baseName;
-      if (utils.isModPressed(evt)) return "mod" + baseName;
-      if (evt.shiftKey) return "shift" + baseName;
-      return baseSlot;
-    }
-    function getClickSlot(evt) {
-      return getModifiedStatusBarSlot(evt, "click");
-    }
-    function getMiddleClickSlot(evt) {
-      return getModifiedStatusBarSlot(evt, "middleClick");
-    }
-    function getRightClickSlot(evt) {
-      return getModifiedStatusBarSlot(evt, "rightClick");
-    }
-    function getStatusBarAction(plugin, slotKey) {
-      return (plugin.data && plugin.data.statusBarActions || {})[slotKey] || "none";
-    }
-    function executeStatusBarSlot(plugin, slotKey, evt, options) {
-      options = options || {};
-      var action = getStatusBarAction(plugin, slotKey);
-      if (action !== "none" && options.preventDefault !== false) {
-        evt.preventDefault();
-        evt.stopPropagation();
-      }
-      return statusBarActions.executeStatusBarAction(plugin, action, evt);
-    }
-    function normalizeWheelDeltaY(evt) {
-      var deltaY = evt.deltaY || 0;
-      if (evt.deltaMode === 1) return deltaY * 16;
-      if (evt.deltaMode === 2) return deltaY * 240;
-      return deltaY;
-    }
-    function handleStatusBarWheel(plugin, evt, now) {
-      if (!plugin.data.statusBarModScrollSwitch) return false;
-      var isMac = utils.isMacPlatform();
-      var cfg = getStatusBarScrollConfig(plugin.data);
-      if (!matchesStatusBarScrollModifier(evt, isMac, plugin.data.statusBarScrollModifierMode)) return false;
-      if (Math.abs(evt.deltaY || 0) <= Math.abs(evt.deltaX || 0)) return false;
-      evt.preventDefault();
-      evt.stopPropagation();
-      now = typeof now === "number" ? now : Date.now();
-      if (plugin.isSwitchingSession) return false;
-      if (now - plugin.statusBarScrollSwitchAt < cfg.cooldownMs) return false;
-      if (now - plugin.statusBarScrollEventAt > cfg.resetMs) {
-        plugin.statusBarScrollDelta = 0;
-      }
-      plugin.statusBarScrollEventAt = now;
-      plugin.statusBarScrollDelta += normalizeWheelDeltaY(evt);
-      if (Math.abs(plugin.statusBarScrollDelta) < cfg.threshold) return false;
-      var direction = plugin.statusBarScrollDelta < 0 ? -1 : 1;
-      if (plugin.data.statusBarScrollInvert) direction *= -1;
-      plugin.statusBarScrollDelta = 0;
-      plugin.statusBarScrollSwitchAt = now;
-      plugin.switchRelativeFromScroll(direction).catch(function() {
-      });
-      return true;
-    }
+    var modals2 = require_modals2();
     function setupStatusBar(plugin) {
       plugin.statusBarEl = plugin.addStatusBarItem();
       plugin.statusBarEl.addClass("wpp-status-bar");
       plugin.statusBarEl.addEventListener("click", function(evt) {
-        executeStatusBarSlot(plugin, getClickSlot(evt), evt);
-      });
-      plugin.statusBarEl.addEventListener("auxclick", function(evt) {
-        if (evt.button !== 1) return;
-        executeStatusBarSlot(plugin, getMiddleClickSlot(evt), evt);
-      });
-      plugin.statusBarEl.addEventListener("contextmenu", function(evt) {
+        if (evt.button !== 0) return;
         evt.preventDefault();
-        var action = getStatusBarAction(plugin, getRightClickSlot(evt));
-        statusBarActions.executeStatusBarAction(plugin, action, evt);
+        evt.stopPropagation();
+        new modals2.SessionManagerModal(plugin.app, plugin).open();
       });
-      plugin.statusBarEl.addEventListener("wheel", function(evt) {
-        handleStatusBarWheel(plugin, evt);
-      }, { passive: false });
       plugin.updateStatusBar();
       return plugin.statusBarEl;
     }
     module2.exports = {
-      getStatusBarScrollConfig,
-      matchesStatusBarScrollModifier,
-      getClickSlot,
-      getMiddleClickSlot,
-      getRightClickSlot,
-      handleStatusBarWheel,
       setupStatusBar
     };
   }
@@ -19053,16 +18334,6 @@ var WorkspacePlusPlus = (
         self.data = Object.assign({}, DEFAULT_DATA, saved || {});
         if (!self.data.sessions) self.data.sessions = {};
         if (!self.data.sessionOrder) self.data.sessionOrder = [];
-        if (!self.data.statusBarActions) {
-          self.data.statusBarActions = Object.assign({}, DEFAULT_DATA.statusBarActions);
-          if (self.data.statusBarQuickSwitcher === false) {
-            self.data.statusBarActions.click = "sessionManager";
-          }
-          if (self.data.versionHistoryCtrlRmbRestore === false) {
-            self.data.statusBarActions.modRightClick = "none";
-          }
-        }
-        self.data.statusBarActions = Object.assign({}, DEFAULT_DATA.statusBarActions, self.data.statusBarActions || {});
         self.normalizeGroupFeatureState();
         self.isSwitchingSession = false;
         self.pendingSwitchRequest = null;

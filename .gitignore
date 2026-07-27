@@ -9,6 +9,7 @@ sessions.json
 sessions.backup.json
 backups/
 exports/
+tmp/
 .claude/
 .workspace-plus-plus/
 .hotreload

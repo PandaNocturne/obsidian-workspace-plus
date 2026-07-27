@@ -30,18 +30,6 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
             if (!self.data.sessions) self.data.sessions = {};
             if (!self.data.sessionOrder) self.data.sessionOrder = [];
 
-            // Migrate legacy settings into statusBarActions
-            if (!self.data.statusBarActions) {
-                self.data.statusBarActions = Object.assign({}, DEFAULT_DATA.statusBarActions);
-                if (self.data.statusBarQuickSwitcher === false) {
-                    self.data.statusBarActions.click = 'sessionManager';
-                }
-                if (self.data.versionHistoryCtrlRmbRestore === false) {
-                    self.data.statusBarActions.modRightClick = 'none';
-                }
-            }
-            self.data.statusBarActions = Object.assign({}, DEFAULT_DATA.statusBarActions, self.data.statusBarActions || {});
-
             self.normalizeGroupFeatureState();
             self.isSwitchingSession = false;
             self.pendingSwitchRequest = null;
