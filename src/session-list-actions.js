@@ -3,6 +3,7 @@
 var obsidian = require('obsidian');
 var i18n = require('./i18n');
 var ConfirmModal = require('./modals/confirm-modal');
+var DeleteOrArchiveModal = require('./modals/delete-or-archive-modal');
 var RenameModal = require('./modals/rename-modal');
 
 function resolveApp(options) {
@@ -79,7 +80,42 @@ function deleteSessionWithPrompt(options) {
         });
     };
 
+    var doArchive = function () {
+        return plugin.archiveSession(session.id).then(function (archived) {
+            if (!archived) {
+                if (options.notifyCannotDelete !== false) {
+                    new obsidian.Notice(L.cannotDeleteLast);
+                }
+                return false;
+            }
+            if (options.notifyArchived !== false) {
+                new obsidian.Notice(L.archived(session.name));
+            }
+            if (typeof options.onArchived === 'function') {
+                options.onArchived(session);
+            } else if (typeof options.onDeleted === 'function') {
+                // Refresh list even if caller only provided onDeleted.
+                options.onDeleted(session);
+            }
+            return true;
+        });
+    };
+
+    var allowArchive = options.allowArchive !== false
+        && typeof plugin.archiveSession === 'function';
     var shouldConfirm = !!options.forceConfirm || plugin.data.confirmDeleteByHotkey !== false;
+
+    if (shouldConfirm && allowArchive) {
+        new DeleteOrArchiveModal(
+            app,
+            options.archiveConfirmMessage || L.confirmDeleteOrArchive(session.name),
+            doArchive,
+            doDelete,
+            options.confirmOptions || {}
+        ).open();
+        return Promise.resolve(true);
+    }
+
     if (shouldConfirm) {
         new ConfirmModal(
             app,

@@ -9933,6 +9933,10 @@ var require_i18n = __commonJS({
         sessionNoteUpdated: function(n) {
           return 'Updated note for "' + n + '"';
         },
+        groupDefault: "Default",
+        groupMovedToDefault: function(n) {
+          return 'Moved "' + n + '" to Default';
+        },
         historyTabManual: "Manual",
         historyTabAuto: "Automatic",
         historyManualEmpty: "No manual saves yet.",
@@ -9960,7 +9964,25 @@ var require_i18n = __commonJS({
         historyDeleteConfirm: function(t) {
           return 'Delete history entry "' + t + '"?';
         },
-        historyUntitled: "Untitled"
+        historyUntitled: "Untitled",
+        archive: "Trash",
+        archiveArea: "Trash",
+        archiveEmpty: "Trash is empty.",
+        archived: function(n) {
+          return 'Moved "' + n + '" to trash';
+        },
+        confirmDeleteOrArchive: function(n) {
+          return 'Move "' + n + '" to trash, or permanently delete?';
+        },
+        restoreFromArchive: "Restore",
+        restoredFromArchive: function(n) {
+          return 'Restored "' + n + '" from trash';
+        },
+        deletePermanently: "Delete permanently",
+        confirmDeleteArchived: function(n) {
+          return 'Permanently delete "' + n + '" from trash? This cannot be undone.';
+        },
+        backToSessions: "Back to sessions"
       },
       zh: {
         editSessionTitle: "\u7F16\u8F91\u4F1A\u8BDD",
@@ -9968,6 +9990,10 @@ var require_i18n = __commonJS({
         sessionNotePlaceholder: "\u6DFB\u52A0\u5907\u6CE8\uFF08\u53EF\u9009\uFF09\u2026",
         sessionNoteUpdated: function(n) {
           return "\u5DF2\u66F4\u65B0\u201C" + n + "\u201D\u7684\u5907\u6CE8";
+        },
+        groupDefault: "\u9ED8\u8BA4",
+        groupMovedToDefault: function(n) {
+          return "\u5DF2\u5C06\u201C" + n + "\u201D\u79FB\u81F3\u9ED8\u8BA4";
         },
         historyTabManual: "\u624B\u52A8\u4FDD\u5B58",
         historyTabAuto: "\u81EA\u52A8\u4FDD\u5B58",
@@ -9996,7 +10022,25 @@ var require_i18n = __commonJS({
         historyDeleteConfirm: function(t) {
           return "\u786E\u5B9A\u5220\u9664\u5386\u53F2\u8BB0\u5F55\u201C" + t + "\u201D\uFF1F";
         },
-        historyUntitled: "\u672A\u547D\u540D"
+        historyUntitled: "\u672A\u547D\u540D",
+        archive: "\u5783\u573E\u6876",
+        archiveArea: "\u5783\u573E\u6876",
+        archiveEmpty: "\u5783\u573E\u6876\u4E3A\u7A7A\u3002",
+        archived: function(n) {
+          return "\u5DF2\u5C06\u201C" + n + "\u201D\u79FB\u5165\u5783\u573E\u6876";
+        },
+        confirmDeleteOrArchive: function(n) {
+          return "\u5C06\u201C" + n + "\u201D\u79FB\u5165\u5783\u573E\u6876\uFF0C\u8FD8\u662F\u6C38\u4E45\u5220\u9664\uFF1F";
+        },
+        restoreFromArchive: "\u8FD8\u539F",
+        restoredFromArchive: function(n) {
+          return "\u5DF2\u4ECE\u5783\u573E\u6876\u8FD8\u539F\u201C" + n + "\u201D";
+        },
+        deletePermanently: "\u6C38\u4E45\u5220\u9664",
+        confirmDeleteArchived: function(n) {
+          return "\u6C38\u4E45\u5220\u9664\u5783\u573E\u6876\u4E2D\u7684\u201C" + n + "\u201D\uFF1F\u6B64\u64CD\u4F5C\u65E0\u6CD5\u64A4\u9500\u3002";
+        },
+        backToSessions: "\u8FD4\u56DE\u4F1A\u8BDD\u5217\u8868"
       },
       "zh-TW": {
         editSessionTitle: "\u7DE8\u8F2F\u5DE5\u4F5C\u968E\u6BB5",
@@ -10004,6 +10048,10 @@ var require_i18n = __commonJS({
         sessionNotePlaceholder: "\u65B0\u589E\u5099\u8A3B\uFF08\u9078\u586B\uFF09\u2026",
         sessionNoteUpdated: function(n) {
           return "\u5DF2\u66F4\u65B0\u300C" + n + "\u300D\u7684\u5099\u8A3B";
+        },
+        groupDefault: "\u9810\u8A2D",
+        groupMovedToDefault: function(n) {
+          return "\u5DF2\u5C07\u300C" + n + "\u300D\u79FB\u81F3\u9810\u8A2D";
         },
         historyTabManual: "\u624B\u52D5\u5132\u5B58",
         historyTabAuto: "\u81EA\u52D5\u5132\u5B58",
@@ -10032,7 +10080,25 @@ var require_i18n = __commonJS({
         historyDeleteConfirm: function(t) {
           return "\u78BA\u5B9A\u522A\u9664\u6B77\u53F2\u7D00\u9304\u300C" + t + "\u300D\uFF1F";
         },
-        historyUntitled: "\u672A\u547D\u540D"
+        historyUntitled: "\u672A\u547D\u540D",
+        archive: "\u5783\u573E\u6876",
+        archiveArea: "\u5783\u573E\u6876",
+        archiveEmpty: "\u5783\u573E\u6876\u662F\u7A7A\u7684\u3002",
+        archived: function(n) {
+          return "\u5DF2\u5C07\u300C" + n + "\u300D\u79FB\u5165\u5783\u573E\u6876";
+        },
+        confirmDeleteOrArchive: function(n) {
+          return "\u8981\u5C07\u300C" + n + "\u300D\u79FB\u5165\u5783\u573E\u6876\uFF0C\u9084\u662F\u6C38\u4E45\u522A\u9664\uFF1F";
+        },
+        restoreFromArchive: "\u9084\u539F",
+        restoredFromArchive: function(n) {
+          return "\u5DF2\u5F9E\u5783\u573E\u6876\u9084\u539F\u300C" + n + "\u300D";
+        },
+        deletePermanently: "\u6C38\u4E45\u522A\u9664",
+        confirmDeleteArchived: function(n) {
+          return "\u6C38\u4E45\u522A\u9664\u5783\u573E\u6876\u4E2D\u7684\u300C" + n + "\u300D\uFF1F\u6B64\u64CD\u4F5C\u7121\u6CD5\u5FA9\u539F\u3002";
+        },
+        backToSessions: "\u8FD4\u56DE\u5DE5\u4F5C\u968E\u6BB5\u5217\u8868"
       },
       ja: {
         editSessionTitle: "\u30BB\u30C3\u30B7\u30E7\u30F3\u3092\u7DE8\u96C6",
@@ -10040,6 +10106,10 @@ var require_i18n = __commonJS({
         sessionNotePlaceholder: "\u30E1\u30E2\u3092\u8FFD\u52A0\uFF08\u4EFB\u610F\uFF09\u2026",
         sessionNoteUpdated: function(n) {
           return '"' + n + '" \u306E\u30E1\u30E2\u3092\u66F4\u65B0\u3057\u307E\u3057\u305F';
+        },
+        groupDefault: "\u30C7\u30D5\u30A9\u30EB\u30C8",
+        groupMovedToDefault: function(n) {
+          return '"' + n + '" \u3092\u30C7\u30D5\u30A9\u30EB\u30C8\u306B\u79FB\u52D5\u3057\u307E\u3057\u305F';
         },
         historyTabManual: "\u624B\u52D5\u4FDD\u5B58",
         historyTabAuto: "\u81EA\u52D5\u4FDD\u5B58",
@@ -10068,7 +10138,25 @@ var require_i18n = __commonJS({
         historyDeleteConfirm: function(t) {
           return '\u5C65\u6B74 "' + t + '" \u3092\u524A\u9664\u3057\u307E\u3059\u304B\uFF1F';
         },
-        historyUntitled: "\u7121\u984C"
+        historyUntitled: "\u7121\u984C",
+        archive: "\u30B4\u30DF\u7BB1",
+        archiveArea: "\u30B4\u30DF\u7BB1",
+        archiveEmpty: "\u30B4\u30DF\u7BB1\u306F\u7A7A\u3067\u3059\u3002",
+        archived: function(n) {
+          return '"' + n + '" \u3092\u30B4\u30DF\u7BB1\u306B\u79FB\u52D5\u3057\u307E\u3057\u305F';
+        },
+        confirmDeleteOrArchive: function(n) {
+          return '"' + n + '" \u3092\u30B4\u30DF\u7BB1\u306B\u79FB\u3057\u307E\u3059\u304B\u3001\u305D\u308C\u3068\u3082\u5B8C\u5168\u306B\u524A\u9664\u3057\u307E\u3059\u304B\uFF1F';
+        },
+        restoreFromArchive: "\u5FA9\u5143",
+        restoredFromArchive: function(n) {
+          return '"' + n + '" \u3092\u30B4\u30DF\u7BB1\u304B\u3089\u5FA9\u5143\u3057\u307E\u3057\u305F';
+        },
+        deletePermanently: "\u5B8C\u5168\u306B\u524A\u9664",
+        confirmDeleteArchived: function(n) {
+          return '\u30B4\u30DF\u7BB1\u306E "' + n + '" \u3092\u5B8C\u5168\u306B\u524A\u9664\u3057\u307E\u3059\u304B\uFF1F\u3053\u306E\u64CD\u4F5C\u306F\u5143\u306B\u623B\u305B\u307E\u305B\u3093\u3002';
+        },
+        backToSessions: "\u30BB\u30C3\u30B7\u30E7\u30F3\u4E00\u89A7\u306B\u623B\u308B"
       }
     };
     var sessionEditLangs = Object.keys(STRINGS);
@@ -10999,47 +11087,38 @@ var require_group_tab_ui = __commonJS({
       var containerEl = options.containerEl;
       if (!plugin || !containerEl) return;
       while (containerEl.firstChild) containerEl.removeChild(containerEl.firstChild);
+      containerEl.addClass("wpp-group-tabs-row-inner");
       var app = options.app || plugin.app;
       var groups = options.groups || plugin.data.groups || {};
       var groupOrder = options.groupOrder || plugin.getOrderedGroupTabIds();
       var selectedGroupId = options.selectedGroupId || null;
+      var defaultWrap = containerEl.createDiv({ cls: "wpp-group-tabs-default" });
+      var groupsWrap = containerEl.createDiv({ cls: "wpp-group-tabs-groups" });
+      var allWrap = containerEl.createDiv({ cls: "wpp-group-tabs-all" });
       function setupGroupTabDrag(tabEl) {
         if (!options.onGroupOrderCommit) return;
-        attachGroupTabDrag(tabEl, containerEl, {
+        attachGroupTabDrag(tabEl, groupsWrap, {
           stopPropagationOnMouseDown: !!options.stopPropagationOnMouseDown,
           onCommit: function(newOrder) {
-            options.onGroupOrderCommit(newOrder);
+            var next = ["__all__"].concat(newOrder.filter(function(id) {
+              return id && id !== "__all__" && id !== "__ungrouped__";
+            }));
+            options.onGroupOrderCommit(next);
           }
         });
       }
+      var defaultTab = defaultWrap.createDiv({ cls: "wpp-group-tab wpp-group-tab--default" });
+      defaultTab.dataset.groupId = "__ungrouped__";
+      if (selectedGroupId === "__ungrouped__") defaultTab.classList.add("is-active");
+      defaultTab.textContent = L.groupDefault || "Default";
+      defaultTab.addEventListener("click", function() {
+        if (typeof options.onSelectGroup === "function") {
+          options.onSelectGroup("__ungrouped__");
+        }
+      });
       for (var gi = 0; gi < groupOrder.length; gi++) {
         var gid = groupOrder[gi];
-        if (gid === "__all__") {
-          var allTab = document.createElement("div");
-          allTab.className = "wpp-group-tab";
-          allTab.dataset.groupId = "__all__";
-          if (!selectedGroupId) allTab.classList.add("is-active");
-          allTab.textContent = L.groupAll;
-          allTab.addEventListener("click", function() {
-            if (typeof options.onSelectGroup === "function") {
-              options.onSelectGroup(null);
-            }
-          });
-          allTab.addEventListener("contextmenu", function(e) {
-            e.preventDefault();
-            openAllGroupsTabContextMenu({
-              app,
-              plugin,
-              event: e,
-              onResetViewGroup: options.onResetViewGroup,
-              onGroupsChanged: options.onGroupsChanged,
-              onSessionsChanged: options.onSessionsChanged
-            });
-          });
-          setupGroupTabDrag(allTab);
-          containerEl.appendChild(allTab);
-          continue;
-        }
+        if (gid === "__all__" || gid === "__ungrouped__") continue;
         var group = groups[gid];
         if (!group) continue;
         (function(currentGroup) {
@@ -11066,7 +11145,7 @@ var require_group_tab_ui = __commonJS({
             });
           });
           setupGroupTabDrag(tab);
-          containerEl.appendChild(tab);
+          groupsWrap.appendChild(tab);
         })(group);
       }
       var addBtn = document.createElement("div");
@@ -11085,7 +11164,27 @@ var require_group_tab_ui = __commonJS({
         }
         openCreateGroupPrompt(app, plugin, options.onGroupsChanged);
       });
-      containerEl.appendChild(addBtn);
+      groupsWrap.appendChild(addBtn);
+      var allTab = allWrap.createDiv({ cls: "wpp-group-tab wpp-group-tab--all" });
+      allTab.dataset.groupId = "__all__";
+      if (!selectedGroupId) allTab.classList.add("is-active");
+      allTab.textContent = L.groupAll;
+      allTab.addEventListener("click", function() {
+        if (typeof options.onSelectGroup === "function") {
+          options.onSelectGroup(null);
+        }
+      });
+      allTab.addEventListener("contextmenu", function(e) {
+        e.preventDefault();
+        openAllGroupsTabContextMenu({
+          app,
+          plugin,
+          event: e,
+          onResetViewGroup: options.onResetViewGroup,
+          onGroupsChanged: options.onGroupsChanged,
+          onSessionsChanged: options.onSessionsChanged
+        });
+      });
     }
     function openAllGroupsTabContextMenu(options) {
       var L = i18n2.L;
@@ -11442,6 +11541,95 @@ var require_session_context_menu = __commonJS({
   }
 });
 
+// src/modals/delete-or-archive-modal.js
+var require_delete_or_archive_modal = __commonJS({
+  "src/modals/delete-or-archive-modal.js"(exports2, module2) {
+    "use strict";
+    var obsidian2 = require("obsidian");
+    var i18n2 = require_i18n();
+    var DeleteOrArchiveModal = (
+      /** @class */
+      function(_super) {
+        function DeleteOrArchiveModal2(app, message, onArchive, onDelete, options) {
+          var _this = _super.call(this, app) || this;
+          _this.message = message;
+          _this.onArchive = onArchive;
+          _this.onDelete = onDelete;
+          _this.options = options || {};
+          return _this;
+        }
+        DeleteOrArchiveModal2.prototype = Object.create(_super.prototype);
+        DeleteOrArchiveModal2.prototype.constructor = DeleteOrArchiveModal2;
+        DeleteOrArchiveModal2.prototype.onOpen = function() {
+          var L = i18n2.L;
+          var self = this;
+          this.containerEl.style.zIndex = "10001";
+          var contentEl = this.contentEl;
+          contentEl.createEl("p", { text: this.message });
+          var btns = contentEl.createDiv({ cls: "wpp-confirm-buttons" });
+          var cancelBtn = btns.createEl("button", { text: L.cancel });
+          cancelBtn.addEventListener("click", function() {
+            self.close();
+          });
+          var archiveBtn = btns.createEl("button", {
+            text: this.options.archiveText || L.archive,
+            cls: "mod-cta"
+          });
+          archiveBtn.addEventListener("click", function() {
+            if (typeof self.onArchive === "function") self.onArchive();
+            self.close();
+          });
+          var deleteBtn = btns.createEl("button", {
+            text: this.options.deleteText || L.delete,
+            cls: "mod-warning"
+          });
+          deleteBtn.addEventListener("click", function() {
+            if (typeof self.onDelete === "function") self.onDelete();
+            self.close();
+          });
+          this.buttons = [cancelBtn, archiveBtn, deleteBtn];
+          this.focusedButtonIndex = 1;
+          this.updateButtonFocus();
+          this.keyHandler = function(e) {
+            if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+              e.preventDefault();
+              if (self.focusedButtonIndex > 0) self.focusedButtonIndex--;
+              self.updateButtonFocus();
+            } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+              e.preventDefault();
+              if (self.focusedButtonIndex < self.buttons.length - 1) self.focusedButtonIndex++;
+              self.updateButtonFocus();
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              self.buttons[self.focusedButtonIndex].click();
+            } else if (e.key === "Escape") {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              self.close();
+            }
+          };
+          document.addEventListener("keydown", this.keyHandler, true);
+        };
+        DeleteOrArchiveModal2.prototype.updateButtonFocus = function() {
+          var self = this;
+          this.buttons.forEach(function(btn, i) {
+            btn.classList.toggle("wpp-btn-focused", i === self.focusedButtonIndex);
+          });
+        };
+        DeleteOrArchiveModal2.prototype.onClose = function() {
+          if (this.keyHandler) {
+            document.removeEventListener("keydown", this.keyHandler, true);
+            this.keyHandler = null;
+          }
+          this.contentEl.empty();
+        };
+        return DeleteOrArchiveModal2;
+      }(obsidian2.Modal)
+    );
+    module2.exports = DeleteOrArchiveModal;
+  }
+});
+
 // src/session-list-actions.js
 var require_session_list_actions = __commonJS({
   "src/session-list-actions.js"(exports2, module2) {
@@ -11449,6 +11637,7 @@ var require_session_list_actions = __commonJS({
     var obsidian2 = require("obsidian");
     var i18n2 = require_i18n();
     var ConfirmModal = require_confirm_modal();
+    var DeleteOrArchiveModal = require_delete_or_archive_modal();
     var RenameModal = require_rename_modal();
     function resolveApp(options) {
       if (options.app) return options.app;
@@ -11512,7 +11701,37 @@ var require_session_list_actions = __commonJS({
           return true;
         });
       };
+      var doArchive = function() {
+        return plugin.archiveSession(session.id).then(function(archived) {
+          if (!archived) {
+            if (options.notifyCannotDelete !== false) {
+              new obsidian2.Notice(L.cannotDeleteLast);
+            }
+            return false;
+          }
+          if (options.notifyArchived !== false) {
+            new obsidian2.Notice(L.archived(session.name));
+          }
+          if (typeof options.onArchived === "function") {
+            options.onArchived(session);
+          } else if (typeof options.onDeleted === "function") {
+            options.onDeleted(session);
+          }
+          return true;
+        });
+      };
+      var allowArchive = options.allowArchive !== false && typeof plugin.archiveSession === "function";
       var shouldConfirm = !!options.forceConfirm || plugin.data.confirmDeleteByHotkey !== false;
+      if (shouldConfirm && allowArchive) {
+        new DeleteOrArchiveModal(
+          app,
+          options.archiveConfirmMessage || L.confirmDeleteOrArchive(session.name),
+          doArchive,
+          doDelete,
+          options.confirmOptions || {}
+        ).open();
+        return Promise.resolve(true);
+      }
       if (shouldConfirm) {
         new ConfirmModal(
           app,
@@ -11897,8 +12116,13 @@ var require_session_manager_modal = __commonJS({
           var contentEl = this.contentEl;
           contentEl.empty();
           contentEl.addClass("wpp-modal");
+          this.modalEl.addClass("wpp-session-manager-modal");
           this.titleEl.setText(L.modalTitle);
+          var savedPanel = this.plugin.resolveSessionManagerPanelState ? this.plugin.resolveSessionManagerPanelState() : { panelMode: "sessions", viewGroupId: null };
+          this.panelMode = savedPanel.panelMode || "sessions";
+          this.openingSessionId = null;
           var saveContainer = contentEl.createDiv({ cls: "wpp-save-container" });
+          this.saveContainerEl = saveContainer;
           this.nameInput = saveContainer.createEl("input", {
             type: "text",
             placeholder: L.savePlaceholder,
@@ -11919,7 +12143,7 @@ var require_session_manager_modal = __commonJS({
             });
           }
           var self = this;
-          this.modalGroupId = this.plugin.isGroupFeatureEnabled() ? this.plugin.data.activeGroupId || null : null;
+          this.modalGroupId = this.plugin.isGroupFeatureEnabled() ? savedPanel.viewGroupId || null : null;
           saveBtn.addEventListener("click", function() {
             self.onSave();
           });
@@ -11944,7 +12168,6 @@ var require_session_manager_modal = __commonJS({
             });
           }
           this.groupTabsRow = contentEl.createDiv({ cls: "wpp-group-tabs-row" });
-          this.renderGroupTabs();
           this.keyboardTarget = { zone: "none", rowIndex: null, actionKey: null };
           this.focusedIndex = -1;
           this.selectedIds = /* @__PURE__ */ new Set();
@@ -11960,17 +12183,31 @@ var require_session_manager_modal = __commonJS({
             self.updateSelectionUI();
           });
           this.listEl = contentEl.createDiv({ cls: "wpp-session-list" });
-          this.renderList();
-          this.setKeyboardTarget(this.getDefaultSessionTarget());
           this.contentFocusHandler = function(e) {
             self.syncKeyboardTargetFromElement(e.target);
           };
           contentEl.addEventListener("focusin", this.contentFocusHandler, true);
-          var footer = contentEl.createDiv({ cls: "wpp-modal-footer" });
-          footer.createDiv({ text: L.footerDragReorder });
+          var footer = contentEl.createDiv({ cls: "wpp-modal-footer wpp-modal-footer-bar" });
+          var footerHints = footer.createDiv({ cls: "wpp-modal-footer-hints" });
+          this.footerHintsEl = footerHints;
+          footerHints.createDiv({ text: L.footerDragReorder });
           if (this.plugin.getOrderedGroups().length > 0) {
-            footer.createDiv({ text: L.footerDragToGroup });
+            footerHints.createDiv({ text: L.footerDragToGroup });
           }
+          var archiveBtnWrap = footer.createDiv({ cls: "wpp-archive-btn-wrap" });
+          this.archiveBtn = archiveBtnWrap.createDiv({
+            cls: "wpp-icon-btn wpp-archive-btn",
+            attr: { role: "button", tabindex: "0" }
+          });
+          this.archiveBadge = archiveBtnWrap.createSpan({ cls: "wpp-archive-badge" });
+          this.archiveBtn.addEventListener("click", function() {
+            self.toggleArchiveMode();
+          });
+          this.syncPanelModeChrome();
+          this.renderGroupTabs();
+          this.renderList();
+          this.updateArchiveBadge();
+          this.setKeyboardTarget(this.getDefaultSessionTarget());
           contentEl.addEventListener("contextmenu", function(e) {
             if (e.target.closest(".wpp-session-item")) return;
             if (e.target.closest(".wpp-save-container")) return;
@@ -12019,6 +12256,16 @@ var require_session_manager_modal = __commonJS({
           }
         };
         SessionManagerModal2.prototype.getVisibleSessions = function() {
+          if (this.panelMode === "archive") {
+            var archived = this.plugin.getArchivedSessions ? this.plugin.getArchivedSessions() : [];
+            var archiveQuery = (this.filterQuery || "").trim().toLowerCase();
+            if (!archiveQuery) return archived;
+            return archived.filter(function(s) {
+              var name = (s.name || "").toLowerCase();
+              var note = (s.note || "").toLowerCase();
+              return name.indexOf(archiveQuery) !== -1 || note.indexOf(archiveQuery) !== -1;
+            });
+          }
           var sessions = this.plugin.getOrderedSessionsForGroup(this.getModalGroupId());
           var query = (this.filterQuery || "").trim().toLowerCase();
           if (!query) return sessions;
@@ -12028,20 +12275,80 @@ var require_session_manager_modal = __commonJS({
             return name.indexOf(query) !== -1 || note.indexOf(query) !== -1;
           });
         };
+        SessionManagerModal2.prototype.updateArchiveBadge = function() {
+          if (!this.archiveBadge) return;
+          var count = this.plugin.getArchivedCount ? this.plugin.getArchivedCount() : 0;
+          if (count > 0) {
+            this.archiveBadge.textContent = String(count);
+            this.archiveBadge.style.display = "";
+          } else {
+            this.archiveBadge.textContent = "";
+            this.archiveBadge.style.display = "none";
+          }
+        };
+        SessionManagerModal2.prototype.persistPanelState = function() {
+          if (!this.plugin.setSessionManagerPanelState) return;
+          this.plugin.setSessionManagerPanelState({
+            panelMode: this.panelMode === "archive" ? "archive" : "sessions",
+            viewGroupId: this.modalGroupId || null
+          });
+        };
+        SessionManagerModal2.prototype.syncPanelModeChrome = function() {
+          var L = i18n2.L;
+          if (this.panelMode === "archive") {
+            this.titleEl.setText(L.archiveArea);
+            if (this.saveContainerEl) this.saveContainerEl.style.display = "none";
+            if (this.groupTabsRow) this.groupTabsRow.style.display = "none";
+            if (this.footerHintsEl) this.footerHintsEl.style.display = "none";
+            if (this.archiveBtn) {
+              obsidian2.setIcon(this.archiveBtn, "arrow-left");
+              obsidian2.setTooltip(this.archiveBtn, L.backToSessions, { delay: 250 });
+            }
+          } else {
+            this.titleEl.setText(L.modalTitle);
+            if (this.saveContainerEl) this.saveContainerEl.style.display = "";
+            if (this.groupTabsRow) {
+              this.groupTabsRow.style.display = this.plugin.isGroupFeatureEnabled() ? "" : "none";
+            }
+            if (this.footerHintsEl) this.footerHintsEl.style.display = "";
+            if (this.archiveBtn) {
+              obsidian2.setIcon(this.archiveBtn, "trash-2");
+              obsidian2.setTooltip(this.archiveBtn, L.archiveArea, { delay: 250 });
+            }
+          }
+        };
+        SessionManagerModal2.prototype.toggleArchiveMode = function() {
+          this.panelMode = this.panelMode === "archive" ? "sessions" : "archive";
+          this.selectedIds.clear();
+          this.syncPanelModeChrome();
+          if (this.panelMode !== "archive") {
+            this.renderGroupTabs();
+          }
+          this.persistPanelState();
+          this.updateArchiveBadge();
+          this.renderList();
+        };
         SessionManagerModal2.prototype.getModalGroupId = function() {
           if (!this.plugin.isGroupFeatureEnabled()) {
             this.modalGroupId = null;
             return null;
           }
+          if (this.modalGroupId === "__ungrouped__") {
+            return "__ungrouped__";
+          }
           var groups = this.plugin.data.groups || {};
           if (this.modalGroupId && !groups[this.modalGroupId]) {
             this.modalGroupId = this.plugin.data.activeGroupId || null;
+            if (this.modalGroupId && !groups[this.modalGroupId]) {
+              this.modalGroupId = null;
+            }
           }
           return this.modalGroupId || null;
         };
         SessionManagerModal2.prototype.selectGroup = function(groupId) {
           if (!this.plugin.isGroupFeatureEnabled()) {
             this.modalGroupId = null;
+            this.persistPanelState();
             this.renderGroupTabs();
             this.renderList();
             return Promise.resolve(false);
@@ -12050,6 +12357,7 @@ var require_session_manager_modal = __commonJS({
           var nextGroupId = groupId || null;
           return this.plugin.resolveGroupViewSelection(nextGroupId).then(function(result) {
             self.modalGroupId = result.resolvedGroupId || null;
+            self.persistPanelState();
             self.renderGroupTabs();
             self.renderList();
             return result.switched;
@@ -12092,14 +12400,19 @@ var require_session_manager_modal = __commonJS({
           if (desiredKey) {
             target = rowEl.querySelector('.wpp-session-actions [data-action-key="' + desiredKey + '"]');
           }
+          if ((!target || !isElementVisible(target)) && desiredKey === "load") {
+            if (rowEl.getAttribute("data-action-key") === "load") return rowEl;
+          }
           if ((!target || !isElementVisible(target)) && desiredKey !== "load") {
             target = rowEl.querySelector('.wpp-session-actions [data-action-key="load"]');
+            if (!target && rowEl.getAttribute("data-action-key") === "load") return rowEl;
           }
           if (target && isElementVisible(target)) return target;
           var rowControls = Array.from(rowEl.querySelectorAll(".wpp-session-actions button, .wpp-session-actions .wpp-icon-btn"));
           for (var i = 0; i < rowControls.length; i++) {
             if (isElementVisible(rowControls[i])) return rowControls[i];
           }
+          if (rowEl.getAttribute("data-action-key") === "load") return rowEl;
           return null;
         };
         SessionManagerModal2.prototype.getDefaultSessionTarget = function() {
@@ -12145,6 +12458,14 @@ var require_session_manager_modal = __commonJS({
         };
         SessionManagerModal2.prototype.syncKeyboardTargetFromElement = function(el) {
           if (!el || !this.contentEl.contains(el)) return;
+          if (el.classList && el.classList.contains("wpp-session-item") && el.getAttribute("data-action-key") === "load") {
+            this.setKeyboardTarget({
+              zone: "session-action",
+              rowIndex: this.getVisibleRowIndex(el),
+              actionKey: "load"
+            });
+            return;
+          }
           var rowAction = el.closest ? el.closest(".wpp-session-actions") : null;
           if (rowAction && this.contentEl.contains(rowAction)) {
             var rowEl = el.closest(".wpp-session-item");
@@ -12195,6 +12516,19 @@ var require_session_manager_modal = __commonJS({
             return;
           }
           if (!controlEl) return;
+          if (controlEl.classList && controlEl.classList.contains("wpp-session-item") && controlEl.getAttribute("data-action-key") === "load") {
+            var rowActionBar = controlEl.querySelector(".wpp-session-actions");
+            if (!rowActionBar) return;
+            var firstControls = Array.from(rowActionBar.querySelectorAll("button, .wpp-icon-btn")).filter(function(el) {
+              return isElementVisible(el);
+            });
+            if (e.key === "ArrowRight" && firstControls.length > 0) {
+              e.preventDefault();
+              e.stopPropagation();
+              firstControls[0].focus();
+            }
+            return;
+          }
           var actionRow = controlEl.closest(".wpp-session-actions");
           if (!actionRow || !this.contentEl.contains(actionRow)) return;
           var rowControls = Array.from(actionRow.querySelectorAll("button, .wpp-icon-btn")).filter(function(el) {
@@ -12204,7 +12538,16 @@ var require_session_manager_modal = __commonJS({
           var rowIndex = rowControls.indexOf(controlEl);
           if (rowIndex === -1) return;
           var nextRowIndex = rowIndex + (e.key === "ArrowRight" ? 1 : -1);
-          if (nextRowIndex < 0 || nextRowIndex >= rowControls.length) return;
+          if (nextRowIndex < 0) {
+            var parentRow = actionRow.closest(".wpp-session-item");
+            if (parentRow && parentRow.getAttribute("data-action-key") === "load") {
+              e.preventDefault();
+              e.stopPropagation();
+              parentRow.focus();
+            }
+            return;
+          }
+          if (nextRowIndex >= rowControls.length) return;
           e.preventDefault();
           e.stopPropagation();
           rowControls[nextRowIndex].focus();
@@ -12356,7 +12699,22 @@ var require_session_manager_modal = __commonJS({
         SessionManagerModal2.prototype.renderList = function() {
           var L = i18n2.L;
           this.listEl.empty();
+          var cardLayout = true;
+          this.listEl.toggleClass("wpp-session-list--cards", cardLayout);
+          this.listEl.toggleClass("wpp-session-list--archive", this.panelMode === "archive");
           var sessions = this.getVisibleSessions();
+          if (this.panelMode === "archive") {
+            for (var ai = 0; ai < sessions.length; ai++) {
+              this.renderArchivedItem(sessions[ai], ai);
+            }
+            if (sessions.length === 0) {
+              this.listEl.createDiv({ text: L.archiveEmpty, cls: "wpp-empty-state" });
+            }
+            this.updateFocusUI();
+            this.updateSelectionUI();
+            this.updateArchiveBadge();
+            return;
+          }
           var selectedGroupId = this.getModalGroupId();
           var ordered = this.plugin.getOrderedSessionsForGroup(selectedGroupId);
           var orderIndex = {};
@@ -12385,16 +12743,43 @@ var require_session_manager_modal = __commonJS({
           });
           this.updateFocusUI();
           this.updateSelectionUI();
+          this.updateArchiveBadge();
         };
         SessionManagerModal2.prototype.renderSessionItem = function(session, index, orderIndex) {
           var L = i18n2.L;
           var isActive = session.id === this.plugin.data.activeSessionId;
+          var isOpening = this.openingSessionId === session.id;
+          var cardLayout = true;
           var self = this;
           var item = this.listEl.createDiv({ cls: "wpp-session-item" });
           item.dataset.sessionId = session.id;
+          item.setAttribute("tabindex", "-1");
+          item.setAttribute("data-action-key", "load");
+          if (isActive) item.addClass("is-active");
+          if (isOpening) item.addClass("is-opening");
+          if (cardLayout) item.addClass("wpp-session-item--card");
+          var dragHandle = item.createDiv({
+            cls: "wpp-session-item-drag",
+            attr: { "aria-label": L.footerDragReorder }
+          });
+          obsidian2.setIcon(dragHandle, "move");
+          dragHandle.addEventListener("click", function(e) {
+            e.stopPropagation();
+          });
+          if (isOpening) {
+            var loadingBadge = item.createSpan({
+              cls: "wpp-session-badge wpp-session-badge--loading"
+            });
+            loadingBadge.createSpan({ cls: "wpp-session-badge-spinner" });
+          } else if (isActive && cardLayout) {
+            var activeBadge = item.createSpan({
+              cls: "wpp-session-badge wpp-session-badge--active"
+            });
+            obsidian2.setIcon(activeBadge, "check");
+          }
           item.addEventListener("click", function(e) {
             self.setKeyboardTarget({ zone: "session-action", rowIndex: index, actionKey: "load" });
-            if (e.target.closest("button, .wpp-icon-btn")) return;
+            if (e.target.closest("button, .wpp-icon-btn, .wpp-session-item-drag")) return;
             self.blurFocusedControl();
             var cmdKey = utils.isModPressed(e);
             if (cmdKey) {
@@ -12404,6 +12789,10 @@ var require_session_manager_modal = __commonJS({
                 self.selectedIds.add(session.id);
               }
               self.updateSelectionUI();
+            } else if (!isActive && !isOpening) {
+              self.selectedIds.clear();
+              self.updateSelectionUI();
+              self.onLoad(session.id);
             } else if (!cmdKey) {
               self.selectedIds.clear();
               self.updateSelectionUI();
@@ -12419,7 +12808,7 @@ var require_session_manager_modal = __commonJS({
               isActive,
               event: e,
               showSwitch: true,
-              showRemoveFromGroup: !!selectedGroupId,
+              showRemoveFromGroup: !!selectedGroupId && selectedGroupId !== "__ungrouped__",
               getViewGroupId: function() {
                 return self.getModalGroupId();
               },
@@ -12444,33 +12833,26 @@ var require_session_manager_modal = __commonJS({
           if (session.isDefault && session.name !== this.plugin.getDefaultSessionName()) {
             nameRow.createSpan({ text: L.defaultLabel, cls: "wpp-default-label" });
           }
-          if (isActive) {
-            nameRow.createSpan({ text: L.active, cls: "wpp-active-badge" });
-          }
-          if (session.note) {
+          if (session.note && String(session.note).trim()) {
             info.createDiv({ text: session.note, cls: "wpp-session-note" });
           }
-          info.createDiv({ text: formatRelativeTime(session.modified), cls: "wpp-session-modified" });
-          var actions = item.createDiv({ cls: "wpp-session-actions" });
-          var loadBtn = actions.createEl("button", { text: L.load, cls: "wpp-load-btn" });
-          loadBtn.setAttribute("data-action-key", "load");
-          loadBtn.addEventListener("click", function() {
-            self.onLoad(session.id);
-          });
+          var footer = item.createDiv({ cls: "wpp-session-item-footer" });
+          var footLeft = footer.createDiv({ cls: "wpp-session-item-footer-left" });
+          footLeft.createDiv({ text: formatRelativeTime(session.modified), cls: "wpp-session-modified" });
+          var actions = footer.createDiv({ cls: "wpp-session-actions" });
           if (isActive && !self.plugin.isAutoSaveOnSwitchEnabled()) {
-            var saveCurrentBtn = actions.createEl("button", {
-              text: L.saveInline,
-              cls: "wpp-save-inline-btn"
+            var saveCurrentBtn = actions.createDiv({
+              cls: "wpp-icon-btn",
+              attr: { role: "button", tabindex: "-1", "data-action-key": "save-inline" }
             });
-            saveCurrentBtn.setAttribute("data-action-key", "save-inline");
+            obsidian2.setIcon(saveCurrentBtn, "hard-drive");
+            obsidian2.setTooltip(saveCurrentBtn, L.saveInline, { delay: 250 });
             saveCurrentBtn.addEventListener("click", function(e) {
               e.stopPropagation();
               self.plugin.saveActiveSession().then(function() {
                 self.renderList();
               });
             });
-            actions.insertBefore(saveCurrentBtn, loadBtn);
-            saveCurrentBtn.style.width = loadBtn.offsetWidth + "px";
           }
           if (self.plugin.isVersionHistoryEnabled()) {
             var manualSaveBtn = actions.createDiv({
@@ -12483,8 +12865,6 @@ var require_session_manager_modal = __commonJS({
               e.stopPropagation();
               self.onManualSave(session);
             });
-          }
-          if (self.plugin.isVersionHistoryEnabled()) {
             var historyBtn = actions.createDiv({
               cls: "wpp-icon-btn",
               attr: { role: "button", tabindex: "-1", "data-action-key": "history" }
@@ -12496,6 +12876,16 @@ var require_session_manager_modal = __commonJS({
               new HistoryModal(self.app, self.plugin, session).open();
             });
           }
+          var renameBtn = actions.createDiv({
+            cls: "wpp-icon-btn",
+            attr: { role: "button", tabindex: "-1", "data-action-key": "rename" }
+          });
+          obsidian2.setIcon(renameBtn, "pen-line");
+          obsidian2.setTooltip(renameBtn, L.editSessionTitle || L.rename, { delay: 250 });
+          renameBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            self.onRename(session);
+          });
           var duplicateBtn = actions.createDiv({
             cls: "wpp-icon-btn",
             attr: { role: "button", tabindex: "-1", "data-action-key": "duplicate" }
@@ -12505,16 +12895,6 @@ var require_session_manager_modal = __commonJS({
           duplicateBtn.addEventListener("click", function(e) {
             e.stopPropagation();
             self.onDuplicate(session);
-          });
-          var renameBtn = actions.createDiv({
-            cls: "wpp-icon-btn",
-            attr: { role: "button", tabindex: "-1", "data-action-key": "rename" }
-          });
-          obsidian2.setIcon(renameBtn, "pencil");
-          obsidian2.setTooltip(renameBtn, L.editSessionTitle || L.rename, { delay: 250 });
-          renameBtn.addEventListener("click", function(e) {
-            e.stopPropagation();
-            self.onRename(session);
           });
           if (Object.keys(self.plugin.data.sessions).length > 1) {
             var deleteBtn = actions.createDiv({
@@ -12532,11 +12912,14 @@ var require_session_manager_modal = __commonJS({
         SessionManagerModal2.prototype.setupDragAndDrop = function() {
           var self = this;
           if ((this.filterQuery || "").trim()) return;
-          this.listEl.querySelectorAll(".wpp-session-item").forEach(function(item) {
-            item.addEventListener("mousedown", function(e) {
+          this.listEl.querySelectorAll(".wpp-session-item-drag").forEach(function(handle) {
+            var item = handle.closest(".wpp-session-item");
+            if (!item) return;
+            handle.addEventListener("mousedown", function(e) {
               if (e.button !== 0) return;
-              if (e.target.closest("button, input, .wpp-icon-btn")) return;
               if (utils.isModPressed(e)) return;
+              e.preventDefault();
+              e.stopPropagation();
               var startX = e.clientX;
               var startY = e.clientY;
               var dragStarted = false;
@@ -12618,7 +13001,21 @@ var require_session_manager_modal = __commonJS({
                 draggedEl.classList.remove("is-dragging");
                 var dropTab = updateGroupDropTarget(ev);
                 clearGroupDropTargets();
-                if (dropTab && dropTab.dataset.groupId && dropTab.dataset.groupId !== "__all__") {
+                if (dropTab && dropTab.dataset.groupId === "__ungrouped__") {
+                  var ungroupSessionId = draggedEl.dataset.sessionId;
+                  var ungroupSessionName = (self.plugin.data.sessions[ungroupSessionId] || {}).name || "";
+                  self.plugin.clearSessionGroupMembership(ungroupSessionId).then(function(changed) {
+                    if (changed) {
+                      new obsidian2.Notice(
+                        i18n2.L.groupMovedToDefault ? i18n2.L.groupMovedToDefault(ungroupSessionName) : 'Moved "' + ungroupSessionName + '" to Default'
+                      );
+                    }
+                    self.renderGroupTabs();
+                    self.renderList();
+                  });
+                  return;
+                }
+                if (dropTab && dropTab.dataset.groupId && dropTab.dataset.groupId !== "__all__" && dropTab.dataset.groupId !== "__ungrouped__") {
                   var sessionId = draggedEl.dataset.sessionId;
                   var groupId = dropTab.dataset.groupId;
                   var sessionName = (self.plugin.data.sessions[sessionId] || {}).name || "";
@@ -12631,7 +13028,7 @@ var require_session_manager_modal = __commonJS({
                   return;
                 } else {
                   var currentGroupId = self.getModalGroupId();
-                  if (dropTab && dropTab.dataset.groupId === "__all__" && currentGroupId) {
+                  if (dropTab && dropTab.dataset.groupId === "__all__" && currentGroupId && currentGroupId !== "__ungrouped__") {
                     var rmSessionId = draggedEl.dataset.sessionId;
                     var rmGroupId = currentGroupId;
                     var rmSessionName = (self.plugin.data.sessions[rmSessionId] || {}).name || "";
@@ -12675,6 +13072,7 @@ var require_session_manager_modal = __commonJS({
             if (!result || !result.created) return;
             var createdName = result.name;
             self.modalGroupId = result.viewGroupId || null;
+            self.persistPanelState();
             self.nameInput.value = "";
             self.renderGroupTabs();
             self.renderList();
@@ -12683,9 +13081,65 @@ var require_session_manager_modal = __commonJS({
         };
         SessionManagerModal2.prototype.onLoad = function(sessionId) {
           if (sessionId === this.plugin.data.activeSessionId) return;
+          if (this.openingSessionId === sessionId) return;
           var self = this;
-          this.plugin.switchSession(sessionId).then(function(switched) {
-            if (switched) self.close();
+          this.openingSessionId = sessionId;
+          this.renderList();
+          this.plugin.switchSession(sessionId).then(function() {
+            self.openingSessionId = null;
+            self.renderList();
+          }).catch(function() {
+            self.openingSessionId = null;
+            self.renderList();
+          });
+        };
+        SessionManagerModal2.prototype.renderArchivedItem = function(session, index) {
+          var L = i18n2.L;
+          var self = this;
+          var item = this.listEl.createDiv({ cls: "wpp-session-item wpp-session-item--card wpp-session-item--archived" });
+          item.dataset.sessionId = session.id;
+          var info = item.createDiv({ cls: "wpp-session-info" });
+          info.createDiv({ cls: "wpp-session-name-row" }).createSpan({ text: session.name, cls: "wpp-session-name" });
+          if (session.note && String(session.note).trim()) {
+            info.createDiv({ text: session.note, cls: "wpp-session-note" });
+          }
+          var footer = item.createDiv({ cls: "wpp-session-item-footer" });
+          var footLeft = footer.createDiv({ cls: "wpp-session-item-footer-left" });
+          footLeft.createDiv({ text: formatRelativeTime(session.modified), cls: "wpp-session-modified" });
+          var actions = footer.createDiv({ cls: "wpp-session-actions" });
+          var restoreBtn = actions.createDiv({
+            cls: "wpp-icon-btn",
+            attr: { role: "button", tabindex: "-1", "data-action-key": "restore" }
+          });
+          obsidian2.setIcon(restoreBtn, "rotate-ccw");
+          obsidian2.setTooltip(restoreBtn, L.restoreFromArchive, { delay: 250 });
+          restoreBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            self.plugin.restoreArchivedSession(session.id).then(function(ok) {
+              if (ok) {
+                new obsidian2.Notice(L.restoredFromArchive(session.name));
+                self.renderList();
+                self.updateArchiveBadge();
+              }
+            });
+          });
+          var deleteBtn = actions.createDiv({
+            cls: "wpp-icon-btn",
+            attr: { role: "button", tabindex: "-1", "data-action-key": "delete" }
+          });
+          obsidian2.setIcon(deleteBtn, "trash");
+          obsidian2.setTooltip(deleteBtn, L.deletePermanently, { delay: 250 });
+          deleteBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            new ConfirmModal(self.app, L.confirmDeleteArchived(session.name), function() {
+              return self.plugin.permanentlyDeleteArchivedSession(session.id).then(function(ok) {
+                if (ok) {
+                  new obsidian2.Notice(L.deleted(session.name));
+                  self.renderList();
+                  self.updateArchiveBadge();
+                }
+              });
+            }).open();
           });
         };
         SessionManagerModal2.prototype.onRename = function(session) {
@@ -12825,10 +13279,12 @@ var require_session_manager_modal = __commonJS({
             },
             onResetViewGroup: function() {
               self.modalGroupId = null;
+              self.persistPanelState();
             },
             onDeleteGroup: function(deletedGroupId) {
               if (self.modalGroupId === deletedGroupId) {
-                self.modalGroupId = self.plugin.data.activeGroupId || null;
+                self.modalGroupId = null;
+                self.persistPanelState();
               }
             },
             onGroupsChanged: function() {
@@ -12849,6 +13305,7 @@ var require_session_manager_modal = __commonJS({
           });
         };
         SessionManagerModal2.prototype.onClose = function() {
+          this.persistPanelState();
           document.body.classList.remove("wpp-session-list-dragging");
           if (this.modalKeyHandler) {
             document.removeEventListener("keydown", this.modalKeyHandler, true);
@@ -12989,7 +13446,8 @@ var require_modals = __commonJS({
       RenameModal,
       UnsavedSwitchModal,
       HistoryModal,
-      HistoryEntryModal
+      HistoryEntryModal,
+      DeleteOrArchiveModal: require_delete_or_archive_modal()
     };
   }
 });
@@ -13716,6 +14174,10 @@ var require_default_data = __commonJS({
       groupFeatureEnabled: true,
       showFilterInput: false,
       overlayDefaultFocus: "current-session",
+      sessionManagerPanelMode: "sessions",
+      sessionManagerViewGroupId: null,
+      archivedSessions: {},
+      archivedOrder: [],
       showActiveSwitchCommand: false,
       numberedSwitchCommands: false,
       searchOverlayPosition: null,
@@ -14097,9 +14559,16 @@ var require_overlays = __commonJS({
             self.searchOverlayViewGroupId = null;
             return null;
           }
+          if (overlayGroupId === "__ungrouped__") {
+            self.searchOverlayViewGroupId = "__ungrouped__";
+            return "__ungrouped__";
+          }
           var groups = self.data.groups || {};
           if (overlayGroupId && !groups[overlayGroupId]) {
             overlayGroupId = self.data.activeGroupId || null;
+            if (overlayGroupId && !groups[overlayGroupId]) {
+              overlayGroupId = null;
+            }
           }
           self.searchOverlayViewGroupId = overlayGroupId || null;
           return overlayGroupId || null;
@@ -14365,7 +14834,7 @@ var require_overlays = __commonJS({
                   isActive: _isActive,
                   event: e,
                   showSwitch: true,
-                  showRemoveFromGroup: !!selectedGroupId,
+                  showRemoveFromGroup: !!selectedGroupId && selectedGroupId !== "__ungrouped__",
                   getViewGroupId: getOverlayGroupId,
                   onSwitch: function() {
                     selectedIndex = idx;
@@ -14517,7 +14986,21 @@ var require_overlays = __commonJS({
               dragItem.classList.remove("is-dragging");
               var dropTab = updateOverlayGroupDropTarget(ev);
               clearOverlayGroupDropTargets();
-              if (dropTab && dropTab.dataset.groupId && dropTab.dataset.groupId !== "__all__") {
+              if (dropTab && dropTab.dataset.groupId === "__ungrouped__") {
+                var ungroupSessionId = dragItem.dataset.sessionId;
+                var ungroupSessionName = (self.data.sessions[ungroupSessionId] || {}).name || "";
+                self.clearSessionGroupMembership(ungroupSessionId).then(function(changed) {
+                  if (changed) {
+                    new obsidian2.Notice(
+                      i18n2.L.groupMovedToDefault ? i18n2.L.groupMovedToDefault(ungroupSessionName) : 'Moved "' + ungroupSessionName + '" to Default'
+                    );
+                  }
+                  renderGroupTabs();
+                  refreshOrderedSessions();
+                });
+                return;
+              }
+              if (dropTab && dropTab.dataset.groupId && dropTab.dataset.groupId !== "__all__" && dropTab.dataset.groupId !== "__ungrouped__") {
                 var sessionId = dragItem.dataset.sessionId;
                 var groupId = dropTab.dataset.groupId;
                 var sessionName = (self.data.sessions[sessionId] || {}).name || "";
@@ -14530,7 +15013,7 @@ var require_overlays = __commonJS({
                 return;
               } else {
                 var currentGroupId = getOverlayGroupId();
-                if (dropTab && dropTab.dataset.groupId === "__all__" && currentGroupId) {
+                if (dropTab && dropTab.dataset.groupId === "__all__" && currentGroupId && currentGroupId !== "__ungrouped__") {
                   var rmSessionId = dragItem.dataset.sessionId;
                   var rmGroupId = currentGroupId;
                   var rmSessionName = (self.data.sessions[rmSessionId] || {}).name || "";
@@ -14957,8 +15440,12 @@ var require_overlays = __commonJS({
           clearTimeout(this.switchOverlayTimer);
         }
         var overlayGroupId = this.isGroupFeatureEnabled() ? typeof viewGroupId === "undefined" ? this.data.activeGroupId || null : viewGroupId || null : null;
-        if (overlayGroupId && !(this.data.groups || {})[overlayGroupId]) {
+        if (overlayGroupId === "__ungrouped__") {
+        } else if (overlayGroupId && !(this.data.groups || {})[overlayGroupId]) {
           overlayGroupId = this.data.activeGroupId || null;
+          if (overlayGroupId && !(this.data.groups || {})[overlayGroupId]) {
+            overlayGroupId = null;
+          }
         }
         var overlayMode = options.mode || "preview";
         var feedbackDurationMs = Math.max(0, Number(options.durationMs) || 400);
@@ -15000,32 +15487,49 @@ var require_overlays = __commonJS({
         if (realGroups.length > 0) {
           var groupTabsRow = document.createElement("div");
           groupTabsRow.className = "wpp-group-tabs";
+          groupTabsRow.classList.add("wpp-group-tabs-row-inner");
+          var defaultWrap = document.createElement("div");
+          defaultWrap.className = "wpp-group-tabs-default";
+          var groupsWrap = document.createElement("div");
+          groupsWrap.className = "wpp-group-tabs-groups";
+          var allWrap = document.createElement("div");
+          allWrap.className = "wpp-group-tabs-all";
+          var defaultTab = document.createElement("div");
+          defaultTab.className = "wpp-group-tab wpp-group-tab--default";
+          if (overlayGroupId === "__ungrouped__") defaultTab.classList.add("is-active");
+          defaultTab.textContent = L.groupDefault || "Default";
+          defaultTab.addEventListener("click", function(e) {
+            onGroupTabClick("__ungrouped__", e);
+          });
+          defaultWrap.appendChild(defaultTab);
           var allGroups = this.data.groups || {};
           var groupOrder = this.getOrderedGroupTabIds();
           for (var gi = 0; gi < groupOrder.length; gi++) {
             var gid = groupOrder[gi];
-            if (gid === "__all__") {
-              var allTab = document.createElement("div");
-              allTab.className = "wpp-group-tab";
-              if (!overlayGroupId) allTab.classList.add("is-active");
-              allTab.textContent = L.groupAll;
-              allTab.addEventListener("click", function(e) {
-                onGroupTabClick(null, e);
+            if (gid === "__all__" || gid === "__ungrouped__") continue;
+            if (!allGroups[gid]) continue;
+            var tab = document.createElement("div");
+            tab.className = "wpp-group-tab";
+            if (overlayGroupId === gid) tab.classList.add("is-active");
+            tab.textContent = allGroups[gid].name;
+            (function(targetGroupId) {
+              tab.addEventListener("click", function(e) {
+                onGroupTabClick(targetGroupId, e);
               });
-              groupTabsRow.appendChild(allTab);
-            } else if (allGroups[gid]) {
-              var tab = document.createElement("div");
-              tab.className = "wpp-group-tab";
-              if (overlayGroupId === gid) tab.classList.add("is-active");
-              tab.textContent = allGroups[gid].name;
-              (function(targetGroupId) {
-                tab.addEventListener("click", function(e) {
-                  onGroupTabClick(targetGroupId, e);
-                });
-              })(gid);
-              groupTabsRow.appendChild(tab);
-            }
+            })(gid);
+            groupsWrap.appendChild(tab);
           }
+          var allTab = document.createElement("div");
+          allTab.className = "wpp-group-tab wpp-group-tab--all";
+          if (!overlayGroupId) allTab.classList.add("is-active");
+          allTab.textContent = L.groupAll;
+          allTab.addEventListener("click", function(e) {
+            onGroupTabClick(null, e);
+          });
+          allWrap.appendChild(allTab);
+          groupTabsRow.appendChild(defaultWrap);
+          groupTabsRow.appendChild(groupsWrap);
+          groupTabsRow.appendChild(allWrap);
           overlay.appendChild(groupTabsRow);
         }
         var list = document.createElement("div");
@@ -15244,7 +15748,9 @@ var require_persistence = __commonJS({
       "groups",
       "groupOrder",
       "sessionGroups",
-      "activeGroupId"
+      "activeGroupId",
+      "archivedSessions",
+      "archivedOrder"
     ];
     var SETTINGS_KEYS = [
       "language",
@@ -15274,7 +15780,9 @@ var require_persistence = __commonJS({
       "confirmQuickActions",
       "showFilterInput",
       "showActiveSwitchCommand",
-      "numberedSwitchCommands"
+      "numberedSwitchCommands",
+      "sessionManagerPanelMode",
+      "sessionManagerViewGroupId"
     ];
     function joinPath(base, child) {
       return String(base || "").replace(/\/+$/, "") + "/" + child;
@@ -15468,6 +15976,22 @@ var require_persistence = __commonJS({
           if (validGids.length > 0) sessionGroupsCleaned[sid] = validGids;
         }
         var activeGroupId = raw && typeof raw.activeGroupId === "string" && groups[raw.activeGroupId] ? raw.activeGroupId : null;
+        var archivedSessions = raw && raw.archivedSessions && typeof raw.archivedSessions === "object" ? raw.archivedSessions : {};
+        var rawArchivedOrder = Array.isArray(raw && raw.archivedOrder) ? raw.archivedOrder : Object.keys(archivedSessions);
+        var archivedSeen = {};
+        var archivedOrder = [];
+        for (i = 0; i < rawArchivedOrder.length; i++) {
+          var aid = rawArchivedOrder[i];
+          if (!archivedSessions[aid] || archivedSeen[aid]) continue;
+          archivedSeen[aid] = true;
+          archivedOrder.push(aid);
+        }
+        var archivedIds = Object.keys(archivedSessions);
+        for (i = 0; i < archivedIds.length; i++) {
+          if (archivedSeen[archivedIds[i]]) continue;
+          archivedSeen[archivedIds[i]] = true;
+          archivedOrder.push(archivedIds[i]);
+        }
         return {
           activeSessionId: active,
           sessions,
@@ -15475,7 +15999,9 @@ var require_persistence = __commonJS({
           groups,
           groupOrder,
           sessionGroups: sessionGroupsCleaned,
-          activeGroupId
+          activeGroupId,
+          archivedSessions,
+          archivedOrder
         };
       };
       WorkspacePlusPlus2.prototype.ensureDir = function(path) {
@@ -16200,7 +16726,9 @@ var require_session_sync = __commonJS({
           sessionOrder: normalized.sessionOrder || [],
           groups: normalized.groups || {},
           groupOrder: normalized.groupOrder || [],
-          sessionGroups: normalized.sessionGroups || {}
+          sessionGroups: normalized.sessionGroups || {},
+          archivedSessions: normalized.archivedSessions || {},
+          archivedOrder: normalized.archivedOrder || []
         };
       };
       WorkspacePlusPlus2.prototype.getComparableSessionDataJson = function(data) {
@@ -16303,6 +16831,11 @@ var require_session_sync = __commonJS({
           local.sessionGroups || {},
           baseline.sessionGroups || {}
         );
+        var archivedSessions = mergeObjectWithLocalDeletes(
+          external.archivedSessions || {},
+          local.archivedSessions || {},
+          baseline.archivedSessions || {}
+        );
         return this.normalizeSessionData({
           activeSessionId: local.activeSessionId || external.activeSessionId,
           sessions: mergedSessions,
@@ -16310,7 +16843,9 @@ var require_session_sync = __commonJS({
           groups,
           groupOrder: mergeOrder(external.groupOrder, local.groupOrder, groups),
           sessionGroups,
-          activeGroupId: local.activeGroupId || external.activeGroupId
+          activeGroupId: local.activeGroupId || external.activeGroupId,
+          archivedSessions,
+          archivedOrder: mergeOrder(external.archivedOrder, local.archivedOrder, archivedSessions)
         });
       };
       WorkspacePlusPlus2.prototype.applySessionDataFromStorage = function(sessionData, options) {
@@ -16324,6 +16859,8 @@ var require_session_sync = __commonJS({
         this.data.groups = next.groups || {};
         this.data.groupOrder = next.groupOrder || [];
         this.data.sessionGroups = next.sessionGroups || {};
+        this.data.archivedSessions = next.archivedSessions || {};
+        this.data.archivedOrder = next.archivedOrder || [];
         if (localActiveSessionId && this.data.sessions[localActiveSessionId]) {
           this.data.activeSessionId = localActiveSessionId;
         } else if (next.activeSessionId && this.data.sessions[next.activeSessionId]) {
@@ -16588,6 +17125,12 @@ var require_sessions = __commonJS({
         var targetGroupId = groupId || null;
         if (!targetGroupId) return all;
         var sessionGroups = this.data.sessionGroups || {};
+        if (targetGroupId === "__ungrouped__") {
+          return all.filter(function(s) {
+            var groups = sessionGroups[s.id];
+            return !groups || groups.length === 0;
+          });
+        }
         return all.filter(function(s) {
           var groups = sessionGroups[s.id];
           return groups && groups.indexOf(targetGroupId) !== -1;
@@ -16803,6 +17346,12 @@ var require_sessions_validation = __commonJS({
             return result;
           }
           var createdSessionId = result.sessionId;
+          if (targetGroupId === "__ungrouped__") {
+            return self.clearSessionGroupMembership(createdSessionId).then(function() {
+              result.viewGroupId = "__ungrouped__";
+              return result;
+            });
+          }
           if (targetGroupId && targetGroupId !== beforeActiveGroupId) {
             return self.moveSessionToGroupExclusive(createdSessionId, targetGroupId).then(function() {
               return self.resolveGroupSelection(targetGroupId).then(function(selection) {
@@ -16971,7 +17520,8 @@ var require_groups = __commonJS({
       WorkspacePlusPlus2.prototype.attachSessionToActiveGroup = function(sessionId) {
         if (!this.isGroupFeatureEnabled()) return;
         var activeGroupId = this.data.activeGroupId;
-        if (!activeGroupId) return;
+        if (!activeGroupId || activeGroupId === "__ungrouped__" || activeGroupId === "__all__") return;
+        if (!this.data.groups || !this.data.groups[activeGroupId]) return;
         if (!this.data.sessionGroups) this.data.sessionGroups = {};
         if (!Array.isArray(this.data.sessionGroups[sessionId])) {
           this.data.sessionGroups[sessionId] = [];
@@ -17160,7 +17710,8 @@ var require_groups = __commonJS({
         var targetGroupId = groupId || null;
         var groups = this.data.groups || {};
         var resolvedGroupId = targetGroupId;
-        if (resolvedGroupId && !groups[resolvedGroupId]) {
+        if (resolvedGroupId === "__ungrouped__") {
+        } else if (resolvedGroupId && !groups[resolvedGroupId]) {
           resolvedGroupId = null;
         }
         return Promise.resolve({
@@ -17168,6 +17719,18 @@ var require_groups = __commonJS({
           targetGroupId,
           resolvedGroupId,
           sessions: this.getOrderedSessionsForGroup(resolvedGroupId)
+        });
+      };
+      WorkspacePlusPlus2.prototype.clearSessionGroupMembership = function(sessionId, options) {
+        if (!sessionId || !this.data.sessions[sessionId]) return Promise.resolve(false);
+        if (!this.data.sessionGroups || !this.data.sessionGroups[sessionId]) {
+          return Promise.resolve(false);
+        }
+        delete this.data.sessionGroups[sessionId];
+        this.syncSessionCommands();
+        if (options && options.persist === false) return Promise.resolve(true);
+        return this.persistData().then(function() {
+          return true;
         });
       };
       WorkspacePlusPlus2.prototype.resolveGroupSelection = function(groupId) {
@@ -17378,6 +17941,100 @@ var require_session_crud = __commonJS({
           return true;
         });
       };
+      WorkspacePlusPlus2.prototype.ensureArchiveStores = function() {
+        if (!this.data.archivedSessions || typeof this.data.archivedSessions !== "object") {
+          this.data.archivedSessions = {};
+        }
+        if (!Array.isArray(this.data.archivedOrder)) {
+          this.data.archivedOrder = [];
+        }
+      };
+      WorkspacePlusPlus2.prototype.getArchivedSessions = function() {
+        this.ensureArchiveStores();
+        var archived = this.data.archivedSessions;
+        return this.data.archivedOrder.map(function(id) {
+          return archived[id];
+        }).filter(function(s) {
+          return !!s;
+        });
+      };
+      WorkspacePlusPlus2.prototype.getArchivedCount = function() {
+        this.ensureArchiveStores();
+        return Object.keys(this.data.archivedSessions).length;
+      };
+      WorkspacePlusPlus2.prototype.archiveSession = function(sessionId) {
+        var session = this.data.sessions[sessionId];
+        if (!session || Object.keys(this.data.sessions).length <= 1) {
+          return Promise.resolve(false);
+        }
+        this.ensureArchiveStores();
+        var wasActive = this.data.activeSessionId === sessionId;
+        var orderIdx = this.data.sessionOrder.indexOf(sessionId);
+        var snapshot = Object.assign({}, session);
+        this.data.archivedSessions[sessionId] = snapshot;
+        this.data.archivedOrder.unshift(sessionId);
+        delete this.data.sessions[sessionId];
+        if (orderIdx !== -1) this.data.sessionOrder.splice(orderIdx, 1);
+        if (this.data.sessionGroups && this.data.sessionGroups[sessionId]) {
+          snapshot.groupIds = this.data.sessionGroups[sessionId].slice();
+          delete this.data.sessionGroups[sessionId];
+        }
+        var nextActiveId = null;
+        if (wasActive) {
+          var fallbackIdx = Math.min(orderIdx, this.data.sessionOrder.length - 1);
+          nextActiveId = this.data.sessionOrder[fallbackIdx] || Object.keys(this.data.sessions)[0] || null;
+          this.data.activeSessionId = nextActiveId;
+        }
+        var applyNextLayout = Promise.resolve();
+        if (wasActive && nextActiveId) {
+          var nextSession = this.data.sessions[nextActiveId];
+          applyNextLayout = nextSession && nextSession.layout ? this.applyWorkspaceLayout(nextSession.layout) : Promise.resolve();
+        }
+        this.updateStatusBar();
+        this.syncSessionCommands();
+        var self = this;
+        return applyNextLayout.then(function() {
+          return self.persistData();
+        }).then(function() {
+          return true;
+        });
+      };
+      WorkspacePlusPlus2.prototype.restoreArchivedSession = function(sessionId) {
+        this.ensureArchiveStores();
+        var archived = this.data.archivedSessions[sessionId];
+        if (!archived) return Promise.resolve(false);
+        var groupIds = Array.isArray(archived.groupIds) ? archived.groupIds.slice() : null;
+        var session = Object.assign({}, archived);
+        delete session.groupIds;
+        this.data.sessions[sessionId] = session;
+        this.data.sessionOrder.push(sessionId);
+        if (groupIds && groupIds.length > 0) {
+          if (!this.data.sessionGroups) this.data.sessionGroups = {};
+          this.data.sessionGroups[sessionId] = groupIds.filter(function(gid) {
+            return !!(this.data.groups && this.data.groups[gid]);
+          }, this);
+          if (this.data.sessionGroups[sessionId].length === 0) {
+            delete this.data.sessionGroups[sessionId];
+          }
+        }
+        delete this.data.archivedSessions[sessionId];
+        var aIdx = this.data.archivedOrder.indexOf(sessionId);
+        if (aIdx !== -1) this.data.archivedOrder.splice(aIdx, 1);
+        this.syncSessionCommands();
+        return this.persistData().then(function() {
+          return true;
+        });
+      };
+      WorkspacePlusPlus2.prototype.permanentlyDeleteArchivedSession = function(sessionId) {
+        this.ensureArchiveStores();
+        if (!this.data.archivedSessions[sessionId]) return Promise.resolve(false);
+        delete this.data.archivedSessions[sessionId];
+        var aIdx = this.data.archivedOrder.indexOf(sessionId);
+        if (aIdx !== -1) this.data.archivedOrder.splice(aIdx, 1);
+        return this.persistData().then(function() {
+          return true;
+        });
+      };
       WorkspacePlusPlus2.prototype.renameCurrentSession = function() {
         var L = i18n2.L;
         var self = this;
@@ -17462,6 +18119,8 @@ var require_session_crud = __commonJS({
         this.data.groupOrder = [];
         this.data.sessionGroups = {};
         this.data.activeGroupId = null;
+        this.data.archivedSessions = {};
+        this.data.archivedOrder = [];
         this.data.sessions[id] = this.createSessionRecord(
           id,
           this.getDefaultSessionName(),
@@ -19015,6 +19674,39 @@ var require_settings_state = __commonJS({
       };
       WorkspacePlusPlus2.prototype.setVersionHistoryConfirmRestore = function(enabled, options) {
         this.data.versionHistoryConfirmRestore = !!enabled;
+        return persistIfNeeded(this, options);
+      };
+      WorkspacePlusPlus2.prototype.resolveSessionManagerPanelState = function() {
+        var panelMode = this.data.sessionManagerPanelMode === "archive" ? "archive" : "sessions";
+        var viewGroupId = null;
+        if (this.isGroupFeatureEnabled()) {
+          var rawGroupId = this.data.sessionManagerViewGroupId || null;
+          if (rawGroupId === "__ungrouped__") {
+            viewGroupId = "__ungrouped__";
+          } else if (rawGroupId && (this.data.groups || {})[rawGroupId]) {
+            viewGroupId = rawGroupId;
+          }
+        }
+        return {
+          panelMode,
+          viewGroupId
+        };
+      };
+      WorkspacePlusPlus2.prototype.setSessionManagerPanelState = function(state, options) {
+        state = state || {};
+        var nextMode = state.panelMode === "archive" ? "archive" : "sessions";
+        var nextGroupId = null;
+        if (state.viewGroupId === "__ungrouped__") {
+          nextGroupId = "__ungrouped__";
+        } else if (state.viewGroupId && (this.data.groups || {})[state.viewGroupId]) {
+          nextGroupId = state.viewGroupId;
+        }
+        var prevMode = this.data.sessionManagerPanelMode === "archive" ? "archive" : "sessions";
+        var prevGroupId = this.data.sessionManagerViewGroupId || null;
+        var changed = prevMode !== nextMode || prevGroupId !== nextGroupId;
+        this.data.sessionManagerPanelMode = nextMode;
+        this.data.sessionManagerViewGroupId = nextGroupId;
+        if (!changed) return Promise.resolve(false);
         return persistIfNeeded(this, options);
       };
     }

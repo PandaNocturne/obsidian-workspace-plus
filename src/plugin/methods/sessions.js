@@ -44,6 +44,14 @@ function attachSessionMethods(WorkspacePlusPlus) {
         if (!targetGroupId) return all;
 
         var sessionGroups = this.data.sessionGroups || {};
+        // Virtual "Default" tab: sessions with no group membership
+        if (targetGroupId === '__ungrouped__') {
+            return all.filter(function (s) {
+                var groups = sessionGroups[s.id];
+                return !groups || groups.length === 0;
+            });
+        }
+
         return all.filter(function (s) {
             var groups = sessionGroups[s.id];
             return groups && groups.indexOf(targetGroupId) !== -1;

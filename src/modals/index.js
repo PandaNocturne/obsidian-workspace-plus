@@ -14,4 +14,5 @@ module.exports = {
     UnsavedSwitchModal: UnsavedSwitchModal,
     HistoryModal: HistoryModal,
     HistoryEntryModal: HistoryEntryModal,
+    DeleteOrArchiveModal: require('./delete-or-archive-modal'),
 };

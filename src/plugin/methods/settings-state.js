@@ -162,6 +162,44 @@ function attachSettingsStateMethods(WorkspacePlusPlus) {
         this.data.versionHistoryConfirmRestore = !!enabled;
         return persistIfNeeded(this, options);
     };
+
+    WorkspacePlusPlus.prototype.resolveSessionManagerPanelState = function () {
+        var panelMode = this.data.sessionManagerPanelMode === 'archive' ? 'archive' : 'sessions';
+        var viewGroupId = null;
+        if (this.isGroupFeatureEnabled()) {
+            var rawGroupId = this.data.sessionManagerViewGroupId || null;
+            if (rawGroupId === '__ungrouped__') {
+                viewGroupId = '__ungrouped__';
+            } else if (rawGroupId && (this.data.groups || {})[rawGroupId]) {
+                viewGroupId = rawGroupId;
+            }
+        }
+        return {
+            panelMode: panelMode,
+            viewGroupId: viewGroupId,
+        };
+    };
+
+    WorkspacePlusPlus.prototype.setSessionManagerPanelState = function (state, options) {
+        state = state || {};
+        var nextMode = state.panelMode === 'archive' ? 'archive' : 'sessions';
+        var nextGroupId = null;
+        if (state.viewGroupId === '__ungrouped__') {
+            nextGroupId = '__ungrouped__';
+        } else if (state.viewGroupId && (this.data.groups || {})[state.viewGroupId]) {
+            nextGroupId = state.viewGroupId;
+        }
+
+        var prevMode = this.data.sessionManagerPanelMode === 'archive' ? 'archive' : 'sessions';
+        var prevGroupId = this.data.sessionManagerViewGroupId || null;
+        var changed = prevMode !== nextMode || prevGroupId !== nextGroupId;
+
+        this.data.sessionManagerPanelMode = nextMode;
+        this.data.sessionManagerViewGroupId = nextGroupId;
+
+        if (!changed) return Promise.resolve(false);
+        return persistIfNeeded(this, options);
+    };
 }
 
 module.exports = attachSettingsStateMethods;

@@ -87,6 +87,8 @@ function attachSessionSyncMethods(WorkspacePlusPlus) {
             groups: normalized.groups || {},
             groupOrder: normalized.groupOrder || [],
             sessionGroups: normalized.sessionGroups || {},
+            archivedSessions: normalized.archivedSessions || {},
+            archivedOrder: normalized.archivedOrder || [],
         };
     };
 
@@ -208,6 +210,11 @@ function attachSessionSyncMethods(WorkspacePlusPlus) {
             local.sessionGroups || {},
             baseline.sessionGroups || {}
         );
+        var archivedSessions = mergeObjectWithLocalDeletes(
+            external.archivedSessions || {},
+            local.archivedSessions || {},
+            baseline.archivedSessions || {}
+        );
 
         return this.normalizeSessionData({
             activeSessionId: local.activeSessionId || external.activeSessionId,
@@ -217,6 +224,8 @@ function attachSessionSyncMethods(WorkspacePlusPlus) {
             groupOrder: mergeOrder(external.groupOrder, local.groupOrder, groups),
             sessionGroups: sessionGroups,
             activeGroupId: local.activeGroupId || external.activeGroupId,
+            archivedSessions: archivedSessions,
+            archivedOrder: mergeOrder(external.archivedOrder, local.archivedOrder, archivedSessions),
         });
     };
 
@@ -235,6 +244,8 @@ function attachSessionSyncMethods(WorkspacePlusPlus) {
         this.data.groups = next.groups || {};
         this.data.groupOrder = next.groupOrder || [];
         this.data.sessionGroups = next.sessionGroups || {};
+        this.data.archivedSessions = next.archivedSessions || {};
+        this.data.archivedOrder = next.archivedOrder || [];
 
         if (localActiveSessionId && this.data.sessions[localActiveSessionId]) {
             this.data.activeSessionId = localActiveSessionId;

@@ -3,23 +3,67 @@
    Matches the core Workspace plugin modal design
    ============================================================ */
 
+/* Session manager modal: fixed height, wide enough for 3-column cards */
+.modal.wpp-session-manager-modal {
+    width: min(80vw, 800px);
+    max-width: min(80vw, 800px);
+    height: min(60vh, 600px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal.wpp-session-manager-modal > .modal-title {
+    flex-shrink: 0;
+}
+
+.modal.wpp-session-manager-modal > .modal-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.wpp-modal {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 5px;
+    margin: 5px;
+    gap: 0;
+}
+
 /* Save section */
 .wpp-save-container {
     display: flex;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+    min-width: 0;
 }
 
 .wpp-save-input {
     flex: 1;
+    min-width: 0;
 }
 
 .wpp-filter-container {
     margin-bottom: 8px;
+    flex-shrink: 0;
+    min-width: 0;
 }
 
 .wpp-filter-input {
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 /* Session list */
@@ -27,8 +71,25 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    max-height: 60vh;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow-x: hidden;
     overflow-y: auto;
+    padding-bottom: 4px;
+}
+
+.wpp-session-list--cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    align-items: stretch;
+    /* Prevent a single row from stretching to fill the fixed modal height */
+    align-content: start;
+    width: 100%;
+    box-sizing: border-box;
+    /* Room for card focus/selection outline (offset outside the border box) */
+    padding: 4px;
 }
 
 .wpp-session-item {
@@ -36,11 +97,331 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 12px;
-    border-radius: 6px;
-    cursor: grab;
+    border-radius: var(--radius-m, 8px);
+    cursor: pointer;
+    position: relative;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-.wpp-session-item:hover {
+/* Card layout — aligned with colorful-sticky-notes workspace panel */
+.wpp-session-item--card {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-height: 120px;
+    padding: 12px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m, 8px);
+    background: var(--background-secondary);
+    box-shadow: none;
+    cursor: pointer;
+    gap: 10px;
+    overflow: visible;
+}
+
+.wpp-session-item--card:hover {
+    background: var(--background-secondary);
+}
+
+.wpp-session-item--card.wpp-focused {
+    background: var(--background-secondary);
+}
+
+.wpp-session-item--card .wpp-session-index {
+    display: none;
+}
+
+.wpp-session-item--card .wpp-session-info {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 0;
+}
+
+.wpp-session-item--card .wpp-session-name-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    min-width: 0;
+    width: 100%;
+}
+
+.wpp-session-item--card .wpp-session-name {
+    font-size: var(--font-ui-medium);
+    font-weight: 600;
+    color: var(--text-normal);
+    line-height: 1.35;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+}
+
+.wpp-session-item--card .wpp-session-note {
+    font-size: var(--font-ui-smaller);
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 2px 0 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    white-space: pre-wrap;
+    text-align: left;
+}
+
+.wpp-session-item--card .wpp-session-note--placeholder {
+    color: var(--text-faint);
+    font-style: italic;
+    -webkit-line-clamp: 2;
+}
+
+.wpp-session-item-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.wpp-session-item-footer-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.wpp-session-item--card .wpp-session-modified {
+    font-size: var(--font-ui-smaller);
+    color: var(--text-muted);
+    line-height: 1.4;
+    text-align: left;
+    max-width: 100%;
+    margin-top: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wpp-session-item--card .wpp-session-actions {
+    margin-left: 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    max-width: none;
+    min-width: 0;
+    opacity: 1;
+}
+
+.modal.wpp-session-manager-modal .wpp-session-item--card .wpp-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--input-height) - 4px);
+    min-width: calc(var(--input-height) - 4px);
+    height: calc(var(--input-height) - 4px);
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-m, 8px);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    box-sizing: border-box;
+    box-shadow: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.modal.wpp-session-manager-modal .wpp-session-item--card .wpp-icon-btn:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+.modal.wpp-session-manager-modal .wpp-session-item--card .wpp-icon-btn:focus,
+.modal.wpp-session-manager-modal .wpp-session-item--card .wpp-icon-btn:focus-visible {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+    outline: 2px solid var(--interactive-accent);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+/* Drag handle — matches colorful-sticky-notes */
+.wpp-session-item-drag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    margin: 0;
+    border-radius: var(--radius-s, 4px);
+    color: var(--text-muted);
+    cursor: grab;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease, color 0.12s ease, background-color 0.12s ease;
+}
+
+.wpp-session-item:hover .wpp-session-item-drag,
+.wpp-session-item.is-dragging .wpp-session-item-drag {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.wpp-session-item-drag svg {
+    width: var(--icon-size, 16px);
+    height: var(--icon-size, 16px);
+    flex-shrink: 0;
+    stroke: currentColor;
+}
+
+.wpp-session-item-drag:hover {
+    color: var(--text-normal);
+    background: var(--background-modifier-hover);
+}
+
+.wpp-session-item-drag:active {
+    cursor: grabbing;
+}
+
+.wpp-session-item--archived .wpp-session-item-drag {
+    display: none;
+}
+
+.wpp-session-item.is-active.wpp-session-item--card {
+    border-color: var(--interactive-accent);
+    background: var(--background-secondary);
+}
+
+.wpp-session-item.is-opening {
+    cursor: wait;
+}
+
+.wpp-session-badge {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    z-index: 2;
+    pointer-events: none;
+    box-shadow: var(--shadow-s);
+}
+
+.wpp-session-badge--loading {
+    background: var(--interactive-accent);
+}
+
+.wpp-session-badge-spinner {
+    display: block;
+    width: 15px;
+    height: 15px;
+    box-sizing: border-box;
+    border: 2px solid color-mix(in srgb, currentColor 32%, transparent);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: wpp-badge-spin 0.72s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes wpp-badge-spin {
+    to { transform: rotate(360deg); }
+}
+
+.wpp-session-badge svg {
+    display: block;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.wpp-modal-footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+    min-width: 0;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.wpp-modal-footer-hints {
+    flex: 1;
+    min-width: 0;
+}
+
+.wpp-archive-btn-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.wpp-archive-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+.wpp-session-item--archived {
+    cursor: default;
+}
+
+.wpp-session-item:hover:not(.wpp-session-item--card) {
     background: var(--background-modifier-hover-dimmed, rgba(var(--mono-rgb-100), 0.03));
 }
 
@@ -121,20 +502,23 @@
 }
 
 /* Keyboard focus */
-.wpp-session-item.wpp-focused {
+.wpp-session-item.wpp-focused:not(.wpp-session-item--card) {
     background: var(--background-modifier-hover);
 }
 
-/* Multi-select */
+/* Multi-select (no outline — accent border only where needed) */
 .wpp-session-item.wpp-selected {
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: -2px;
+    background: var(--background-modifier-hover);
 }
 
-.wpp-session-item.wpp-focused.wpp-selected {
+.wpp-session-item.wpp-focused.wpp-selected:not(.wpp-session-item--card) {
     background: var(--background-modifier-hover);
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: -2px;
+}
+
+.wpp-session-item--card.wpp-selected,
+.wpp-session-item--card.wpp-focused.wpp-selected {
+    background: var(--background-secondary);
+    border-color: var(--interactive-accent);
 }
 
 /* Bulk actions bar */
@@ -263,6 +647,11 @@ body.wpp-session-list-dragging * {
     color: var(--text-faint);
     text-align: center;
     margin-top: 12px;
+    flex-shrink: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .wpp-rename-input {
@@ -663,6 +1052,54 @@ body.wpp-session-list-dragging * {
     flex-shrink: 0;
 }
 
+.wpp-group-tabs-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.wpp-group-tabs-row-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+}
+
+.wpp-group-tabs-default {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.wpp-group-tabs-all {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.wpp-group-tabs-groups {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+}
+
 .wpp-group-tab {
     padding: 4px 12px;
     border-radius: 6px;
@@ -703,9 +1140,10 @@ body.wpp-session-list-dragging * {
 .wpp-group-tabs-row {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 12px;
     margin-bottom: 8px;
-    overflow-x: auto;
+    min-width: 0;
+    overflow: visible;
     padding: 2px 0;
 }
 

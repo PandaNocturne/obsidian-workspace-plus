@@ -121,51 +121,46 @@ function renderGroupTabs(options) {
     if (!plugin || !containerEl) return;
 
     while (containerEl.firstChild) containerEl.removeChild(containerEl.firstChild);
+    containerEl.addClass('wpp-group-tabs-row-inner');
 
     var app = options.app || plugin.app;
     var groups = options.groups || plugin.data.groups || {};
     var groupOrder = options.groupOrder || plugin.getOrderedGroupTabIds();
     var selectedGroupId = options.selectedGroupId || null;
 
+    // Left: Default | scrollable groups + add | All pinned on the right (like sticky notes)
+    var defaultWrap = containerEl.createDiv({ cls: 'wpp-group-tabs-default' });
+    var groupsWrap = containerEl.createDiv({ cls: 'wpp-group-tabs-groups' });
+    var allWrap = containerEl.createDiv({ cls: 'wpp-group-tabs-all' });
+
     function setupGroupTabDrag(tabEl) {
         if (!options.onGroupOrderCommit) return;
-        attachGroupTabDrag(tabEl, containerEl, {
+        attachGroupTabDrag(tabEl, groupsWrap, {
             stopPropagationOnMouseDown: !!options.stopPropagationOnMouseDown,
             onCommit: function (newOrder) {
-                options.onGroupOrderCommit(newOrder);
+                // Keep sentinels out of draggable order; pin __all__ for storage compat.
+                var next = ['__all__'].concat(newOrder.filter(function (id) {
+                    return id && id !== '__all__' && id !== '__ungrouped__';
+                }));
+                options.onGroupOrderCommit(next);
             },
         });
     }
 
+    // Pinned "Default" (uncategorized) tab — first, not draggable
+    var defaultTab = defaultWrap.createDiv({ cls: 'wpp-group-tab wpp-group-tab--default' });
+    defaultTab.dataset.groupId = '__ungrouped__';
+    if (selectedGroupId === '__ungrouped__') defaultTab.classList.add('is-active');
+    defaultTab.textContent = L.groupDefault || 'Default';
+    defaultTab.addEventListener('click', function () {
+        if (typeof options.onSelectGroup === 'function') {
+            options.onSelectGroup('__ungrouped__');
+        }
+    });
+
     for (var gi = 0; gi < groupOrder.length; gi++) {
         var gid = groupOrder[gi];
-
-        if (gid === '__all__') {
-            var allTab = document.createElement('div');
-            allTab.className = 'wpp-group-tab';
-            allTab.dataset.groupId = '__all__';
-            if (!selectedGroupId) allTab.classList.add('is-active');
-            allTab.textContent = L.groupAll;
-            allTab.addEventListener('click', function () {
-                if (typeof options.onSelectGroup === 'function') {
-                    options.onSelectGroup(null);
-                }
-            });
-            allTab.addEventListener('contextmenu', function (e) {
-                e.preventDefault();
-                openAllGroupsTabContextMenu({
-                    app: app,
-                    plugin: plugin,
-                    event: e,
-                    onResetViewGroup: options.onResetViewGroup,
-                    onGroupsChanged: options.onGroupsChanged,
-                    onSessionsChanged: options.onSessionsChanged,
-                });
-            });
-            setupGroupTabDrag(allTab);
-            containerEl.appendChild(allTab);
-            continue;
-        }
+        if (gid === '__all__' || gid === '__ungrouped__') continue;
 
         var group = groups[gid];
         if (!group) continue;
@@ -194,7 +189,7 @@ function renderGroupTabs(options) {
                 });
             });
             setupGroupTabDrag(tab);
-            containerEl.appendChild(tab);
+            groupsWrap.appendChild(tab);
         })(group);
     }
 
@@ -214,7 +209,29 @@ function renderGroupTabs(options) {
         }
         openCreateGroupPrompt(app, plugin, options.onGroupsChanged);
     });
-    containerEl.appendChild(addBtn);
+    groupsWrap.appendChild(addBtn);
+
+    // Pinned "All" tab on the right (not draggable)
+    var allTab = allWrap.createDiv({ cls: 'wpp-group-tab wpp-group-tab--all' });
+    allTab.dataset.groupId = '__all__';
+    if (!selectedGroupId) allTab.classList.add('is-active');
+    allTab.textContent = L.groupAll;
+    allTab.addEventListener('click', function () {
+        if (typeof options.onSelectGroup === 'function') {
+            options.onSelectGroup(null);
+        }
+    });
+    allTab.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        openAllGroupsTabContextMenu({
+            app: app,
+            plugin: plugin,
+            event: e,
+            onResetViewGroup: options.onResetViewGroup,
+            onGroupsChanged: options.onGroupsChanged,
+            onSessionsChanged: options.onSessionsChanged,
+        });
+    });
 }
 
 function openAllGroupsTabContextMenu(options) {

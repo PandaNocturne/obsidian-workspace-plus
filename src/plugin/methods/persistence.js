@@ -22,6 +22,8 @@ var SESSION_KEYS = [
     'groupOrder',
     'sessionGroups',
     'activeGroupId',
+    'archivedSessions',
+    'archivedOrder',
 ];
 
 var SETTINGS_KEYS = [
@@ -53,6 +55,8 @@ var SETTINGS_KEYS = [
     'showFilterInput',
     'showActiveSwitchCommand',
     'numberedSwitchCommands',
+    'sessionManagerPanelMode',
+    'sessionManagerViewGroupId',
 ];
 
 function joinPath(base, child) {
@@ -322,6 +326,26 @@ function attachPersistenceMethods(WorkspacePlusPlus) {
         var activeGroupId = (raw && typeof raw.activeGroupId === 'string' && groups[raw.activeGroupId])
             ? raw.activeGroupId : null;
 
+        var archivedSessions = (raw && raw.archivedSessions && typeof raw.archivedSessions === 'object')
+            ? raw.archivedSessions : {};
+        var rawArchivedOrder = Array.isArray(raw && raw.archivedOrder)
+            ? raw.archivedOrder
+            : Object.keys(archivedSessions);
+        var archivedSeen = {};
+        var archivedOrder = [];
+        for (i = 0; i < rawArchivedOrder.length; i++) {
+            var aid = rawArchivedOrder[i];
+            if (!archivedSessions[aid] || archivedSeen[aid]) continue;
+            archivedSeen[aid] = true;
+            archivedOrder.push(aid);
+        }
+        var archivedIds = Object.keys(archivedSessions);
+        for (i = 0; i < archivedIds.length; i++) {
+            if (archivedSeen[archivedIds[i]]) continue;
+            archivedSeen[archivedIds[i]] = true;
+            archivedOrder.push(archivedIds[i]);
+        }
+
         return {
             activeSessionId: active,
             sessions: sessions,
@@ -330,6 +354,8 @@ function attachPersistenceMethods(WorkspacePlusPlus) {
             groupOrder: groupOrder,
             sessionGroups: sessionGroupsCleaned,
             activeGroupId: activeGroupId,
+            archivedSessions: archivedSessions,
+            archivedOrder: archivedOrder,
         };
     };
 

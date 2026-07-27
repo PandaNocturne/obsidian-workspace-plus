@@ -51,9 +51,16 @@ function attachOverlayMethods(WorkspacePlusPlus) {
                 self.searchOverlayViewGroupId = null;
                 return null;
             }
+            if (overlayGroupId === '__ungrouped__') {
+                self.searchOverlayViewGroupId = '__ungrouped__';
+                return '__ungrouped__';
+            }
             var groups = self.data.groups || {};
             if (overlayGroupId && !groups[overlayGroupId]) {
                 overlayGroupId = self.data.activeGroupId || null;
+                if (overlayGroupId && !groups[overlayGroupId]) {
+                    overlayGroupId = null;
+                }
             }
             self.searchOverlayViewGroupId = overlayGroupId || null;
             return overlayGroupId || null;
@@ -380,7 +387,7 @@ function attachOverlayMethods(WorkspacePlusPlus) {
                             isActive: _isActive,
                             event: e,
                             showSwitch: true,
-                            showRemoveFromGroup: !!selectedGroupId,
+                            showRemoveFromGroup: !!selectedGroupId && selectedGroupId !== '__ungrouped__',
                             getViewGroupId: getOverlayGroupId,
                             onSwitch: function () {
                                 selectedIndex = idx;
@@ -561,7 +568,26 @@ function attachOverlayMethods(WorkspacePlusPlus) {
                     var dropTab = updateOverlayGroupDropTarget(ev);
                     clearOverlayGroupDropTargets();
 
-                    if (dropTab && dropTab.dataset.groupId && dropTab.dataset.groupId !== '__all__') {
+                    if (dropTab && dropTab.dataset.groupId === '__ungrouped__') {
+                        var ungroupSessionId = dragItem.dataset.sessionId;
+                        var ungroupSessionName = (self.data.sessions[ungroupSessionId] || {}).name || '';
+                        self.clearSessionGroupMembership(ungroupSessionId).then(function (changed) {
+                            if (changed) {
+                                new obsidian.Notice(
+                                    i18n.L.groupMovedToDefault
+                                        ? i18n.L.groupMovedToDefault(ungroupSessionName)
+                                        : ('Moved "' + ungroupSessionName + '" to Default')
+                                );
+                            }
+                            renderGroupTabs();
+                            refreshOrderedSessions();
+                        });
+                        return;
+                    }
+
+                    if (dropTab && dropTab.dataset.groupId
+                        && dropTab.dataset.groupId !== '__all__'
+                        && dropTab.dataset.groupId !== '__ungrouped__') {
                         var sessionId = dragItem.dataset.sessionId;
                         var groupId = dropTab.dataset.groupId;
                         var sessionName = (self.data.sessions[sessionId] || {}).name || '';
@@ -574,7 +600,9 @@ function attachOverlayMethods(WorkspacePlusPlus) {
                         return;
                     } else {
                         var currentGroupId = getOverlayGroupId();
-                        if (dropTab && dropTab.dataset.groupId === '__all__' && currentGroupId) {
+                        if (dropTab && dropTab.dataset.groupId === '__all__'
+                            && currentGroupId
+                            && currentGroupId !== '__ungrouped__') {
                         // Drop on "All" tab while viewing a group → remove from group
                             var rmSessionId = dragItem.dataset.sessionId;
                             var rmGroupId = currentGroupId;
@@ -1072,8 +1100,13 @@ function attachOverlayMethods(WorkspacePlusPlus) {
                 ? (this.data.activeGroupId || null)
                 : (viewGroupId || null))
             : null;
-        if (overlayGroupId && !(this.data.groups || {})[overlayGroupId]) {
+        if (overlayGroupId === '__ungrouped__') {
+            // keep virtual Default filter
+        } else if (overlayGroupId && !(this.data.groups || {})[overlayGroupId]) {
             overlayGroupId = this.data.activeGroupId || null;
+            if (overlayGroupId && !(this.data.groups || {})[overlayGroupId]) {
+                overlayGroupId = null;
+            }
         }
         var overlayMode = options.mode || 'preview';
         var feedbackDurationMs = Math.max(0, Number(options.durationMs) || 400);
@@ -1125,34 +1158,54 @@ function attachOverlayMethods(WorkspacePlusPlus) {
         if (realGroups.length > 0) {
             var groupTabsRow = document.createElement('div');
             groupTabsRow.className = 'wpp-group-tabs';
+            groupTabsRow.classList.add('wpp-group-tabs-row-inner');
+
+            var defaultWrap = document.createElement('div');
+            defaultWrap.className = 'wpp-group-tabs-default';
+            var groupsWrap = document.createElement('div');
+            groupsWrap.className = 'wpp-group-tabs-groups';
+            var allWrap = document.createElement('div');
+            allWrap.className = 'wpp-group-tabs-all';
+
+            var defaultTab = document.createElement('div');
+            defaultTab.className = 'wpp-group-tab wpp-group-tab--default';
+            if (overlayGroupId === '__ungrouped__') defaultTab.classList.add('is-active');
+            defaultTab.textContent = L.groupDefault || 'Default';
+            defaultTab.addEventListener('click', function (e) {
+                onGroupTabClick('__ungrouped__', e);
+            });
+            defaultWrap.appendChild(defaultTab);
 
             var allGroups = this.data.groups || {};
             var groupOrder = this.getOrderedGroupTabIds();
             for (var gi = 0; gi < groupOrder.length; gi++) {
                 var gid = groupOrder[gi];
-                if (gid === '__all__') {
-                    var allTab = document.createElement('div');
-                    allTab.className = 'wpp-group-tab';
-                    if (!overlayGroupId) allTab.classList.add('is-active');
-                    allTab.textContent = L.groupAll;
-                    allTab.addEventListener('click', function (e) {
-                        onGroupTabClick(null, e);
+                if (gid === '__all__' || gid === '__ungrouped__') continue;
+                if (!allGroups[gid]) continue;
+                var tab = document.createElement('div');
+                tab.className = 'wpp-group-tab';
+                if (overlayGroupId === gid) tab.classList.add('is-active');
+                tab.textContent = allGroups[gid].name;
+                (function (targetGroupId) {
+                    tab.addEventListener('click', function (e) {
+                        onGroupTabClick(targetGroupId, e);
                     });
-                    groupTabsRow.appendChild(allTab);
-                } else if (allGroups[gid]) {
-                    var tab = document.createElement('div');
-                    tab.className = 'wpp-group-tab';
-                    if (overlayGroupId === gid) tab.classList.add('is-active');
-                    tab.textContent = allGroups[gid].name;
-                    (function (targetGroupId) {
-                        tab.addEventListener('click', function (e) {
-                            onGroupTabClick(targetGroupId, e);
-                        });
-                    })(gid);
-                    groupTabsRow.appendChild(tab);
-                }
+                })(gid);
+                groupsWrap.appendChild(tab);
             }
 
+            var allTab = document.createElement('div');
+            allTab.className = 'wpp-group-tab wpp-group-tab--all';
+            if (!overlayGroupId) allTab.classList.add('is-active');
+            allTab.textContent = L.groupAll;
+            allTab.addEventListener('click', function (e) {
+                onGroupTabClick(null, e);
+            });
+            allWrap.appendChild(allTab);
+
+            groupTabsRow.appendChild(defaultWrap);
+            groupTabsRow.appendChild(groupsWrap);
+            groupTabsRow.appendChild(allWrap);
             overlay.appendChild(groupTabsRow);
         }
 

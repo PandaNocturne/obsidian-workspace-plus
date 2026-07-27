@@ -39,7 +39,8 @@ function attachGroupMethods(WorkspacePlusPlus) {
     WorkspacePlusPlus.prototype.attachSessionToActiveGroup = function (sessionId) {
         if (!this.isGroupFeatureEnabled()) return;
         var activeGroupId = this.data.activeGroupId;
-        if (!activeGroupId) return;
+        if (!activeGroupId || activeGroupId === '__ungrouped__' || activeGroupId === '__all__') return;
+        if (!this.data.groups || !this.data.groups[activeGroupId]) return;
         if (!this.data.sessionGroups) this.data.sessionGroups = {};
         if (!Array.isArray(this.data.sessionGroups[sessionId])) {
             this.data.sessionGroups[sessionId] = [];
@@ -248,7 +249,9 @@ function attachGroupMethods(WorkspacePlusPlus) {
         var targetGroupId = groupId || null;
         var groups = this.data.groups || {};
         var resolvedGroupId = targetGroupId;
-        if (resolvedGroupId && !groups[resolvedGroupId]) {
+        if (resolvedGroupId === '__ungrouped__') {
+            // Virtual Default / uncategorized tab
+        } else if (resolvedGroupId && !groups[resolvedGroupId]) {
             resolvedGroupId = null;
         }
 
@@ -258,6 +261,17 @@ function attachGroupMethods(WorkspacePlusPlus) {
             resolvedGroupId: resolvedGroupId,
             sessions: this.getOrderedSessionsForGroup(resolvedGroupId),
         });
+    };
+
+    WorkspacePlusPlus.prototype.clearSessionGroupMembership = function (sessionId, options) {
+        if (!sessionId || !this.data.sessions[sessionId]) return Promise.resolve(false);
+        if (!this.data.sessionGroups || !this.data.sessionGroups[sessionId]) {
+            return Promise.resolve(false);
+        }
+        delete this.data.sessionGroups[sessionId];
+        this.syncSessionCommands();
+        if (options && options.persist === false) return Promise.resolve(true);
+        return this.persistData().then(function () { return true; });
     };
 
     WorkspacePlusPlus.prototype.resolveGroupSelection = function (groupId) {

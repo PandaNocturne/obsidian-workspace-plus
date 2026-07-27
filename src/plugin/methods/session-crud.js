@@ -88,6 +88,119 @@ function attachSessionCrudMethods(WorkspacePlusPlus) {
             .then(function () { return true; });
     };
 
+    WorkspacePlusPlus.prototype.ensureArchiveStores = function () {
+        if (!this.data.archivedSessions || typeof this.data.archivedSessions !== 'object') {
+            this.data.archivedSessions = {};
+        }
+        if (!Array.isArray(this.data.archivedOrder)) {
+            this.data.archivedOrder = [];
+        }
+    };
+
+    WorkspacePlusPlus.prototype.getArchivedSessions = function () {
+        this.ensureArchiveStores();
+        var archived = this.data.archivedSessions;
+        return this.data.archivedOrder
+            .map(function (id) { return archived[id]; })
+            .filter(function (s) { return !!s; });
+    };
+
+    WorkspacePlusPlus.prototype.getArchivedCount = function () {
+        this.ensureArchiveStores();
+        return Object.keys(this.data.archivedSessions).length;
+    };
+
+    /**
+     * Move a session into the archive (soft remove from active list).
+     */
+    WorkspacePlusPlus.prototype.archiveSession = function (sessionId) {
+        var session = this.data.sessions[sessionId];
+        if (!session || Object.keys(this.data.sessions).length <= 1) {
+            return Promise.resolve(false);
+        }
+
+        this.ensureArchiveStores();
+
+        var wasActive = this.data.activeSessionId === sessionId;
+        var orderIdx = this.data.sessionOrder.indexOf(sessionId);
+
+        var snapshot = Object.assign({}, session);
+        this.data.archivedSessions[sessionId] = snapshot;
+        this.data.archivedOrder.unshift(sessionId);
+
+        delete this.data.sessions[sessionId];
+        if (orderIdx !== -1) this.data.sessionOrder.splice(orderIdx, 1);
+        if (this.data.sessionGroups && this.data.sessionGroups[sessionId]) {
+            // Keep group membership on the archived snapshot for restore.
+            snapshot.groupIds = this.data.sessionGroups[sessionId].slice();
+            delete this.data.sessionGroups[sessionId];
+        }
+
+        var nextActiveId = null;
+        if (wasActive) {
+            var fallbackIdx = Math.min(orderIdx, this.data.sessionOrder.length - 1);
+            nextActiveId = this.data.sessionOrder[fallbackIdx]
+                || Object.keys(this.data.sessions)[0]
+                || null;
+            this.data.activeSessionId = nextActiveId;
+        }
+
+        var applyNextLayout = Promise.resolve();
+        if (wasActive && nextActiveId) {
+            var nextSession = this.data.sessions[nextActiveId];
+            applyNextLayout = nextSession && nextSession.layout
+                ? this.applyWorkspaceLayout(nextSession.layout)
+                : Promise.resolve();
+        }
+
+        this.updateStatusBar();
+        this.syncSessionCommands();
+        var self = this;
+        return applyNextLayout
+            .then(function () {
+                return self.persistData();
+            })
+            .then(function () { return true; });
+    };
+
+    WorkspacePlusPlus.prototype.restoreArchivedSession = function (sessionId) {
+        this.ensureArchiveStores();
+        var archived = this.data.archivedSessions[sessionId];
+        if (!archived) return Promise.resolve(false);
+
+        var groupIds = Array.isArray(archived.groupIds) ? archived.groupIds.slice() : null;
+        var session = Object.assign({}, archived);
+        delete session.groupIds;
+
+        this.data.sessions[sessionId] = session;
+        this.data.sessionOrder.push(sessionId);
+        if (groupIds && groupIds.length > 0) {
+            if (!this.data.sessionGroups) this.data.sessionGroups = {};
+            this.data.sessionGroups[sessionId] = groupIds.filter(function (gid) {
+                return !!(this.data.groups && this.data.groups[gid]);
+            }, this);
+            if (this.data.sessionGroups[sessionId].length === 0) {
+                delete this.data.sessionGroups[sessionId];
+            }
+        }
+
+        delete this.data.archivedSessions[sessionId];
+        var aIdx = this.data.archivedOrder.indexOf(sessionId);
+        if (aIdx !== -1) this.data.archivedOrder.splice(aIdx, 1);
+
+        this.syncSessionCommands();
+        return this.persistData().then(function () { return true; });
+    };
+
+    WorkspacePlusPlus.prototype.permanentlyDeleteArchivedSession = function (sessionId) {
+        this.ensureArchiveStores();
+        if (!this.data.archivedSessions[sessionId]) return Promise.resolve(false);
+        delete this.data.archivedSessions[sessionId];
+        var aIdx = this.data.archivedOrder.indexOf(sessionId);
+        if (aIdx !== -1) this.data.archivedOrder.splice(aIdx, 1);
+        return this.persistData().then(function () { return true; });
+    };
+
     WorkspacePlusPlus.prototype.renameCurrentSession = function () {
         var L = i18n.L;
         var self = this;
@@ -179,6 +292,8 @@ function attachSessionCrudMethods(WorkspacePlusPlus) {
         this.data.groupOrder = [];
         this.data.sessionGroups = {};
         this.data.activeGroupId = null;
+        this.data.archivedSessions = {};
+        this.data.archivedOrder = [];
         this.data.sessions[id] = this.createSessionRecord(
             id,
             this.getDefaultSessionName(),
