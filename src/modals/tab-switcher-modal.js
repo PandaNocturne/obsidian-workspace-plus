@@ -400,21 +400,8 @@ var TabSwitcherModal = /** @class */ (function () {
             },
         });
 
-        // Header: drag + icon + title + pin + close
+        // Header: icon + title + pin + close (drag via header)
         var header = card.createDiv({ cls: 'wpp-tab-switcher-header' });
-
-        var dragHandle = header.createDiv({
-            cls: 'wpp-tab-switcher-drag',
-            attr: {
-                role: 'button',
-                tabindex: '-1',
-                'aria-label': L.tabSwitcherDragReorder,
-            },
-        });
-        obsidian.setIcon(dragHandle, 'grip-vertical');
-        if (typeof obsidian.setTooltip === 'function') {
-            obsidian.setTooltip(dragHandle, L.tabSwitcherDragReorder, { delay: 250 });
-        }
 
         var iconEl = header.createDiv({ cls: 'wpp-tab-switcher-icon' });
         obsidian.setIcon(iconEl, getLeafIcon(leaf));

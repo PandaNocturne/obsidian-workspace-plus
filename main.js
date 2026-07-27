@@ -10239,8 +10239,7 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
         tabSwitcherCloseTab: "Close tab",
         tabSwitcherPinTab: "Pin tab",
-        tabSwitcherUnpinTab: "Unpin tab",
-        tabSwitcherDragReorder: "Drag to reorder"
+        tabSwitcherUnpinTab: "Unpin tab"
       },
       zh: {
         cmdTabSwitcher: "\u5207\u6362\u6807\u7B7E\u9875\uFF08\u4EFB\u52A1\u89C6\u56FE\uFF09",
@@ -10249,8 +10248,7 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
         tabSwitcherCloseTab: "\u5173\u95ED\u6807\u7B7E\u9875",
         tabSwitcherPinTab: "\u56FA\u5B9A\u6807\u7B7E\u9875",
-        tabSwitcherUnpinTab: "\u53D6\u6D88\u56FA\u5B9A",
-        tabSwitcherDragReorder: "\u62D6\u52A8\u6392\u5E8F"
+        tabSwitcherUnpinTab: "\u53D6\u6D88\u56FA\u5B9A"
       },
       "zh-TW": {
         cmdTabSwitcher: "\u5207\u63DB\u5206\u9801\uFF08\u4EFB\u52D9\u6AA2\u8996\uFF09",
@@ -10259,8 +10257,7 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
         tabSwitcherCloseTab: "\u95DC\u9589\u5206\u9801",
         tabSwitcherPinTab: "\u91D8\u9078\u5206\u9801",
-        tabSwitcherUnpinTab: "\u53D6\u6D88\u91D8\u9078",
-        tabSwitcherDragReorder: "\u62D6\u66F3\u6392\u5E8F"
+        tabSwitcherUnpinTab: "\u53D6\u6D88\u91D8\u9078"
       },
       ja: {
         cmdTabSwitcher: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048\uFF08\u30DF\u30C3\u30B7\u30E7\u30F3\u30B3\u30F3\u30C8\u30ED\u30FC\u30EB\uFF09",
@@ -10269,8 +10266,7 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
         tabSwitcherCloseTab: "\u30BF\u30D6\u3092\u9589\u3058\u308B",
         tabSwitcherPinTab: "\u30BF\u30D6\u3092\u30D4\u30F3\u7559\u3081",
-        tabSwitcherUnpinTab: "\u30D4\u30F3\u7559\u3081\u3092\u89E3\u9664",
-        tabSwitcherDragReorder: "\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048"
+        tabSwitcherUnpinTab: "\u30D4\u30F3\u7559\u3081\u3092\u89E3\u9664"
       },
       ko: {
         cmdTabSwitcher: "\uD0ED \uC804\uD658 (\uBBF8\uC158 \uCEE8\uD2B8\uB864)",
@@ -10279,8 +10275,7 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
         tabSwitcherCloseTab: "\uD0ED \uB2EB\uAE30",
         tabSwitcherPinTab: "\uD0ED \uACE0\uC815",
-        tabSwitcherUnpinTab: "\uACE0\uC815 \uD574\uC81C",
-        tabSwitcherDragReorder: "\uB4DC\uB798\uADF8\uD558\uC5EC \uC815\uB82C"
+        tabSwitcherUnpinTab: "\uACE0\uC815 \uD574\uC81C"
       }
     };
     var tabSwitcherLangs = Object.keys(STRINGS);
@@ -12187,6 +12182,10 @@ var require_session_manager_modal = __commonJS({
           contentEl.empty();
           contentEl.addClass("wpp-modal");
           this.modalEl.addClass("wpp-session-manager-modal");
+          this.modalEl.style.setProperty("width", "min(80vw, 800px)", "important");
+          this.modalEl.style.setProperty("max-width", "min(80vw, 800px)", "important");
+          this.modalEl.style.setProperty("height", "min(60vh, 600px)", "important");
+          this.modalEl.style.setProperty("max-height", "min(60vh, 600px)", "important");
           this.titleEl.setText(L.modalTitle);
           var savedPanel = this.plugin.resolveSessionManagerPanelState ? this.plugin.resolveSessionManagerPanelState() : { panelMode: "sessions", viewGroupId: null };
           this.panelMode = savedPanel.panelMode || "sessions";
@@ -13864,18 +13863,6 @@ var require_tab_switcher_modal = __commonJS({
             }
           });
           var header = card.createDiv({ cls: "wpp-tab-switcher-header" });
-          var dragHandle = header.createDiv({
-            cls: "wpp-tab-switcher-drag",
-            attr: {
-              role: "button",
-              tabindex: "-1",
-              "aria-label": L.tabSwitcherDragReorder
-            }
-          });
-          obsidian2.setIcon(dragHandle, "grip-vertical");
-          if (typeof obsidian2.setTooltip === "function") {
-            obsidian2.setTooltip(dragHandle, L.tabSwitcherDragReorder, { delay: 250 });
-          }
           var iconEl = header.createDiv({ cls: "wpp-tab-switcher-icon" });
           obsidian2.setIcon(iconEl, getLeafIcon(leaf));
           header.createDiv({

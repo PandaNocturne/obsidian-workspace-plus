@@ -41,6 +41,11 @@ var SessionManagerModal = /** @class */ (function (_super) {
         contentEl.empty();
         contentEl.addClass('wpp-modal');
         this.modalEl.addClass('wpp-session-manager-modal');
+        // Inline size so CSS BOM / theme cascade cannot shrink the 3-column card layout
+        this.modalEl.style.setProperty('width', 'min(80vw, 800px)', 'important');
+        this.modalEl.style.setProperty('max-width', 'min(80vw, 800px)', 'important');
+        this.modalEl.style.setProperty('height', 'min(60vh, 600px)', 'important');
+        this.modalEl.style.setProperty('max-height', 'min(60vh, 600px)', 'important');
 
         this.titleEl.setText(L.modalTitle);
         var savedPanel = this.plugin.resolveSessionManagerPanelState

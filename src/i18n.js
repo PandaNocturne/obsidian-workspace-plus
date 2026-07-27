@@ -7828,7 +7828,6 @@ var TAB_SWITCHER_STRINGS = {
         tabSwitcherCloseTab: 'Close tab',
         tabSwitcherPinTab: 'Pin tab',
         tabSwitcherUnpinTab: 'Unpin tab',
-        tabSwitcherDragReorder: 'Drag to reorder',
     },
     zh: {
         cmdTabSwitcher: '切换标签页（任务视图）',
@@ -7838,7 +7837,6 @@ var TAB_SWITCHER_STRINGS = {
         tabSwitcherCloseTab: '关闭标签页',
         tabSwitcherPinTab: '固定标签页',
         tabSwitcherUnpinTab: '取消固定',
-        tabSwitcherDragReorder: '拖动排序',
     },
     'zh-TW': {
         cmdTabSwitcher: '切換分頁（任務檢視）',
@@ -7848,7 +7846,6 @@ var TAB_SWITCHER_STRINGS = {
         tabSwitcherCloseTab: '關閉分頁',
         tabSwitcherPinTab: '釘選分頁',
         tabSwitcherUnpinTab: '取消釘選',
-        tabSwitcherDragReorder: '拖曳排序',
     },
     ja: {
         cmdTabSwitcher: 'タブを切り替え（ミッションコントロール）',
@@ -7858,7 +7855,6 @@ var TAB_SWITCHER_STRINGS = {
         tabSwitcherCloseTab: 'タブを閉じる',
         tabSwitcherPinTab: 'タブをピン留め',
         tabSwitcherUnpinTab: 'ピン留めを解除',
-        tabSwitcherDragReorder: 'ドラッグで並べ替え',
     },
     ko: {
         cmdTabSwitcher: '탭 전환 (미션 컨트롤)',
@@ -7868,7 +7864,6 @@ var TAB_SWITCHER_STRINGS = {
         tabSwitcherCloseTab: '탭 닫기',
         tabSwitcherPinTab: '탭 고정',
         tabSwitcherUnpinTab: '고정 해제',
-        tabSwitcherDragReorder: '드래그하여 정렬',
     },
 };
 
