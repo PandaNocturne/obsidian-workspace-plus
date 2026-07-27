@@ -57,6 +57,7 @@ var SETTINGS_KEYS = [
     'numberedSwitchCommands',
     'sessionManagerPanelMode',
     'sessionManagerViewGroupId',
+    'restoreSidebars',
 ];
 
 function joinPath(base, child) {

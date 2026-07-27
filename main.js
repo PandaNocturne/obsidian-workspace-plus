@@ -13698,6 +13698,14 @@ var require_settings = __commonJS({
                 sc.inputEl.dispatchEvent(new Event("input"));
               });
             });
+            addToggleSetting(contentEl, {
+              name: L.settingsRestoreSidebars,
+              desc: L.settingsRestoreSidebarsDesc,
+              value: self.plugin.isSidebarRestoreEnabled(),
+              onChange: function(value) {
+                self.plugin.setRestoreSidebars(value);
+              }
+            });
           }
           if (self.activeTab === "sessions") {
             addSubsection(contentEl, L.settingsSubsectionAutoSaveMode);
@@ -13736,15 +13744,6 @@ var require_settings = __commonJS({
                 }
               });
             }
-            addSubsection(contentEl, L.settingsSubsectionSessionRestore);
-            addToggleSetting(contentEl, {
-              name: L.settingsRestoreSidebars,
-              desc: L.settingsRestoreSidebarsDesc,
-              value: self.plugin.isSidebarRestoreEnabled(),
-              onChange: function(value) {
-                self.plugin.setRestoreSidebars(value);
-              }
-            });
             addSection(L.settingsSectionSessionListSearch);
             addToggleSetting(contentEl, {
               name: L.settingsShowFilterInput,
@@ -15782,7 +15781,8 @@ var require_persistence = __commonJS({
       "showActiveSwitchCommand",
       "numberedSwitchCommands",
       "sessionManagerPanelMode",
-      "sessionManagerViewGroupId"
+      "sessionManagerViewGroupId",
+      "restoreSidebars"
     ];
     function joinPath(base, child) {
       return String(base || "").replace(/\/+$/, "") + "/" + child;

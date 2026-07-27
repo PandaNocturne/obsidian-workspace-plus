@@ -96,6 +96,15 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
                     });
                 });
 
+            addToggleSetting(contentEl, {
+                name: L.settingsRestoreSidebars,
+                desc: L.settingsRestoreSidebarsDesc,
+                value: self.plugin.isSidebarRestoreEnabled(),
+                onChange: function (value) {
+                    self.plugin.setRestoreSidebars(value);
+                },
+            });
+
         }
 
         // ── Sessions tab ──
@@ -143,17 +152,6 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
                     },
                 });
             }
-
-            addSubsection(contentEl, L.settingsSubsectionSessionRestore);
-
-            addToggleSetting(contentEl, {
-                name: L.settingsRestoreSidebars,
-                desc: L.settingsRestoreSidebarsDesc,
-                value: self.plugin.isSidebarRestoreEnabled(),
-                onChange: function (value) {
-                    self.plugin.setRestoreSidebars(value);
-                },
-            });
 
             addSection(L.settingsSectionSessionListSearch);
 
