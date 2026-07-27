@@ -13,3 +13,8 @@ tmp/
 .claude/
 .workspace-plus-plus/
 .hotreload
+
+# vscode
+.vscode 
+.history 
+.github  

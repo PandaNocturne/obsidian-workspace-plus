@@ -239,11 +239,15 @@ function attachSessionCrudMethods(WorkspacePlusPlus) {
 
         var name = this.getNextSessionName();
         var newId = utils.generateId();
-        this.data.sessions[newId] = this.createSessionRecord(
+        var copy = this.createSessionRecord(
             newId,
             name,
             layoutUtils.cloneLayout(source.layout)
         );
+        if (source.note) {
+            copy.note = source.note;
+        }
+        this.data.sessions[newId] = copy;
         this.data.sessionOrder.push(newId);
 
         // Copy group memberships

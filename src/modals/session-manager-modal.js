@@ -3,6 +3,7 @@
 var obsidian = require('obsidian');
 var i18n = require('../i18n');
 var ConfirmModal = require('./confirm-modal');
+var HistoryModal = require('./history-modal');
 var formatRelativeTime = require('./format-relative-time');
 var groupTabUi = require('../group-tab-ui');
 var navigationUtils = require('../navigation-utils');
@@ -195,7 +196,9 @@ var SessionManagerModal = /** @class */ (function (_super) {
         var query = (this.filterQuery || '').trim().toLowerCase();
         if (!query) return sessions;
         return sessions.filter(function (s) {
-            return (s.name || '').toLowerCase().indexOf(query) !== -1;
+            var name = (s.name || '').toLowerCase();
+            var note = (s.note || '').toLowerCase();
+            return name.indexOf(query) !== -1 || note.indexOf(query) !== -1;
         });
     };
 
@@ -673,6 +676,9 @@ var SessionManagerModal = /** @class */ (function (_super) {
         if (isActive) {
             nameRow.createSpan({ text: L.active, cls: 'wpp-active-badge' });
         }
+        if (session.note) {
+            info.createDiv({ text: session.note, cls: 'wpp-session-note' });
+        }
         info.createDiv({ text: formatRelativeTime(session.modified), cls: 'wpp-session-modified' });
 
         // Action buttons
@@ -699,13 +705,39 @@ var SessionManagerModal = /** @class */ (function (_super) {
             saveCurrentBtn.style.width = loadBtn.offsetWidth + 'px';
         }
 
-        // Rename button
+        // Version history button
+        if (self.plugin.isVersionHistoryEnabled()) {
+            var historyBtn = actions.createDiv({
+                cls: 'wpp-icon-btn',
+                attr: { role: 'button', tabindex: '-1', 'data-action-key': 'history' },
+            });
+            obsidian.setIcon(historyBtn, 'history');
+            obsidian.setTooltip(historyBtn, L.contextVersionHistory, { delay: 250 });
+            historyBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                new HistoryModal(self.app, self.plugin, session).open();
+            });
+        }
+
+        // Duplicate / copy button
+        var duplicateBtn = actions.createDiv({
+            cls: 'wpp-icon-btn',
+            attr: { role: 'button', tabindex: '-1', 'data-action-key': 'duplicate' },
+        });
+        obsidian.setIcon(duplicateBtn, 'copy');
+        obsidian.setTooltip(duplicateBtn, L.contextDuplicateSession, { delay: 250 });
+        duplicateBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            self.onDuplicate(session);
+        });
+
+        // Rename / edit button (name + note)
         var renameBtn = actions.createDiv({
             cls: 'wpp-icon-btn',
             attr: { role: 'button', tabindex: '-1', 'data-action-key': 'rename' },
         });
         obsidian.setIcon(renameBtn, 'pencil');
-        obsidian.setTooltip(renameBtn, L.rename, { delay: 250 });
+        obsidian.setTooltip(renameBtn, L.editSessionTitle || L.rename, { delay: 250 });
         renameBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             self.onRename(session);
@@ -927,6 +959,13 @@ var SessionManagerModal = /** @class */ (function (_super) {
             onRenamed: function () {
                 self.renderList();
             },
+        });
+    };
+
+    SessionManagerModal.prototype.onDuplicate = function (session) {
+        var self = this;
+        this.plugin.duplicateSession(session.id).then(function () {
+            self.renderList();
         });
     };
 

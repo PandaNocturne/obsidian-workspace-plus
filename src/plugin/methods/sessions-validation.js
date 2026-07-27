@@ -139,6 +139,60 @@ function attachSessionValidationMethods(WorkspacePlusPlus) {
         });
     };
 
+    /**
+     * Update session name and/or note. Name must be non-empty.
+     * Pass note as a string to set/clear it; omit note to leave unchanged.
+     */
+    WorkspacePlusPlus.prototype.editSessionById = function (sessionId, newName, note, options) {
+        var L = i18n.L;
+        options = options || {};
+        var session = this.data.sessions[sessionId];
+        if (!session) return Promise.resolve(false);
+
+        var normalized = typeof newName === 'string' ? newName.trim() : '';
+        if (!normalized) {
+            if (options.notify !== false) {
+                new obsidian.Notice(L.emptyName);
+            }
+            return Promise.resolve(false);
+        }
+
+        var updateNote = arguments.length >= 3 && note !== undefined;
+        var nextNote = updateNote && typeof note === 'string' ? note.trim() : '';
+        var nameChanged = normalized !== session.name;
+        var noteChanged = updateNote && nextNote !== (session.note || '');
+
+        if (!nameChanged && !noteChanged) return Promise.resolve(false);
+
+        if (nameChanged && this.isSessionNameTaken(normalized, sessionId)) {
+            if (options.notify !== false) {
+                new obsidian.Notice(L.duplicateName);
+            }
+            return Promise.resolve(false);
+        }
+
+        var oldName = session.name;
+        if (nameChanged) session.name = normalized;
+        if (updateNote) {
+            if (nextNote) session.note = nextNote;
+            else delete session.note;
+        }
+        session.modified = Date.now();
+        this.updateStatusBar();
+        this.syncSessionCommands();
+
+        return this.persistData().then(function () {
+            if (options.notify !== false) {
+                if (nameChanged) {
+                    new obsidian.Notice(L.renamed(oldName, normalized));
+                } else {
+                    new obsidian.Notice(L.sessionNoteUpdated(normalized));
+                }
+            }
+            return true;
+        });
+    };
+
     WorkspacePlusPlus.prototype.createGroupValidated = function (name, options) {
         var L = i18n.L;
         options = options || {};

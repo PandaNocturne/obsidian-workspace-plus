@@ -7,6 +7,7 @@ var layoutUtils = require('../../layout-utils');
 var HOUR = 3600000;
 var DAY = 86400000;
 var WEEK = 7 * DAY;
+var MONTH = 30 * DAY;
 var MAX_HISTORY = 45;
 
 function attachHistoryMethods(WorkspacePlusPlus) {
@@ -105,15 +106,21 @@ function attachHistoryMethods(WorkspacePlusPlus) {
                     buckets[key] = true;
                     result.push(entry);
                 }
-            } else if (age <= 30 * DAY) {
+            } else if (age <= MONTH) {
                 // 7-30 days: 1 per week
                 key = 'w' + Math.floor(age / WEEK);
                 if (!buckets[key]) {
                     buckets[key] = true;
                     result.push(entry);
                 }
+            } else {
+                // Older than 30 days: keep 1 per month (do not drop)
+                key = 'm' + Math.floor(age / MONTH);
+                if (!buckets[key]) {
+                    buckets[key] = true;
+                    result.push(entry);
+                }
             }
-            // Older than 30 days: drop
         }
 
         if (result.length > MAX_HISTORY) result.length = MAX_HISTORY;

@@ -7617,6 +7617,46 @@ for (var resetLangIndex = 0; resetLangIndex < resetLangs.length; resetLangIndex+
     }
 }
 
+var SESSION_EDIT_STRINGS = {
+    en: {
+        editSessionTitle: 'Edit session',
+        saveChanges: 'Save',
+        sessionNotePlaceholder: 'Add a note (optional)...',
+        sessionNoteUpdated: function (n) { return 'Updated note for "' + n + '"'; },
+    },
+    zh: {
+        editSessionTitle: '编辑会话',
+        saveChanges: '保存',
+        sessionNotePlaceholder: '添加备注（可选）…',
+        sessionNoteUpdated: function (n) { return '已更新\u201c' + n + '\u201d的备注'; },
+    },
+    'zh-TW': {
+        editSessionTitle: '編輯工作階段',
+        saveChanges: '儲存',
+        sessionNotePlaceholder: '新增備註（選填）…',
+        sessionNoteUpdated: function (n) { return '已更新\u300c' + n + '\u300d的備註'; },
+    },
+    ja: {
+        editSessionTitle: 'セッションを編集',
+        saveChanges: '保存',
+        sessionNotePlaceholder: 'メモを追加（任意）…',
+        sessionNoteUpdated: function (n) { return '"' + n + '" のメモを更新しました'; },
+    },
+};
+
+var sessionEditLangs = Object.keys(STRINGS);
+for (var sessionEditLangIndex = 0; sessionEditLangIndex < sessionEditLangs.length; sessionEditLangIndex++) {
+    var sessionEditLang = sessionEditLangs[sessionEditLangIndex];
+    var sessionEditStrings = SESSION_EDIT_STRINGS[sessionEditLang] || SESSION_EDIT_STRINGS.en;
+    var sessionEditKeys = Object.keys(sessionEditStrings);
+    for (var sessionEditKeyIndex = 0; sessionEditKeyIndex < sessionEditKeys.length; sessionEditKeyIndex++) {
+        var sessionEditKey = sessionEditKeys[sessionEditKeyIndex];
+        if (STRINGS[sessionEditLang][sessionEditKey] === undefined) {
+            STRINGS[sessionEditLang][sessionEditKey] = sessionEditStrings[sessionEditKey];
+        }
+    }
+}
+
 var SESSION_STORAGE_STRINGS = {
     en: {
         settingsSessionStorageLocation: 'Session storage location',

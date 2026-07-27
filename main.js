@@ -9925,6 +9925,58 @@ var require_i18n = __commonJS({
     var resetKey;
     var resetKeyIndex;
     var resetLangIndex;
+    var SESSION_EDIT_STRINGS = {
+      en: {
+        editSessionTitle: "Edit session",
+        saveChanges: "Save",
+        sessionNotePlaceholder: "Add a note (optional)...",
+        sessionNoteUpdated: function(n) {
+          return 'Updated note for "' + n + '"';
+        }
+      },
+      zh: {
+        editSessionTitle: "\u7F16\u8F91\u4F1A\u8BDD",
+        saveChanges: "\u4FDD\u5B58",
+        sessionNotePlaceholder: "\u6DFB\u52A0\u5907\u6CE8\uFF08\u53EF\u9009\uFF09\u2026",
+        sessionNoteUpdated: function(n) {
+          return "\u5DF2\u66F4\u65B0\u201C" + n + "\u201D\u7684\u5907\u6CE8";
+        }
+      },
+      "zh-TW": {
+        editSessionTitle: "\u7DE8\u8F2F\u5DE5\u4F5C\u968E\u6BB5",
+        saveChanges: "\u5132\u5B58",
+        sessionNotePlaceholder: "\u65B0\u589E\u5099\u8A3B\uFF08\u9078\u586B\uFF09\u2026",
+        sessionNoteUpdated: function(n) {
+          return "\u5DF2\u66F4\u65B0\u300C" + n + "\u300D\u7684\u5099\u8A3B";
+        }
+      },
+      ja: {
+        editSessionTitle: "\u30BB\u30C3\u30B7\u30E7\u30F3\u3092\u7DE8\u96C6",
+        saveChanges: "\u4FDD\u5B58",
+        sessionNotePlaceholder: "\u30E1\u30E2\u3092\u8FFD\u52A0\uFF08\u4EFB\u610F\uFF09\u2026",
+        sessionNoteUpdated: function(n) {
+          return '"' + n + '" \u306E\u30E1\u30E2\u3092\u66F4\u65B0\u3057\u307E\u3057\u305F';
+        }
+      }
+    };
+    var sessionEditLangs = Object.keys(STRINGS);
+    for (sessionEditLangIndex = 0; sessionEditLangIndex < sessionEditLangs.length; sessionEditLangIndex++) {
+      sessionEditLang = sessionEditLangs[sessionEditLangIndex];
+      sessionEditStrings = SESSION_EDIT_STRINGS[sessionEditLang] || SESSION_EDIT_STRINGS.en;
+      sessionEditKeys = Object.keys(sessionEditStrings);
+      for (sessionEditKeyIndex = 0; sessionEditKeyIndex < sessionEditKeys.length; sessionEditKeyIndex++) {
+        sessionEditKey = sessionEditKeys[sessionEditKeyIndex];
+        if (STRINGS[sessionEditLang][sessionEditKey] === void 0) {
+          STRINGS[sessionEditLang][sessionEditKey] = sessionEditStrings[sessionEditKey];
+        }
+      }
+    }
+    var sessionEditLang;
+    var sessionEditStrings;
+    var sessionEditKeys;
+    var sessionEditKey;
+    var sessionEditKeyIndex;
+    var sessionEditLangIndex;
     var SESSION_STORAGE_STRINGS = {
       en: {
         settingsSessionStorageLocation: "Session storage location",
@@ -10139,6 +10191,139 @@ var require_confirm_modal = __commonJS({
   }
 });
 
+// src/modals/history-modal.js
+var require_history_modal = __commonJS({
+  "src/modals/history-modal.js"(exports2, module2) {
+    "use strict";
+    var obsidian2 = require("obsidian");
+    var i18n2 = require_i18n();
+    var ConfirmModal = require_confirm_modal();
+    var DAY = 864e5;
+    var HistoryModal = (
+      /** @class */
+      function(_super) {
+        function HistoryModal2(app, plugin, session) {
+          var _this = _super.call(this, app) || this;
+          _this.plugin = plugin;
+          _this.session = session;
+          return _this;
+        }
+        HistoryModal2.prototype = Object.create(_super.prototype);
+        HistoryModal2.prototype.constructor = HistoryModal2;
+        HistoryModal2.prototype.onOpen = function() {
+          var L = i18n2.L;
+          var self = this;
+          var contentEl = this.contentEl;
+          contentEl.empty();
+          contentEl.addClass("wpp-modal", "wpp-history-modal");
+          this.titleEl.setText(L.historyTitle + " \u2014 " + self.session.name);
+          var history = self.session.history || [];
+          if (history.length === 0) {
+            contentEl.createEl("p", { text: L.historyEmpty, cls: "wpp-history-empty" });
+            return;
+          }
+          var groups = self.groupByDate(history);
+          var listEl = contentEl.createDiv({ cls: "wpp-history-list" });
+          for (var gi = 0; gi < groups.length; gi++) {
+            var group = groups[gi];
+            listEl.createEl("h4", { text: group.label, cls: "wpp-history-date-label" });
+            for (var ei = 0; ei < group.entries.length; ei++) {
+              self.renderEntry(listEl, group.entries[ei], group.indices[ei]);
+            }
+          }
+        };
+        HistoryModal2.prototype.renderEntry = function(listEl, entry, originalIndex) {
+          var L = i18n2.L;
+          var self = this;
+          var itemEl = listEl.createDiv({ cls: "wpp-history-item" });
+          var infoEl = itemEl.createDiv({ cls: "wpp-history-info" });
+          var time = new Date(entry.savedAt);
+          var timeStr = time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+          infoEl.createDiv({ text: timeStr, cls: "wpp-history-time" });
+          var filePaths = self.plugin.extractFilePathsFromLayout(entry.layout);
+          var paneCount = self.plugin.countPanesInLayout(entry.layout);
+          var fileNames = filePaths.map(function(p) {
+            var parts = p.split("/");
+            return parts[parts.length - 1];
+          });
+          var summary = L.historyPanes(paneCount);
+          if (fileNames.length > 0) {
+            var displayNames = fileNames.slice(0, 5).join(", ");
+            if (fileNames.length > 5) displayNames += " ...";
+            summary += " \xB7 " + displayNames;
+          }
+          infoEl.createDiv({ text: summary, cls: "wpp-history-summary" });
+          var btnEl = itemEl.createEl("button", {
+            text: L.historyRestore,
+            cls: "wpp-history-restore-btn"
+          });
+          btnEl.addEventListener("click", function() {
+            var doRestore = function() {
+              self.plugin.restoreFromHistoryEntry(
+                self.session.id,
+                originalIndex
+              ).then(function(ok) {
+                if (ok) {
+                  new obsidian2.Notice(L.historyRestored(self.session.name));
+                }
+                self.close();
+              });
+            };
+            if (self.plugin.isVersionHistoryConfirmRestoreEnabled()) {
+              new ConfirmModal(
+                self.app,
+                L.historyRestoreConfirm(self.session.name, timeStr),
+                doRestore,
+                { confirmText: L.historyRestore, confirmClass: "mod-cta" }
+              ).open();
+            } else {
+              doRestore();
+            }
+          });
+        };
+        HistoryModal2.prototype.groupByDate = function(history) {
+          var L = i18n2.L;
+          var now = /* @__PURE__ */ new Date();
+          var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+          var yesterdayStart = todayStart - DAY;
+          var weekStart = todayStart - 6 * DAY;
+          var groups = {};
+          var groupOrder = [];
+          for (var i = 0; i < history.length; i++) {
+            var entry = history[i];
+            var t = entry.savedAt;
+            var label;
+            if (t >= todayStart) {
+              label = L.historyToday;
+            } else if (t >= yesterdayStart) {
+              label = L.historyYesterday;
+            } else if (t >= weekStart) {
+              label = L.historyThisWeek;
+            } else {
+              var d = new Date(t);
+              label = d.toLocaleDateString();
+            }
+            if (!groups[label]) {
+              groups[label] = { label, entries: [], indices: [] };
+              groupOrder.push(label);
+            }
+            groups[label].entries.push(entry);
+            groups[label].indices.push(i);
+          }
+          return groupOrder.map(function(k) {
+            return groups[k];
+          });
+        };
+        HistoryModal2.prototype.onClose = function() {
+          this.contentEl.empty();
+        };
+        return HistoryModal2;
+      }(obsidian2.Modal)
+    );
+    module2.exports = HistoryModal;
+  }
+});
+
 // src/modals/format-relative-time.js
 var require_format_relative_time = __commonJS({
   "src/modals/format-relative-time.js"(exports2, module2) {
@@ -10173,6 +10358,7 @@ var require_rename_modal = __commonJS({
           _this.currentName = currentName;
           _this.onRename = onRename;
           _this.modalOptions = options || {};
+          _this.currentNote = typeof _this.modalOptions.currentNote === "string" ? _this.modalOptions.currentNote : "";
           return _this;
         }
         RenameModal2.prototype = Object.create(_super.prototype);
@@ -10182,6 +10368,7 @@ var require_rename_modal = __commonJS({
           var contentEl = this.contentEl;
           var self = this;
           var opts = this.modalOptions;
+          var showNote = !!opts.showNote;
           this.titleEl.setText(opts.title || L.renameTitle);
           var input = contentEl.createEl("input", {
             type: "text",
@@ -10190,6 +10377,19 @@ var require_rename_modal = __commonJS({
             cls: "wpp-rename-input"
           });
           input.select();
+          this.nameInput = input;
+          var noteInput = null;
+          if (showNote) {
+            noteInput = contentEl.createEl("textarea", {
+              cls: "wpp-session-note-input",
+              attr: {
+                rows: "3",
+                placeholder: opts.notePlaceholder || L.sessionNotePlaceholder
+              }
+            });
+            noteInput.value = this.currentNote;
+            this.noteInput = noteInput;
+          }
           var btns = contentEl.createDiv({ cls: "wpp-confirm-buttons" });
           var cancelBtn = btns.createEl("button", { text: L.cancel });
           cancelBtn.addEventListener("click", function() {
@@ -10203,9 +10403,13 @@ var require_rename_modal = __commonJS({
               self.close();
             });
           }
-          var renameBtn = btns.createEl("button", { text: opts.buttonText || L.rename, cls: "mod-cta" });
+          var renameBtn = btns.createEl("button", {
+            text: opts.buttonText || (showNote ? L.saveChanges : L.rename),
+            cls: "mod-cta"
+          });
           var doRename = function() {
             var newName = input.value.trim();
+            var nextNote = showNote ? noteInput.value || "" : void 0;
             if (!newName) {
               if (opts.onSkip) {
                 opts.onSkip();
@@ -10217,22 +10421,49 @@ var require_rename_modal = __commonJS({
               }
               return;
             }
-            if (newName === self.currentName) return;
-            self.onRename(newName);
+            var noteUnchanged = !showNote || nextNote.trim() === (self.currentNote || "").trim();
+            if (newName === self.currentName && noteUnchanged) return;
+            if (showNote) {
+              self.onRename(newName, nextNote);
+            } else {
+              self.onRename(newName);
+            }
             self.close();
           };
           renameBtn.addEventListener("click", doRename);
           this.buttons = skipBtn ? [cancelBtn, skipBtn, renameBtn] : [cancelBtn, renameBtn];
           var lastBtnIdx = this.buttons.length - 1;
           this.focusedButtonIndex = -1;
+          function focusName() {
+            self.focusedButtonIndex = -1;
+            self.updateRenameBtnFocus();
+            input.focus();
+          }
+          function focusNote() {
+            if (!noteInput) {
+              focusName();
+              return;
+            }
+            self.focusedButtonIndex = -2;
+            self.updateRenameBtnFocus();
+            noteInput.focus();
+          }
+          function focusButtons(index) {
+            self.focusedButtonIndex = index;
+            self.updateRenameBtnFocus();
+            if (input.blur) input.blur();
+            if (noteInput && noteInput.blur) noteInput.blur();
+          }
           this.renameKeyHandler = function(e) {
             if (e.isComposing) return;
             if (self.focusedButtonIndex === -1) {
               if (e.key === "ArrowDown") {
                 e.preventDefault();
-                self.focusedButtonIndex = lastBtnIdx;
-                self.updateRenameBtnFocus();
-                input.blur();
+                if (showNote) {
+                  focusNote();
+                } else {
+                  focusButtons(lastBtnIdx);
+                }
               } else if (e.key === "Enter") {
                 e.preventDefault();
                 e.stopPropagation();
@@ -10242,23 +10473,36 @@ var require_rename_modal = __commonJS({
                 e.stopImmediatePropagation();
                 self.close();
               }
+            } else if (self.focusedButtonIndex === -2) {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                focusButtons(lastBtnIdx);
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                focusName();
+              } else if (e.key === "Escape") {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                self.close();
+              }
             } else {
               if (e.key === "ArrowUp") {
                 e.preventDefault();
-                self.focusedButtonIndex = -1;
-                self.updateRenameBtnFocus();
-                input.focus();
+                if (showNote) {
+                  focusNote();
+                } else {
+                  focusName();
+                }
               } else if (e.key === "ArrowLeft") {
                 e.preventDefault();
                 if (self.focusedButtonIndex > 0) {
                   self.focusedButtonIndex--;
-                } else {
-                  self.focusedButtonIndex = -1;
                   self.updateRenameBtnFocus();
-                  input.focus();
-                  return;
+                } else if (showNote) {
+                  focusNote();
+                } else {
+                  focusName();
                 }
-                self.updateRenameBtnFocus();
               } else if (e.key === "ArrowRight") {
                 e.preventDefault();
                 if (self.focusedButtonIndex < lastBtnIdx) {
@@ -10277,6 +10521,16 @@ var require_rename_modal = __commonJS({
             }
           };
           document.addEventListener("keydown", this.renameKeyHandler, true);
+          if (noteInput) {
+            noteInput.addEventListener("focus", function() {
+              self.focusedButtonIndex = -2;
+              self.updateRenameBtnFocus();
+            });
+          }
+          input.addEventListener("focus", function() {
+            self.focusedButtonIndex = -1;
+            self.updateRenameBtnFocus();
+          });
           setTimeout(function() {
             input.focus();
           }, 50);
@@ -10707,139 +10961,6 @@ var require_utils = __commonJS({
   }
 });
 
-// src/modals/history-modal.js
-var require_history_modal = __commonJS({
-  "src/modals/history-modal.js"(exports2, module2) {
-    "use strict";
-    var obsidian2 = require("obsidian");
-    var i18n2 = require_i18n();
-    var ConfirmModal = require_confirm_modal();
-    var DAY = 864e5;
-    var HistoryModal = (
-      /** @class */
-      function(_super) {
-        function HistoryModal2(app, plugin, session) {
-          var _this = _super.call(this, app) || this;
-          _this.plugin = plugin;
-          _this.session = session;
-          return _this;
-        }
-        HistoryModal2.prototype = Object.create(_super.prototype);
-        HistoryModal2.prototype.constructor = HistoryModal2;
-        HistoryModal2.prototype.onOpen = function() {
-          var L = i18n2.L;
-          var self = this;
-          var contentEl = this.contentEl;
-          contentEl.empty();
-          contentEl.addClass("wpp-modal", "wpp-history-modal");
-          this.titleEl.setText(L.historyTitle + " \u2014 " + self.session.name);
-          var history = self.session.history || [];
-          if (history.length === 0) {
-            contentEl.createEl("p", { text: L.historyEmpty, cls: "wpp-history-empty" });
-            return;
-          }
-          var groups = self.groupByDate(history);
-          var listEl = contentEl.createDiv({ cls: "wpp-history-list" });
-          for (var gi = 0; gi < groups.length; gi++) {
-            var group = groups[gi];
-            listEl.createEl("h4", { text: group.label, cls: "wpp-history-date-label" });
-            for (var ei = 0; ei < group.entries.length; ei++) {
-              self.renderEntry(listEl, group.entries[ei], group.indices[ei]);
-            }
-          }
-        };
-        HistoryModal2.prototype.renderEntry = function(listEl, entry, originalIndex) {
-          var L = i18n2.L;
-          var self = this;
-          var itemEl = listEl.createDiv({ cls: "wpp-history-item" });
-          var infoEl = itemEl.createDiv({ cls: "wpp-history-info" });
-          var time = new Date(entry.savedAt);
-          var timeStr = time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-          infoEl.createDiv({ text: timeStr, cls: "wpp-history-time" });
-          var filePaths = self.plugin.extractFilePathsFromLayout(entry.layout);
-          var paneCount = self.plugin.countPanesInLayout(entry.layout);
-          var fileNames = filePaths.map(function(p) {
-            var parts = p.split("/");
-            return parts[parts.length - 1];
-          });
-          var summary = L.historyPanes(paneCount);
-          if (fileNames.length > 0) {
-            var displayNames = fileNames.slice(0, 5).join(", ");
-            if (fileNames.length > 5) displayNames += " ...";
-            summary += " \xB7 " + displayNames;
-          }
-          infoEl.createDiv({ text: summary, cls: "wpp-history-summary" });
-          var btnEl = itemEl.createEl("button", {
-            text: L.historyRestore,
-            cls: "wpp-history-restore-btn"
-          });
-          btnEl.addEventListener("click", function() {
-            var doRestore = function() {
-              self.plugin.restoreFromHistoryEntry(
-                self.session.id,
-                originalIndex
-              ).then(function(ok) {
-                if (ok) {
-                  new obsidian2.Notice(L.historyRestored(self.session.name));
-                }
-                self.close();
-              });
-            };
-            if (self.plugin.isVersionHistoryConfirmRestoreEnabled()) {
-              new ConfirmModal(
-                self.app,
-                L.historyRestoreConfirm(self.session.name, timeStr),
-                doRestore,
-                { confirmText: L.historyRestore, confirmClass: "mod-cta" }
-              ).open();
-            } else {
-              doRestore();
-            }
-          });
-        };
-        HistoryModal2.prototype.groupByDate = function(history) {
-          var L = i18n2.L;
-          var now = /* @__PURE__ */ new Date();
-          var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-          var yesterdayStart = todayStart - DAY;
-          var weekStart = todayStart - 6 * DAY;
-          var groups = {};
-          var groupOrder = [];
-          for (var i = 0; i < history.length; i++) {
-            var entry = history[i];
-            var t = entry.savedAt;
-            var label;
-            if (t >= todayStart) {
-              label = L.historyToday;
-            } else if (t >= yesterdayStart) {
-              label = L.historyYesterday;
-            } else if (t >= weekStart) {
-              label = L.historyThisWeek;
-            } else {
-              var d = new Date(t);
-              label = d.toLocaleDateString();
-            }
-            if (!groups[label]) {
-              groups[label] = { label, entries: [], indices: [] };
-              groupOrder.push(label);
-            }
-            groups[label].entries.push(entry);
-            groups[label].indices.push(i);
-          }
-          return groupOrder.map(function(k) {
-            return groups[k];
-          });
-        };
-        HistoryModal2.prototype.onClose = function() {
-          this.contentEl.empty();
-        };
-        return HistoryModal2;
-      }(obsidian2.Modal)
-    );
-    module2.exports = HistoryModal;
-  }
-});
-
 // src/session-context-menu.js
 var require_session_context_menu = __commonJS({
   "src/session-context-menu.js"(exports2, module2) {
@@ -11010,12 +11131,19 @@ var require_session_list_actions = __commonJS({
       var plugin = options.plugin;
       var session = options.session;
       if (!app || !plugin || !session) return;
+      var allowNote = options.showNote !== false;
       var modalOptions = Object.assign({
-        emptyNotice: L.emptyName
+        emptyNotice: L.emptyName,
+        title: allowNote ? L.editSessionTitle : L.renameTitle,
+        buttonText: allowNote ? L.saveChanges : L.rename,
+        showNote: allowNote,
+        currentNote: session.note || "",
+        notePlaceholder: L.sessionNotePlaceholder
       }, options.modalOptions || {});
-      new RenameModal(app, session.name, function(newName) {
-        plugin.renameSessionById(session.id, newName).then(function(renamed) {
-          if (!renamed) return;
+      new RenameModal(app, session.name, function(newName, note) {
+        var editPromise = allowNote && typeof plugin.editSessionById === "function" ? plugin.editSessionById(session.id, newName, note) : plugin.renameSessionById(session.id, newName);
+        editPromise.then(function(updated) {
+          if (!updated) return;
           if (typeof options.onRenamed === "function") {
             options.onRenamed(session, newName);
           }
@@ -11408,6 +11536,7 @@ var require_session_manager_modal = __commonJS({
     var obsidian2 = require("obsidian");
     var i18n2 = require_i18n();
     var ConfirmModal = require_confirm_modal();
+    var HistoryModal = require_history_modal();
     var formatRelativeTime = require_format_relative_time();
     var groupTabUi = require_group_tab_ui();
     var navigationUtils = require_navigation_utils();
@@ -11562,7 +11691,9 @@ var require_session_manager_modal = __commonJS({
           var query = (this.filterQuery || "").trim().toLowerCase();
           if (!query) return sessions;
           return sessions.filter(function(s) {
-            return (s.name || "").toLowerCase().indexOf(query) !== -1;
+            var name = (s.name || "").toLowerCase();
+            var note = (s.note || "").toLowerCase();
+            return name.indexOf(query) !== -1 || note.indexOf(query) !== -1;
           });
         };
         SessionManagerModal2.prototype.getModalGroupId = function() {
@@ -11984,6 +12115,9 @@ var require_session_manager_modal = __commonJS({
           if (isActive) {
             nameRow.createSpan({ text: L.active, cls: "wpp-active-badge" });
           }
+          if (session.note) {
+            info.createDiv({ text: session.note, cls: "wpp-session-note" });
+          }
           info.createDiv({ text: formatRelativeTime(session.modified), cls: "wpp-session-modified" });
           var actions = item.createDiv({ cls: "wpp-session-actions" });
           var loadBtn = actions.createEl("button", { text: L.load, cls: "wpp-load-btn" });
@@ -12006,12 +12140,34 @@ var require_session_manager_modal = __commonJS({
             actions.insertBefore(saveCurrentBtn, loadBtn);
             saveCurrentBtn.style.width = loadBtn.offsetWidth + "px";
           }
+          if (self.plugin.isVersionHistoryEnabled()) {
+            var historyBtn = actions.createDiv({
+              cls: "wpp-icon-btn",
+              attr: { role: "button", tabindex: "-1", "data-action-key": "history" }
+            });
+            obsidian2.setIcon(historyBtn, "history");
+            obsidian2.setTooltip(historyBtn, L.contextVersionHistory, { delay: 250 });
+            historyBtn.addEventListener("click", function(e) {
+              e.stopPropagation();
+              new HistoryModal(self.app, self.plugin, session).open();
+            });
+          }
+          var duplicateBtn = actions.createDiv({
+            cls: "wpp-icon-btn",
+            attr: { role: "button", tabindex: "-1", "data-action-key": "duplicate" }
+          });
+          obsidian2.setIcon(duplicateBtn, "copy");
+          obsidian2.setTooltip(duplicateBtn, L.contextDuplicateSession, { delay: 250 });
+          duplicateBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            self.onDuplicate(session);
+          });
           var renameBtn = actions.createDiv({
             cls: "wpp-icon-btn",
             attr: { role: "button", tabindex: "-1", "data-action-key": "rename" }
           });
           obsidian2.setIcon(renameBtn, "pencil");
-          obsidian2.setTooltip(renameBtn, L.rename, { delay: 250 });
+          obsidian2.setTooltip(renameBtn, L.editSessionTitle || L.rename, { delay: 250 });
           renameBtn.addEventListener("click", function(e) {
             e.stopPropagation();
             self.onRename(session);
@@ -12197,6 +12353,12 @@ var require_session_manager_modal = __commonJS({
             onRenamed: function() {
               self.renderList();
             }
+          });
+        };
+        SessionManagerModal2.prototype.onDuplicate = function(session) {
+          var self = this;
+          this.plugin.duplicateSession(session.id).then(function() {
+            self.renderList();
           });
         };
         SessionManagerModal2.prototype.onDelete = function(session) {
@@ -16322,6 +16484,49 @@ var require_sessions_validation = __commonJS({
           return true;
         });
       };
+      WorkspacePlusPlus2.prototype.editSessionById = function(sessionId, newName, note, options) {
+        var L = i18n2.L;
+        options = options || {};
+        var session = this.data.sessions[sessionId];
+        if (!session) return Promise.resolve(false);
+        var normalized = typeof newName === "string" ? newName.trim() : "";
+        if (!normalized) {
+          if (options.notify !== false) {
+            new obsidian2.Notice(L.emptyName);
+          }
+          return Promise.resolve(false);
+        }
+        var updateNote = arguments.length >= 3 && note !== void 0;
+        var nextNote = updateNote && typeof note === "string" ? note.trim() : "";
+        var nameChanged = normalized !== session.name;
+        var noteChanged = updateNote && nextNote !== (session.note || "");
+        if (!nameChanged && !noteChanged) return Promise.resolve(false);
+        if (nameChanged && this.isSessionNameTaken(normalized, sessionId)) {
+          if (options.notify !== false) {
+            new obsidian2.Notice(L.duplicateName);
+          }
+          return Promise.resolve(false);
+        }
+        var oldName = session.name;
+        if (nameChanged) session.name = normalized;
+        if (updateNote) {
+          if (nextNote) session.note = nextNote;
+          else delete session.note;
+        }
+        session.modified = Date.now();
+        this.updateStatusBar();
+        this.syncSessionCommands();
+        return this.persistData().then(function() {
+          if (options.notify !== false) {
+            if (nameChanged) {
+              new obsidian2.Notice(L.renamed(oldName, normalized));
+            } else {
+              new obsidian2.Notice(L.sessionNoteUpdated(normalized));
+            }
+          }
+          return true;
+        });
+      };
       WorkspacePlusPlus2.prototype.createGroupValidated = function(name, options) {
         var L = i18n2.L;
         options = options || {};
@@ -16944,11 +17149,15 @@ var require_session_crud = __commonJS({
         if (!source) return Promise.resolve();
         var name = this.getNextSessionName();
         var newId = utils.generateId();
-        this.data.sessions[newId] = this.createSessionRecord(
+        var copy = this.createSessionRecord(
           newId,
           name,
           layoutUtils.cloneLayout(source.layout)
         );
+        if (source.note) {
+          copy.note = source.note;
+        }
+        this.data.sessions[newId] = copy;
         this.data.sessionOrder.push(newId);
         var groups = (this.data.sessionGroups || {})[sessionId];
         if (groups && groups.length > 0) {
@@ -17741,6 +17950,7 @@ var require_history = __commonJS({
     var HOUR = 36e5;
     var DAY = 864e5;
     var WEEK = 7 * DAY;
+    var MONTH = 30 * DAY;
     var MAX_HISTORY = 45;
     function attachHistoryMethods(WorkspacePlusPlus2) {
       WorkspacePlusPlus2.prototype.isVersionHistoryEnabled = function() {
@@ -17820,8 +18030,14 @@ var require_history = __commonJS({
               buckets[key] = true;
               result.push(entry);
             }
-          } else if (age <= 30 * DAY) {
+          } else if (age <= MONTH) {
             key = "w" + Math.floor(age / WEEK);
+            if (!buckets[key]) {
+              buckets[key] = true;
+              result.push(entry);
+            }
+          } else {
+            key = "m" + Math.floor(age / MONTH);
             if (!buckets[key]) {
               buckets[key] = true;
               result.push(entry);

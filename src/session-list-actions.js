@@ -19,13 +19,22 @@ function renameSessionWithPrompt(options) {
     var session = options.session;
     if (!app || !plugin || !session) return;
 
+    var allowNote = options.showNote !== false;
     var modalOptions = Object.assign({
         emptyNotice: L.emptyName,
+        title: allowNote ? L.editSessionTitle : L.renameTitle,
+        buttonText: allowNote ? L.saveChanges : L.rename,
+        showNote: allowNote,
+        currentNote: session.note || '',
+        notePlaceholder: L.sessionNotePlaceholder,
     }, options.modalOptions || {});
 
-    new RenameModal(app, session.name, function (newName) {
-        plugin.renameSessionById(session.id, newName).then(function (renamed) {
-            if (!renamed) return;
+    new RenameModal(app, session.name, function (newName, note) {
+        var editPromise = allowNote && typeof plugin.editSessionById === 'function'
+            ? plugin.editSessionById(session.id, newName, note)
+            : plugin.renameSessionById(session.id, newName);
+        editPromise.then(function (updated) {
+            if (!updated) return;
             if (typeof options.onRenamed === 'function') {
                 options.onRenamed(session, newName);
             }
