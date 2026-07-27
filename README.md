@@ -1,8 +1,11 @@
-# Workspace++
+# Workspace++ Beta
 
-Workspace++ is an [Obsidian](https://obsidian.md/) community plugin for saving, switching, and organizing workspace sessions. It is built for people who want Obsidian layouts to feel fast, native, and keyboard-friendly.
+Workspace++ Beta 是 [Workspace++](https://github.com/s1m4ne/obsidian-workspace-plus) 的功能修改版，用于保存、切换与组织 Obsidian 工作区会话。工作区管理能力可追溯至 [Workspaces Plus](https://github.com/jsmorabito/obsidian-workspaces-plus)。
+
+本分支在上游基础上做了卡片化面板、垃圾桶归档、手动历史、侧边栏恢复开关、缺失路径自动修复等改动。详见 [CHANGELOG.md](CHANGELOG.md)。
 
 ![Workspace++ session manager workflow](assets/readme/session-manager-modal.png)
+
 
 ## Highlights
 
@@ -204,9 +207,14 @@ https://github.com/user-attachments/assets/6c2b5a13-cc9f-43ca-bff1-944c5b318a92
 
 ## Community
 
-Bug reports, feature requests, and pull requests are welcome. Feel free to open an [issue](https://github.com/s1m4ne/obsidian-workspace-plus/issues) or PR.
+Bug reports, feature requests, and pull requests are welcome on this fork.
 
-If you find this plugin useful, please give it a star on GitHub. It helps others discover it.
+Upstream projects:
+
+- [Workspace++](https://github.com/s1m4ne/obsidian-workspace-plus) by s1m4ne
+- [Workspaces Plus](https://github.com/jsmorabito/obsidian-workspaces-plus) by Johnny / Nothingislost
+
+If you find this plugin useful, please also consider starring the upstream repositories.
 
 ## License
 
