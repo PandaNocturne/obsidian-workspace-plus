@@ -521,6 +521,12 @@ function removeOverlayDom(doc) {
     for (var i = 0; i < nodes.length; i++) {
         try { nodes[i].remove(); } catch (err) { /* ignore */ }
     }
+    try {
+        doc.body.style.removeProperty('--wpp-mc-source-width');
+        doc.body.style.removeProperty('--wpp-mc-source-height');
+        doc.body.style.removeProperty('--wpp-mc-content-zoom');
+        doc.body.style.removeProperty('--wpp-mc-zoom');
+    } catch (err2) { /* ignore */ }
     doc.body.removeClass('wpp-mission-control-open');
     doc.body.classList.remove('wpp-tab-switcher-dragging');
 }
@@ -570,6 +576,21 @@ var TabSwitcherModal = /** @class */ (function () {
         this.focusedIndex = activeIndex;
 
         doc.body.addClass('wpp-mission-control-open');
+        try {
+            if (this.plugin && typeof this.plugin.getTaskViewThumbnailSourceSize === 'function') {
+                var size = this.plugin.getTaskViewThumbnailSourceSize();
+                if (size && size.width && size.height) {
+                    doc.body.style.setProperty('--wpp-mc-source-width', size.width + 'px');
+                    doc.body.style.setProperty('--wpp-mc-source-height', size.height + 'px');
+                }
+            }
+            if (this.plugin && typeof this.plugin.getTaskViewContentZoom === 'function') {
+                doc.body.style.setProperty(
+                    '--wpp-mc-content-zoom',
+                    String(this.plugin.getTaskViewContentZoom())
+                );
+            }
+        } catch (err) { /* ignore */ }
 
         this.backdropEl = doc.body.createDiv({ cls: 'wpp-tab-switcher-backdrop' });
         this.backdropEl.addEventListener('click', this._onBackdropClick);
@@ -848,45 +869,34 @@ var TabSwitcherModal = /** @class */ (function () {
     };
 
     TabSwitcherModal.prototype.fillCardPreview = function (leaf, scaleEl) {
-        var self = this;
         var file = getLeafFile(this.app, leaf);
-
-        // Canvas / Excalidraw: show as document embed (![[path]]), never dump JSON / md source
-        if (isCanvasOrExcalidrawLeaf(this.app, leaf)
+        var isCanvasExcalidraw = isCanvasOrExcalidrawLeaf(this.app, leaf)
             || isCanvasFile(file)
-            || isExcalidrawFile(this.app, file)) {
-            return this.fillCardPreviewEmbed(leaf, scaleEl, file);
+            || isExcalidrawFile(this.app, file);
+
+        // Markdown / Canvas / Excalidraw: prefer Obsidian document embed (![[path]])
+        if (file && (file.extension === 'md' || isCanvasFile(file) || isCanvasExcalidraw)) {
+            return this.fillCardPreviewEmbed(leaf, scaleEl, file, {
+                visualOnlyFallback: isCanvasExcalidraw,
+            });
         }
 
-        // Markdown notes: always render from vault first — works for never-opened / deferred tabs
-        if (file && file.extension === 'md') {
-            return this.app.vault.cachedRead(file).then(function (md) {
-                if (!scaleEl || !scaleEl.isConnected) return;
-                scaleEl.empty();
-                var host = scaleEl.createDiv();
-                return renderMarkdownInto(self.app, self.plugin, host, file, md).then(function (ok) {
-                    if (ok || !scaleEl.isConnected) return;
-                    scaleEl.empty();
-                    fillTextOrIcon(scaleEl, leaf);
-                });
-            }).catch(function () {
-                if (!scaleEl || !scaleEl.isConnected) return;
-                // Last resort: load leaf then try clone / text
-                return self.fillCardPreviewFromLeaf(leaf, scaleEl);
-            });
+        if (isCanvasExcalidraw) {
+            return this.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
         }
 
         return this.fillCardPreviewFromLeaf(leaf, scaleEl);
     };
 
     /**
-     * Canvas / Excalidraw preview via wiki-embed (![[file]]).
-     * Falls back to visual DOM clone, then icon-only.
+     * Preview via wiki-embed (![[file]]) for Markdown / Canvas / Excalidraw.
+     * Falls back to DOM clone (visualOnly for canvas-like) or markdown render.
      */
-    TabSwitcherModal.prototype.fillCardPreviewEmbed = function (leaf, scaleEl, file) {
+    TabSwitcherModal.prototype.fillCardPreviewEmbed = function (leaf, scaleEl, file, options) {
         var self = this;
+        var visualOnlyFallback = !!(options && options.visualOnlyFallback);
         if (!file) {
-            return this.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+            return this.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: visualOnlyFallback });
         }
 
         if (!scaleEl || !scaleEl.isConnected) return Promise.resolve();
@@ -896,11 +906,35 @@ var TabSwitcherModal = /** @class */ (function () {
         return renderFileEmbedInto(this.app, this.plugin, host, file).then(function (ok) {
             if (!scaleEl.isConnected) return;
             if (ok) return;
-            // Embed did not materialize — try live leaf clone, then icon
-            return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+
+            if (visualOnlyFallback) {
+                return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+            }
+
+            // Markdown fallback: render file body directly
+            if (file.extension === 'md' && !isExcalidrawFile(self.app, file)) {
+                return self.app.vault.cachedRead(file).then(function (md) {
+                    if (!scaleEl.isConnected) return;
+                    scaleEl.empty();
+                    var mdHost = scaleEl.createDiv();
+                    return renderMarkdownInto(self.app, self.plugin, mdHost, file, md).then(function (rendered) {
+                        if (rendered || !scaleEl.isConnected) return;
+                        scaleEl.empty();
+                        fillTextOrIcon(scaleEl, leaf);
+                    });
+                }).catch(function () {
+                    if (!scaleEl.isConnected) return;
+                    return self.fillCardPreviewFromLeaf(leaf, scaleEl);
+                });
+            }
+
+            return self.fillCardPreviewFromLeaf(leaf, scaleEl);
         }).catch(function () {
             if (!scaleEl || !scaleEl.isConnected) return;
-            return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+            if (visualOnlyFallback) {
+                return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+            }
+            return self.fillCardPreviewFromLeaf(leaf, scaleEl);
         });
     };
 

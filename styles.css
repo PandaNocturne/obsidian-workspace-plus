@@ -1534,11 +1534,13 @@ body.wpp-session-list-dragging * {
 
 body.wpp-mission-control-open {
     --wpp-mc-leaf-gap: 20px;
-    --wpp-mc-zoom: 0.5;
+    /* Card outer size only — does NOT scale preview text */
+    --wpp-mc-layout-scale: 0.5;
+    --wpp-mc-content-zoom: 0.45;
     --wpp-mc-source-width: 650px;
-    --wpp-mc-source-height: 450px;
-    --wpp-mc-leaf-width: calc(var(--wpp-mc-source-width) * var(--wpp-mc-zoom));
-    --wpp-mc-leaf-height: calc(var(--wpp-mc-source-height) * var(--wpp-mc-zoom));
+    --wpp-mc-source-height: 488px; /* default 4:3 */
+    --wpp-mc-leaf-width: calc(var(--wpp-mc-source-width) * var(--wpp-mc-layout-scale));
+    --wpp-mc-leaf-height: calc(var(--wpp-mc-source-height) * var(--wpp-mc-layout-scale));
     --wpp-mc-panel-max-width: 80vw;
     --wpp-mc-panel-max-height: 80vh;
 }
@@ -1746,16 +1748,19 @@ body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-tab-switche
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-scale {
-    width: var(--wpp-mc-source-width);
-    height: var(--wpp-mc-source-height);
-    transform: scale(var(--wpp-mc-zoom));
-    transform-origin: top left;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    /* No transform:scale — content zoom is controlled only by --wpp-mc-content-zoom */
+    transform: none;
     pointer-events: none;
     overflow: hidden;
     background: var(--background-primary);
-    /* Collapse unused layout space after visual scale so cards do not overlap */
-    margin-right: calc(var(--wpp-mc-source-width) * (var(--wpp-mc-zoom) - 1));
-    margin-bottom: calc(var(--wpp-mc-source-height) * (var(--wpp-mc-zoom) - 1));
+}
+
+/* Preview content zoom (CSS zoom). Default 1 = 1:1, no shrink. */
+body.wpp-mission-control-open .wpp-tab-switcher-scale > * {
+    zoom: var(--wpp-mc-content-zoom);
 }
 
 body.wpp-tab-switcher-dragging {
@@ -1876,12 +1881,15 @@ body.wpp-mission-control-open .wpp-tab-switcher-embed .embed-title {
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-embed .markdown-embed-content,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .markdown-embed-content > .markdown-preview-view,
 body.wpp-mission-control-open .wpp-tab-switcher-embed .canvas-wrapper,
 body.wpp-mission-control-open .wpp-tab-switcher-embed .excalidraw-wrapper,
 body.wpp-mission-control-open .wpp-tab-switcher-embed .excalidraw {
     width: 100% !important;
     height: 100% !important;
     max-height: none !important;
+    padding: 0 !important;
+    overflow: hidden !important;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-md-fallback p,

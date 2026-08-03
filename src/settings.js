@@ -105,6 +105,50 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
                 },
             });
 
+            new obsidian.Setting(contentEl)
+                .setName(L.settingsTaskViewThumbnailRatio)
+                .setDesc(L.settingsTaskViewThumbnailRatioDesc)
+                .addDropdown(function (dropdown) {
+                    dropdown.addOption('16:9', '16:9');
+                    dropdown.addOption('4:3', '4:3');
+                    dropdown.addOption('3:2', '3:2');
+                    dropdown.addOption('1:1', '1:1');
+                    dropdown.setValue(self.plugin.getTaskViewThumbnailRatio());
+                    dropdown.onChange(function (value) {
+                        self.plugin.setTaskViewThumbnailRatio(value);
+                    });
+                });
+
+            // Preview content zoom (CSS zoom), patterned after colorful-stickynotes
+            var contentZoomDefault = 0.45;
+            var contentZoomSetting = new obsidian.Setting(contentEl)
+                .setName(L.settingsTaskViewContentZoom)
+                .setDesc(L.settingsTaskViewContentZoomDesc)
+                .addSlider(function (slider) {
+                    slider
+                        .setLimits(0.1, 1, 0.05)
+                        .setValue(self.plugin.getTaskViewContentZoom())
+                        .setDynamicTooltip()
+                        .onChange(function (value) {
+                            self.plugin.setTaskViewContentZoom(value);
+                        });
+                    if (typeof slider.setInstant === 'function') {
+                        slider.setInstant(true);
+                    }
+                });
+            contentZoomSetting.addExtraButton(function (btn) {
+                btn.setIcon('rotate-ccw');
+                btn.setTooltip(
+                    (L.settingsTaskViewContentZoomReset || 'Reset to {value}')
+                        .replace('{value}', String(Math.round(contentZoomDefault * 100)) + '%')
+                );
+                btn.onClick(function () {
+                    self.plugin.setTaskViewContentZoom(contentZoomDefault).then(function () {
+                        self.display();
+                    });
+                });
+            });
+
         }
 
         // ── Sessions tab ──

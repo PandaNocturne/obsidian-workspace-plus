@@ -10239,7 +10239,12 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
         tabSwitcherCloseTab: "Close tab",
         tabSwitcherPinTab: "Pin tab",
-        tabSwitcherUnpinTab: "Unpin tab"
+        tabSwitcherUnpinTab: "Unpin tab",
+        settingsTaskViewThumbnailRatio: "Task view thumbnail ratio",
+        settingsTaskViewThumbnailRatioDesc: "Aspect ratio of preview thumbnails in the tab switcher.",
+        settingsTaskViewContentZoom: "Task view content zoom",
+        settingsTaskViewContentZoomDesc: "Zoom of preview content inside task view cards (10%\u2013100%).",
+        settingsTaskViewContentZoomReset: "Reset to {value}"
       },
       zh: {
         cmdTabSwitcher: "\u5207\u6362\u6807\u7B7E\u9875\uFF08\u4EFB\u52A1\u89C6\u56FE\uFF09",
@@ -10248,7 +10253,12 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
         tabSwitcherCloseTab: "\u5173\u95ED\u6807\u7B7E\u9875",
         tabSwitcherPinTab: "\u56FA\u5B9A\u6807\u7B7E\u9875",
-        tabSwitcherUnpinTab: "\u53D6\u6D88\u56FA\u5B9A"
+        tabSwitcherUnpinTab: "\u53D6\u6D88\u56FA\u5B9A",
+        settingsTaskViewThumbnailRatio: "\u4EFB\u52A1\u89C6\u56FE\u7F29\u7565\u56FE\u6BD4\u4F8B",
+        settingsTaskViewThumbnailRatioDesc: "\u8C03\u6574\u4EFB\u52A1\u89C6\u56FE\u9884\u89C8\u7F29\u7565\u56FE\u7684\u5BBD\u9AD8\u6BD4\u3002",
+        settingsTaskViewContentZoom: "\u4EFB\u52A1\u89C6\u56FE\u5185\u5BB9\u7F29\u653E",
+        settingsTaskViewContentZoomDesc: "\u8C03\u6574\u4EFB\u52A1\u89C6\u56FE\u9884\u89C8\u5361\u7247\u5185\u6B63\u6587\u7684 zoom \u6BD4\u4F8B\uFF0810%\u2013100%\uFF09\u3002",
+        settingsTaskViewContentZoomReset: "\u91CD\u7F6E\u4E3A {value}"
       },
       "zh-TW": {
         cmdTabSwitcher: "\u5207\u63DB\u5206\u9801\uFF08\u4EFB\u52D9\u6AA2\u8996\uFF09",
@@ -10257,7 +10267,12 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
         tabSwitcherCloseTab: "\u95DC\u9589\u5206\u9801",
         tabSwitcherPinTab: "\u91D8\u9078\u5206\u9801",
-        tabSwitcherUnpinTab: "\u53D6\u6D88\u91D8\u9078"
+        tabSwitcherUnpinTab: "\u53D6\u6D88\u91D8\u9078",
+        settingsTaskViewThumbnailRatio: "\u4EFB\u52D9\u6AA2\u8996\u7E2E\u5716\u6BD4\u4F8B",
+        settingsTaskViewThumbnailRatioDesc: "\u8ABF\u6574\u4EFB\u52D9\u6AA2\u8996\u9810\u89BD\u7E2E\u5716\u7684\u5BEC\u9AD8\u6BD4\u3002",
+        settingsTaskViewContentZoom: "\u4EFB\u52D9\u6AA2\u8996\u5167\u5BB9\u7E2E\u653E",
+        settingsTaskViewContentZoomDesc: "\u8ABF\u6574\u4EFB\u52D9\u6AA2\u8996\u9810\u89BD\u5361\u7247\u5167\u6B63\u6587\u7684 zoom \u6BD4\u4F8B\uFF0810%\u2013100%\uFF09\u3002",
+        settingsTaskViewContentZoomReset: "\u91CD\u8A2D\u70BA {value}"
       },
       ja: {
         cmdTabSwitcher: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048\uFF08\u30DF\u30C3\u30B7\u30E7\u30F3\u30B3\u30F3\u30C8\u30ED\u30FC\u30EB\uFF09",
@@ -10266,7 +10281,12 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
         tabSwitcherCloseTab: "\u30BF\u30D6\u3092\u9589\u3058\u308B",
         tabSwitcherPinTab: "\u30BF\u30D6\u3092\u30D4\u30F3\u7559\u3081",
-        tabSwitcherUnpinTab: "\u30D4\u30F3\u7559\u3081\u3092\u89E3\u9664"
+        tabSwitcherUnpinTab: "\u30D4\u30F3\u7559\u3081\u3092\u89E3\u9664",
+        settingsTaskViewThumbnailRatio: "\u30BF\u30B9\u30AF\u30D3\u30E5\u30FC\u306E\u30B5\u30E0\u30CD\u30A4\u30EB\u6BD4\u7387",
+        settingsTaskViewThumbnailRatioDesc: "\u30BF\u30D6\u5207\u308A\u66FF\u3048\u30D7\u30EC\u30D3\u30E5\u30FC\u306E\u30B5\u30E0\u30CD\u30A4\u30EB\u7E26\u6A2A\u6BD4\u3092\u8ABF\u6574\u3057\u307E\u3059\u3002",
+        settingsTaskViewContentZoom: "\u30BF\u30B9\u30AF\u30D3\u30E5\u30FC\u672C\u6587\u30BA\u30FC\u30E0",
+        settingsTaskViewContentZoomDesc: "\u30D7\u30EC\u30D3\u30E5\u30FC\u30AB\u30FC\u30C9\u5185\u30B3\u30F3\u30C6\u30F3\u30C4\u306E zoom\uFF0810%\uFF5E100%\uFF09\u3002",
+        settingsTaskViewContentZoomReset: "{value} \u306B\u30EA\u30BB\u30C3\u30C8"
       },
       ko: {
         cmdTabSwitcher: "\uD0ED \uC804\uD658 (\uBBF8\uC158 \uCEE8\uD2B8\uB864)",
@@ -10275,7 +10295,12 @@ var require_i18n = __commonJS({
         tabSwitcherHint: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
         tabSwitcherCloseTab: "\uD0ED \uB2EB\uAE30",
         tabSwitcherPinTab: "\uD0ED \uACE0\uC815",
-        tabSwitcherUnpinTab: "\uACE0\uC815 \uD574\uC81C"
+        tabSwitcherUnpinTab: "\uACE0\uC815 \uD574\uC81C",
+        settingsTaskViewThumbnailRatio: "\uC791\uC5C5 \uBCF4\uAE30 \uC378\uB124\uC77C \uBE44\uC728",
+        settingsTaskViewThumbnailRatioDesc: "\uD0ED \uC804\uD658 \uBBF8\uB9AC\uBCF4\uAE30 \uC378\uB124\uC77C\uC758 \uAC00\uB85C\uC138\uB85C \uBE44\uC728\uC744 \uC870\uC815\uD569\uB2C8\uB2E4.",
+        settingsTaskViewContentZoom: "\uC791\uC5C5 \uBCF4\uAE30 \uBCF8\uBB38 \uD655\uB300/\uCD95\uC18C",
+        settingsTaskViewContentZoomDesc: "\uBBF8\uB9AC\uBCF4\uAE30 \uCE74\uB4DC \uC548 \uBCF8\uBB38\uC758 zoom \uBE44\uC728(10%\u2013100%).",
+        settingsTaskViewContentZoomReset: "{value}(\uC73C)\uB85C \uCD08\uAE30\uD654"
       }
     };
     var tabSwitcherLangs = Object.keys(STRINGS);
@@ -13993,6 +14018,13 @@ var require_tab_switcher_modal = __commonJS({
         } catch (err) {
         }
       }
+      try {
+        doc.body.style.removeProperty("--wpp-mc-source-width");
+        doc.body.style.removeProperty("--wpp-mc-source-height");
+        doc.body.style.removeProperty("--wpp-mc-content-zoom");
+        doc.body.style.removeProperty("--wpp-mc-zoom");
+      } catch (err2) {
+      }
       doc.body.removeClass("wpp-mission-control-open");
       doc.body.classList.remove("wpp-tab-switcher-dragging");
     }
@@ -14032,6 +14064,22 @@ var require_tab_switcher_modal = __commonJS({
           if (activeIndex < 0) activeIndex = 0;
           this.focusedIndex = activeIndex;
           doc.body.addClass("wpp-mission-control-open");
+          try {
+            if (this.plugin && typeof this.plugin.getTaskViewThumbnailSourceSize === "function") {
+              var size = this.plugin.getTaskViewThumbnailSourceSize();
+              if (size && size.width && size.height) {
+                doc.body.style.setProperty("--wpp-mc-source-width", size.width + "px");
+                doc.body.style.setProperty("--wpp-mc-source-height", size.height + "px");
+              }
+            }
+            if (this.plugin && typeof this.plugin.getTaskViewContentZoom === "function") {
+              doc.body.style.setProperty(
+                "--wpp-mc-content-zoom",
+                String(this.plugin.getTaskViewContentZoom())
+              );
+            }
+          } catch (err) {
+          }
           this.backdropEl = doc.body.createDiv({ cls: "wpp-tab-switcher-backdrop" });
           this.backdropEl.addEventListener("click", this._onBackdropClick);
           this.panelEl = doc.body.createDiv({
@@ -14266,32 +14314,23 @@ var require_tab_switcher_modal = __commonJS({
           this.updateFocus(false);
         };
         TabSwitcherModal2.prototype.fillCardPreview = function(leaf, scaleEl) {
-          var self = this;
           var file = getLeafFile(this.app, leaf);
-          if (isCanvasOrExcalidrawLeaf(this.app, leaf) || isCanvasFile(file) || isExcalidrawFile(this.app, file)) {
-            return this.fillCardPreviewEmbed(leaf, scaleEl, file);
-          }
-          if (file && file.extension === "md") {
-            return this.app.vault.cachedRead(file).then(function(md) {
-              if (!scaleEl || !scaleEl.isConnected) return;
-              scaleEl.empty();
-              var host = scaleEl.createDiv();
-              return renderMarkdownInto(self.app, self.plugin, host, file, md).then(function(ok) {
-                if (ok || !scaleEl.isConnected) return;
-                scaleEl.empty();
-                fillTextOrIcon(scaleEl, leaf);
-              });
-            }).catch(function() {
-              if (!scaleEl || !scaleEl.isConnected) return;
-              return self.fillCardPreviewFromLeaf(leaf, scaleEl);
+          var isCanvasExcalidraw = isCanvasOrExcalidrawLeaf(this.app, leaf) || isCanvasFile(file) || isExcalidrawFile(this.app, file);
+          if (file && (file.extension === "md" || isCanvasFile(file) || isCanvasExcalidraw)) {
+            return this.fillCardPreviewEmbed(leaf, scaleEl, file, {
+              visualOnlyFallback: isCanvasExcalidraw
             });
+          }
+          if (isCanvasExcalidraw) {
+            return this.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
           }
           return this.fillCardPreviewFromLeaf(leaf, scaleEl);
         };
-        TabSwitcherModal2.prototype.fillCardPreviewEmbed = function(leaf, scaleEl, file) {
+        TabSwitcherModal2.prototype.fillCardPreviewEmbed = function(leaf, scaleEl, file, options) {
           var self = this;
+          var visualOnlyFallback = !!(options && options.visualOnlyFallback);
           if (!file) {
-            return this.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+            return this.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: visualOnlyFallback });
           }
           if (!scaleEl || !scaleEl.isConnected) return Promise.resolve();
           scaleEl.empty();
@@ -14299,10 +14338,31 @@ var require_tab_switcher_modal = __commonJS({
           return renderFileEmbedInto(this.app, this.plugin, host, file).then(function(ok) {
             if (!scaleEl.isConnected) return;
             if (ok) return;
-            return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+            if (visualOnlyFallback) {
+              return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+            }
+            if (file.extension === "md" && !isExcalidrawFile(self.app, file)) {
+              return self.app.vault.cachedRead(file).then(function(md) {
+                if (!scaleEl.isConnected) return;
+                scaleEl.empty();
+                var mdHost = scaleEl.createDiv();
+                return renderMarkdownInto(self.app, self.plugin, mdHost, file, md).then(function(rendered) {
+                  if (rendered || !scaleEl.isConnected) return;
+                  scaleEl.empty();
+                  fillTextOrIcon(scaleEl, leaf);
+                });
+              }).catch(function() {
+                if (!scaleEl.isConnected) return;
+                return self.fillCardPreviewFromLeaf(leaf, scaleEl);
+              });
+            }
+            return self.fillCardPreviewFromLeaf(leaf, scaleEl);
           }).catch(function() {
             if (!scaleEl || !scaleEl.isConnected) return;
-            return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+            if (visualOnlyFallback) {
+              return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+            }
+            return self.fillCardPreviewFromLeaf(leaf, scaleEl);
           });
         };
         TabSwitcherModal2.prototype.fillCardPreviewFromLeaf = function(leaf, scaleEl, options) {
@@ -14777,6 +14837,36 @@ var require_settings = __commonJS({
                 self.plugin.setRestoreSidebars(value);
               }
             });
+            new obsidian2.Setting(contentEl).setName(L.settingsTaskViewThumbnailRatio).setDesc(L.settingsTaskViewThumbnailRatioDesc).addDropdown(function(dropdown) {
+              dropdown.addOption("16:9", "16:9");
+              dropdown.addOption("4:3", "4:3");
+              dropdown.addOption("3:2", "3:2");
+              dropdown.addOption("1:1", "1:1");
+              dropdown.setValue(self.plugin.getTaskViewThumbnailRatio());
+              dropdown.onChange(function(value) {
+                self.plugin.setTaskViewThumbnailRatio(value);
+              });
+            });
+            var contentZoomDefault = 0.45;
+            var contentZoomSetting = new obsidian2.Setting(contentEl).setName(L.settingsTaskViewContentZoom).setDesc(L.settingsTaskViewContentZoomDesc).addSlider(function(slider) {
+              slider.setLimits(0.1, 1, 0.05).setValue(self.plugin.getTaskViewContentZoom()).setDynamicTooltip().onChange(function(value) {
+                self.plugin.setTaskViewContentZoom(value);
+              });
+              if (typeof slider.setInstant === "function") {
+                slider.setInstant(true);
+              }
+            });
+            contentZoomSetting.addExtraButton(function(btn) {
+              btn.setIcon("rotate-ccw");
+              btn.setTooltip(
+                (L.settingsTaskViewContentZoomReset || "Reset to {value}").replace("{value}", String(Math.round(contentZoomDefault * 100)) + "%")
+              );
+              btn.onClick(function() {
+                self.plugin.setTaskViewContentZoom(contentZoomDefault).then(function() {
+                  self.display();
+                });
+              });
+            });
           }
           if (self.activeTab === "sessions") {
             addSubsection(contentEl, L.settingsSubsectionAutoSaveMode);
@@ -15240,6 +15330,8 @@ var require_default_data = __commonJS({
       warnOnUnsavedSwitch: true,
       highlightUnsavedSessionChanges: true,
       restoreSidebars: true,
+      taskViewThumbnailRatio: "4:3",
+      taskViewContentZoom: 0.45,
       statusBarQuickSwitcher: false,
       groupFeatureEnabled: true,
       showFilterInput: false,
@@ -16859,7 +16951,9 @@ var require_persistence = __commonJS({
       "numberedSwitchCommands",
       "sessionManagerPanelMode",
       "sessionManagerViewGroupId",
-      "restoreSidebars"
+      "restoreSidebars",
+      "taskViewThumbnailRatio",
+      "taskViewContentZoom"
     ];
     function joinPath(base, child) {
       return String(base || "").replace(/\/+$/, "") + "/" + child;
@@ -20809,6 +20903,46 @@ var require_settings_state = __commonJS({
       };
       WorkspacePlusPlus2.prototype.setRestoreSidebars = function(enabled, options) {
         this.data.restoreSidebars = !!enabled;
+        return persistIfNeeded(this, options);
+      };
+      WorkspacePlusPlus2.prototype.getTaskViewThumbnailRatio = function() {
+        var value = String(this.data.taskViewThumbnailRatio || DEFAULT_DATA2.taskViewThumbnailRatio || "4:3");
+        var allowed = { "16:9": 1, "4:3": 1, "3:2": 1, "1:1": 1 };
+        return allowed[value] ? value : "4:3";
+      };
+      WorkspacePlusPlus2.prototype.getTaskViewThumbnailSourceSize = function() {
+        var ratio = this.getTaskViewThumbnailRatio();
+        var width = 650;
+        var parts = ratio.split(":");
+        var w = Number(parts[0]);
+        var h = Number(parts[1]);
+        if (!isFinite(w) || !isFinite(h) || w <= 0 || h <= 0) {
+          return { width, height: 488 };
+        }
+        return {
+          width,
+          height: Math.max(200, Math.round(width * h / w))
+        };
+      };
+      WorkspacePlusPlus2.prototype.setTaskViewThumbnailRatio = function(value, options) {
+        var next = String(value || "");
+        var allowed = { "16:9": 1, "4:3": 1, "3:2": 1, "1:1": 1 };
+        this.data.taskViewThumbnailRatio = allowed[next] ? next : DEFAULT_DATA2.taskViewThumbnailRatio;
+        return persistIfNeeded(this, options);
+      };
+      WorkspacePlusPlus2.prototype.getTaskViewContentZoom = function() {
+        var zoom = Number(this.data.taskViewContentZoom);
+        if (!isFinite(zoom)) zoom = DEFAULT_DATA2.taskViewContentZoom;
+        if (zoom < 0.1) zoom = 0.1;
+        if (zoom > 1) zoom = 1;
+        return Math.round(zoom * 100) / 100;
+      };
+      WorkspacePlusPlus2.prototype.setTaskViewContentZoom = function(value, options) {
+        var zoom = Number(value);
+        if (!isFinite(zoom)) zoom = DEFAULT_DATA2.taskViewContentZoom;
+        if (zoom < 0.1) zoom = 0.1;
+        if (zoom > 1) zoom = 1;
+        this.data.taskViewContentZoom = Math.round(zoom * 100) / 100;
         return persistIfNeeded(this, options);
       };
       WorkspacePlusPlus2.prototype.setStatusBarModScrollSwitch = function(enabled, options) {

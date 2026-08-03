@@ -65,6 +65,52 @@ function attachSettingsStateMethods(WorkspacePlusPlus) {
         return persistIfNeeded(this, options);
     };
 
+    WorkspacePlusPlus.prototype.getTaskViewThumbnailRatio = function () {
+        var value = String(this.data.taskViewThumbnailRatio || DEFAULT_DATA.taskViewThumbnailRatio || '4:3');
+        var allowed = { '16:9': 1, '4:3': 1, '3:2': 1, '1:1': 1 };
+        return allowed[value] ? value : '4:3';
+    };
+
+    WorkspacePlusPlus.prototype.getTaskViewThumbnailSourceSize = function () {
+        var ratio = this.getTaskViewThumbnailRatio();
+        var width = 650;
+        var parts = ratio.split(':');
+        var w = Number(parts[0]);
+        var h = Number(parts[1]);
+        if (!isFinite(w) || !isFinite(h) || w <= 0 || h <= 0) {
+            return { width: width, height: 488 };
+        }
+        return {
+            width: width,
+            height: Math.max(200, Math.round(width * h / w)),
+        };
+    };
+
+    WorkspacePlusPlus.prototype.setTaskViewThumbnailRatio = function (value, options) {
+        var next = String(value || '');
+        var allowed = { '16:9': 1, '4:3': 1, '3:2': 1, '1:1': 1 };
+        this.data.taskViewThumbnailRatio = allowed[next] ? next : DEFAULT_DATA.taskViewThumbnailRatio;
+        return persistIfNeeded(this, options);
+    };
+
+    /** Task view preview content zoom — same idea as colorful-stickynotes view-content zoom. */
+    WorkspacePlusPlus.prototype.getTaskViewContentZoom = function () {
+        var zoom = Number(this.data.taskViewContentZoom);
+        if (!isFinite(zoom)) zoom = DEFAULT_DATA.taskViewContentZoom;
+        if (zoom < 0.1) zoom = 0.1;
+        if (zoom > 1) zoom = 1;
+        return Math.round(zoom * 100) / 100;
+    };
+
+    WorkspacePlusPlus.prototype.setTaskViewContentZoom = function (value, options) {
+        var zoom = Number(value);
+        if (!isFinite(zoom)) zoom = DEFAULT_DATA.taskViewContentZoom;
+        if (zoom < 0.1) zoom = 0.1;
+        if (zoom > 1) zoom = 1;
+        this.data.taskViewContentZoom = Math.round(zoom * 100) / 100;
+        return persistIfNeeded(this, options);
+    };
+
     WorkspacePlusPlus.prototype.setStatusBarModScrollSwitch = function (enabled, options) {
         this.data.statusBarModScrollSwitch = !!enabled;
         return persistIfNeeded(this, options);

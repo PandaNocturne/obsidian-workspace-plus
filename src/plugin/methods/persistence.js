@@ -58,6 +58,8 @@ var SETTINGS_KEYS = [
     'sessionManagerPanelMode',
     'sessionManagerViewGroupId',
     'restoreSidebars',
+    'taskViewThumbnailRatio',
+    'taskViewContentZoom',
 ];
 
 function joinPath(base, child) {
