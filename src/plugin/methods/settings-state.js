@@ -111,6 +111,15 @@ function attachSettingsStateMethods(WorkspacePlusPlus) {
         return persistIfNeeded(this, options);
     };
 
+    WorkspacePlusPlus.prototype.isTaskViewHintsEnabled = function () {
+        return this.data.showTaskViewHints !== false;
+    };
+
+    WorkspacePlusPlus.prototype.setShowTaskViewHints = function (enabled, options) {
+        this.data.showTaskViewHints = !!enabled;
+        return persistIfNeeded(this, options);
+    };
+
     WorkspacePlusPlus.prototype.setStatusBarModScrollSwitch = function (enabled, options) {
         this.data.statusBarModScrollSwitch = !!enabled;
         return persistIfNeeded(this, options);

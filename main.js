@@ -10236,8 +10236,10 @@ var require_i18n = __commonJS({
         cmdTabSwitcher: "Switch tabs (mission control)",
         tabSwitcherTitle: "Switch tab",
         tabSwitcherEmpty: "No open tabs to switch.",
-        tabSwitcherHint: "Click preview to switch \xB7 Drag header to reorder \xB7 Scroll mask for split \xB7 Click outside to cancel",
-        tabSwitcherHintSplit: "\u2039 \u203A or 1\u20139 to switch split \xB7 Drop on grid to move across",
+        tabSwitcherHint: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
+        tabSwitcherHintNav: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
+        tabSwitcherHintGrid: "Scroll mask to switch split \xB7 Number keys to switch split",
+        tabSwitcherHintSplit: "Scroll mask / 1\u20139 to switch split",
         tabSwitcherPrevSplit: "Previous split",
         tabSwitcherNextSplit: "Next split",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10250,14 +10252,18 @@ var require_i18n = __commonJS({
         settingsTaskViewThumbnailRatioDesc: "Aspect ratio of preview thumbnails in the tab switcher.",
         settingsTaskViewContentZoom: "Task view content zoom",
         settingsTaskViewContentZoomDesc: "Zoom of preview content inside task view cards (10%\u2013100%).",
-        settingsTaskViewContentZoomReset: "Reset to {value}"
+        settingsTaskViewContentZoomReset: "Reset to {value}",
+        settingsShowTaskViewHints: "Show task view hints",
+        settingsShowTaskViewHintsDesc: "Show usage tips under the split nav and below the card grid."
       },
       zh: {
         cmdTabSwitcher: "\u5207\u6362\u6807\u7B7E\u9875\uFF08\u4EFB\u52A1\u89C6\u56FE\uFF09",
         tabSwitcherTitle: "\u5207\u6362\u6807\u7B7E\u9875",
         tabSwitcherEmpty: "\u6CA1\u6709\u53EF\u5207\u6362\u7684\u6807\u7B7E\u9875\u3002",
-        tabSwitcherHint: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u8499\u7248\u6EDA\u8F6E\u5207\u5206\u680F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintSplit: "\u2039 \u203A \u6216\u6570\u5B57\u952E\u5207\u6362\u5206\u680F \xB7 \u62D6\u5230\u76EE\u6807\u5206\u680F\u7F51\u683C\u4E2D\u677E\u5F00\u4EE5\u8DE8\u680F\u79FB\u52A8",
+        tabSwitcherHint: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintNav: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintGrid: "\u8499\u7248\u6EDA\u8F6E\u5207\u5206\u680F \xB7 \u6570\u5B57\u952E\u5207\u6362\u5206\u680F",
+        tabSwitcherHintSplit: "\u8499\u7248\u6EDA\u8F6E / \u6570\u5B57\u952E\u5207\u6362\u5206\u680F",
         tabSwitcherPrevSplit: "\u4E0A\u4E00\u4E2A\u5206\u680F",
         tabSwitcherNextSplit: "\u4E0B\u4E00\u4E2A\u5206\u680F",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10270,14 +10276,18 @@ var require_i18n = __commonJS({
         settingsTaskViewThumbnailRatioDesc: "\u8C03\u6574\u4EFB\u52A1\u89C6\u56FE\u9884\u89C8\u7F29\u7565\u56FE\u7684\u5BBD\u9AD8\u6BD4\u3002",
         settingsTaskViewContentZoom: "\u4EFB\u52A1\u89C6\u56FE\u5185\u5BB9\u7F29\u653E",
         settingsTaskViewContentZoomDesc: "\u8C03\u6574\u4EFB\u52A1\u89C6\u56FE\u9884\u89C8\u5361\u7247\u5185\u6B63\u6587\u7684 zoom \u6BD4\u4F8B\uFF0810%\u2013100%\uFF09\u3002",
-        settingsTaskViewContentZoomReset: "\u91CD\u7F6E\u4E3A {value}"
+        settingsTaskViewContentZoomReset: "\u91CD\u7F6E\u4E3A {value}",
+        settingsShowTaskViewHints: "\u663E\u793A\u4EFB\u52A1\u89C6\u56FE\u63D0\u793A",
+        settingsShowTaskViewHintsDesc: "\u5728\u5206\u680F\u5BFC\u822A\u4E0E\u7F51\u683C\u4E0B\u65B9\u663E\u793A\u64CD\u4F5C\u63D0\u793A\u3002"
       },
       "zh-TW": {
         cmdTabSwitcher: "\u5207\u63DB\u5206\u9801\uFF08\u4EFB\u52D9\u6AA2\u8996\uFF09",
         tabSwitcherTitle: "\u5207\u63DB\u5206\u9801",
         tabSwitcherEmpty: "\u6C92\u6709\u53EF\u5207\u63DB\u7684\u5206\u9801\u3002",
         tabSwitcherHint: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintSplit: "\u2039 \u203A \u6216\u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04 \xB7 \u62D6\u5230\u76EE\u6A19\u5206\u6B04\u7DB2\u683C\u9B06\u958B\u4EE5\u8DE8\u6B04\u79FB\u52D5",
+        tabSwitcherHintNav: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintGrid: "\u8499\u7248\u6EFE\u8F2A\u5207\u5206\u6B04 \xB7 \u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04",
+        tabSwitcherHintSplit: "\u8499\u7248\u6EFE\u8F2A / \u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04",
         tabSwitcherPrevSplit: "\u4E0A\u4E00\u500B\u5206\u6B04",
         tabSwitcherNextSplit: "\u4E0B\u4E00\u500B\u5206\u6B04",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10290,14 +10300,18 @@ var require_i18n = __commonJS({
         settingsTaskViewThumbnailRatioDesc: "\u8ABF\u6574\u4EFB\u52D9\u6AA2\u8996\u9810\u89BD\u7E2E\u5716\u7684\u5BEC\u9AD8\u6BD4\u3002",
         settingsTaskViewContentZoom: "\u4EFB\u52D9\u6AA2\u8996\u5167\u5BB9\u7E2E\u653E",
         settingsTaskViewContentZoomDesc: "\u8ABF\u6574\u4EFB\u52D9\u6AA2\u8996\u9810\u89BD\u5361\u7247\u5167\u6B63\u6587\u7684 zoom \u6BD4\u4F8B\uFF0810%\u2013100%\uFF09\u3002",
-        settingsTaskViewContentZoomReset: "\u91CD\u8A2D\u70BA {value}"
+        settingsTaskViewContentZoomReset: "\u91CD\u8A2D\u70BA {value}",
+        settingsShowTaskViewHints: "\u986F\u793A\u4EFB\u52D9\u6AA2\u8996\u63D0\u793A",
+        settingsShowTaskViewHintsDesc: "\u5728\u5206\u6B04\u5C0E\u822A\u8207\u7DB2\u683C\u4E0B\u65B9\u986F\u793A\u64CD\u4F5C\u63D0\u793A\u3002"
       },
       ja: {
         cmdTabSwitcher: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048\uFF08\u30DF\u30C3\u30B7\u30E7\u30F3\u30B3\u30F3\u30C8\u30ED\u30FC\u30EB\uFF09",
         tabSwitcherTitle: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048",
         tabSwitcherEmpty: "\u5207\u308A\u66FF\u3048\u53EF\u80FD\u306A\u30BF\u30D6\u304C\u3042\u308A\u307E\u305B\u3093\u3002",
         tabSwitcherHint: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
-        tabSwitcherHintSplit: "\u2039 \u203A \u307E\u305F\u306F\u6570\u5B57\u3067\u30DA\u30A4\u30F3\u5207\u66FF \xB7 \u30B0\u30EA\u30C3\u30C9\u3078\u30C9\u30ED\u30C3\u30D7\u3067\u79FB\u52D5",
+        tabSwitcherHintNav: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
+        tabSwitcherHintGrid: "\u30DE\u30B9\u30AF\u3092\u30B9\u30AF\u30ED\u30FC\u30EB\u3067\u30DA\u30A4\u30F3\u5207\u66FF \xB7 \u6570\u5B57\u30AD\u30FC\u3067\u30DA\u30A4\u30F3\u5207\u66FF",
+        tabSwitcherHintSplit: "\u30B9\u30AF\u30ED\u30FC\u30EB / \u6570\u5B57\u3067\u30DA\u30A4\u30F3\u5207\u66FF",
         tabSwitcherPrevSplit: "\u524D\u306E\u30DA\u30A4\u30F3",
         tabSwitcherNextSplit: "\u6B21\u306E\u30DA\u30A4\u30F3",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10317,7 +10331,9 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\uD0ED \uC804\uD658",
         tabSwitcherEmpty: "\uC804\uD658\uD560 \uD0ED\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
         tabSwitcherHint: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
-        tabSwitcherHintSplit: "\u2039 \u203A \uB610\uB294 \uC22B\uC790\uB85C \uBD84\uD560 \uC804\uD658 \xB7 \uADF8\uB9AC\uB4DC\uC5D0 \uB193\uC544 \uC774\uB3D9",
+        tabSwitcherHintNav: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
+        tabSwitcherHintGrid: "\uB9C8\uC2A4\uD06C \uC2A4\uD06C\uB864\uB85C \uBD84\uD560 \uC804\uD658 \xB7 \uC22B\uC790 \uD0A4\uB85C \uBD84\uD560 \uC804\uD658",
+        tabSwitcherHintSplit: "\uB9C8\uC2A4\uD06C \uC2A4\uD06C\uB864 / \uC22B\uC790\uB85C \uBD84\uD560 \uC804\uD658",
         tabSwitcherPrevSplit: "\uC774\uC804 \uBD84\uD560",
         tabSwitcherNextSplit: "\uB2E4\uC74C \uBD84\uD560",
         tabSwitcherSplitLabel: function(i, n) {
@@ -14301,7 +14317,7 @@ var require_tab_switcher_modal = __commonJS({
     function removeOverlayDom(doc) {
       if (!doc || !doc.body) return;
       var nodes = doc.body.querySelectorAll(
-        ".wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-drag-clone"
+        ".wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-hint, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-drag-clone"
       );
       for (var i = 0; i < nodes.length; i++) {
         try {
@@ -14432,10 +14448,11 @@ var require_tab_switcher_modal = __commonJS({
               "aria-label": i18n2.L.tabSwitcherTitle
             }
           });
-          this.gridEl = this.panelEl.createDiv({ cls: "wpp-tab-switcher-grid" });
+          this.gridWrapEl = this.panelEl.createDiv({ cls: "wpp-tab-switcher-grid-wrap" });
+          this.gridEl = this.gridWrapEl.createDiv({ cls: "wpp-tab-switcher-grid" });
+          this.gridHintEl = this.gridWrapEl.createDiv({ cls: "wpp-tab-switcher-hint wpp-tab-switcher-grid-hint" });
           this.mountSplitToolbar(doc);
-          this.hintEl = doc.body.createDiv({ cls: "wpp-tab-switcher-floating-hint" });
-          this.hintEl.setText(this.getHintText());
+          this.updateHints();
           this.cardEls = [];
           this.renderCards();
           this.updateSplitToolbar();
@@ -14445,12 +14462,24 @@ var require_tab_switcher_modal = __commonJS({
           doc.addEventListener("wheel", this._onWheel, { capture: true, passive: false });
           this.updateFocus(true);
         };
-        TabSwitcherModal2.prototype.getHintText = function() {
-          var base = i18n2.L.tabSwitcherHint || "";
-          if (this.groups && this.groups.length > 1 && i18n2.L.tabSwitcherHintSplit) {
-            return base + " \xB7 " + i18n2.L.tabSwitcherHintSplit;
+        TabSwitcherModal2.prototype.updateHints = function() {
+          var L = i18n2.L;
+          var multiSplit = !!(this.groups && this.groups.length > 1);
+          var showHints = !(this.plugin && typeof this.plugin.isTaskViewHintsEnabled === "function") || this.plugin.isTaskViewHintsEnabled();
+          if (this.gridHintEl) {
+            var gridText = showHints ? L.tabSwitcherHintGrid || "" : "";
+            this.gridHintEl.setText(gridText);
+            this.gridHintEl.classList.toggle("is-hidden", !showHints || !multiSplit || !gridText);
+            this.gridHintEl.style.display = showHints && multiSplit && gridText ? "" : "none";
           }
-          return base;
+          if (this.toolbarHintEl) {
+            var navText = showHints ? L.tabSwitcherHintNav || L.tabSwitcherHint || "" : "";
+            this.toolbarHintEl.setText(navText);
+            this.toolbarHintEl.classList.toggle("is-hidden", !showHints || !navText);
+            this.toolbarHintEl.style.display = showHints && navText ? "" : "none";
+            this.toolbarHintEl.classList.toggle("is-below-nav", multiSplit);
+            this.toolbarHintEl.classList.toggle("is-top-only", !multiSplit);
+          }
         };
         TabSwitcherModal2.prototype.mountSplitToolbar = function(doc) {
           var self = this;
@@ -14488,15 +14517,19 @@ var require_tab_switcher_modal = __commonJS({
             e.stopPropagation();
             self.shiftSplitGroup(1);
           });
+          this.toolbarHintEl = doc.body.createDiv({
+            cls: "wpp-tab-switcher-hint wpp-tab-switcher-toolbar-hint"
+          });
         };
         TabSwitcherModal2.prototype.updateSplitToolbar = function() {
           if (!this.toolbarEl) return;
           var self = this;
           var count = this.groups ? this.groups.length : 0;
-          var show = count > 1;
-          this.toolbarEl.classList.toggle("is-hidden", !show);
-          this.toolbarEl.style.display = show ? "" : "none";
-          if (!show) return;
+          var showNav = count > 1;
+          this.toolbarEl.classList.toggle("is-hidden", !showNav);
+          this.toolbarEl.style.display = showNav ? "" : "none";
+          this.updateHints();
+          if (!showNav) return;
           var previewIndex = this.groupIndex || 0;
           var workspaceActive = getActiveLeaf(this.app);
           var workspaceSplitIndex = -1;
@@ -14535,7 +14568,6 @@ var require_tab_switcher_modal = __commonJS({
               })(i);
             }
           }
-          if (this.hintEl) this.hintEl.setText(this.getHintText());
         };
         TabSwitcherModal2.prototype.goToSplitGroup = function(index) {
           this.groups = collectRootTabGroups(this.app);
@@ -15108,7 +15140,7 @@ var require_tab_switcher_modal = __commonJS({
           this.close();
         };
         TabSwitcherModal2.prototype._onPanelClick = function(e) {
-          if (e.target === this.panelEl || e.target === this.gridEl) {
+          if (e.target === this.panelEl || e.target === this.gridWrapEl || e.target === this.gridEl || e.target === this.gridHintEl) {
             e.preventDefault();
             e.stopPropagation();
             this.close();
@@ -15134,7 +15166,7 @@ var require_tab_switcher_modal = __commonJS({
             if (!target || typeof target.closest !== "function") return;
             if (target.closest(".wpp-tab-switcher-grid")) return;
             var onMask = target.closest(
-              ".wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint"
+              ".wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-hint, .wpp-tab-switcher-grid-wrap"
             );
             if (!onMask) return;
           }
@@ -15288,7 +15320,9 @@ var require_tab_switcher_modal = __commonJS({
             this.panelEl.remove();
             this.panelEl = null;
           }
+          this.gridWrapEl = null;
           this.gridEl = null;
+          this.gridHintEl = null;
           this.cardEls = [];
           if (this.backdropEl) {
             this.backdropEl.removeEventListener("click", this._onBackdropClick);
@@ -15298,6 +15332,10 @@ var require_tab_switcher_modal = __commonJS({
           if (this.hintEl) {
             this.hintEl.remove();
             this.hintEl = null;
+          }
+          if (this.toolbarHintEl) {
+            this.toolbarHintEl.remove();
+            this.toolbarHintEl = null;
           }
           if (this.toolbarEl) {
             this.toolbarEl.remove();
@@ -15649,6 +15687,14 @@ var require_settings = __commonJS({
                   self.display();
                 });
               });
+            });
+            addToggleSetting(contentEl, {
+              name: L.settingsShowTaskViewHints,
+              desc: L.settingsShowTaskViewHintsDesc,
+              value: self.plugin.isTaskViewHintsEnabled(),
+              onChange: function(value) {
+                self.plugin.setShowTaskViewHints(value);
+              }
             });
             addToggleSetting(contentEl, {
               name: L.settingsZenMode,
@@ -16135,6 +16181,7 @@ var require_default_data = __commonJS({
       restoreSidebars: true,
       taskViewThumbnailRatio: "4:3",
       taskViewContentZoom: 0.45,
+      showTaskViewHints: true,
       // zenMode is per-session (session.zenMode); kept here only for one-time migration
       zenMode: false,
       zenHideInactiveTabs: true,
@@ -21825,6 +21872,13 @@ var require_settings_state = __commonJS({
         if (zoom < 0.1) zoom = 0.1;
         if (zoom > 1) zoom = 1;
         this.data.taskViewContentZoom = Math.round(zoom * 100) / 100;
+        return persistIfNeeded(this, options);
+      };
+      WorkspacePlusPlus2.prototype.isTaskViewHintsEnabled = function() {
+        return this.data.showTaskViewHints !== false;
+      };
+      WorkspacePlusPlus2.prototype.setShowTaskViewHints = function(enabled, options) {
+        this.data.showTaskViewHints = !!enabled;
         return persistIfNeeded(this, options);
       };
       WorkspacePlusPlus2.prototype.setStatusBarModScrollSwitch = function(enabled, options) {

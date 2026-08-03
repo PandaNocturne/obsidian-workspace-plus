@@ -694,7 +694,7 @@ function requestWorkspaceLayoutPersist(app) {
 function removeOverlayDom(doc) {
     if (!doc || !doc.body) return;
     var nodes = doc.body.querySelectorAll(
-        '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-drag-clone'
+        '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-hint, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-drag-clone'
     );
     for (var i = 0; i < nodes.length; i++) {
         try { nodes[i].remove(); } catch (err) { /* ignore */ }
@@ -838,12 +838,12 @@ var TabSwitcherModal = /** @class */ (function () {
                 'aria-label': i18n.L.tabSwitcherTitle,
             },
         });
-        this.gridEl = this.panelEl.createDiv({ cls: 'wpp-tab-switcher-grid' });
+        this.gridWrapEl = this.panelEl.createDiv({ cls: 'wpp-tab-switcher-grid-wrap' });
+        this.gridEl = this.gridWrapEl.createDiv({ cls: 'wpp-tab-switcher-grid' });
+        this.gridHintEl = this.gridWrapEl.createDiv({ cls: 'wpp-tab-switcher-hint wpp-tab-switcher-grid-hint' });
 
         this.mountSplitToolbar(doc);
-
-        this.hintEl = doc.body.createDiv({ cls: 'wpp-tab-switcher-floating-hint' });
-        this.hintEl.setText(this.getHintText());
+        this.updateHints();
 
         this.cardEls = [];
         this.renderCards();
@@ -857,12 +857,29 @@ var TabSwitcherModal = /** @class */ (function () {
         this.updateFocus(true);
     };
 
-    TabSwitcherModal.prototype.getHintText = function () {
-        var base = i18n.L.tabSwitcherHint || '';
-        if (this.groups && this.groups.length > 1 && i18n.L.tabSwitcherHintSplit) {
-            return base + ' · ' + i18n.L.tabSwitcherHintSplit;
+    TabSwitcherModal.prototype.updateHints = function () {
+        var L = i18n.L;
+        var multiSplit = !!(this.groups && this.groups.length > 1);
+        var showHints = !(this.plugin && typeof this.plugin.isTaskViewHintsEnabled === 'function')
+            || this.plugin.isTaskViewHintsEnabled();
+
+        if (this.gridHintEl) {
+            // Below grid: split-switching tips (mask wheel / number keys)
+            var gridText = showHints ? (L.tabSwitcherHintGrid || '') : '';
+            this.gridHintEl.setText(gridText);
+            this.gridHintEl.classList.toggle('is-hidden', !showHints || !multiSplit || !gridText);
+            this.gridHintEl.style.display = (showHints && multiSplit && gridText) ? '' : 'none';
         }
-        return base;
+
+        if (this.toolbarHintEl) {
+            // Separate element below split nav (not inside the toolbar container)
+            var navText = showHints ? (L.tabSwitcherHintNav || L.tabSwitcherHint || '') : '';
+            this.toolbarHintEl.setText(navText);
+            this.toolbarHintEl.classList.toggle('is-hidden', !showHints || !navText);
+            this.toolbarHintEl.style.display = (showHints && navText) ? '' : 'none';
+            this.toolbarHintEl.classList.toggle('is-below-nav', multiSplit);
+            this.toolbarHintEl.classList.toggle('is-top-only', !multiSplit);
+        }
     };
 
     TabSwitcherModal.prototype.mountSplitToolbar = function (doc) {
@@ -904,16 +921,24 @@ var TabSwitcherModal = /** @class */ (function () {
             e.stopPropagation();
             self.shiftSplitGroup(1);
         });
+
+        // Own container — visually below the split nav, not nested in it
+        this.toolbarHintEl = doc.body.createDiv({
+            cls: 'wpp-tab-switcher-hint wpp-tab-switcher-toolbar-hint',
+        });
     };
 
     TabSwitcherModal.prototype.updateSplitToolbar = function () {
         if (!this.toolbarEl) return;
         var self = this;
         var count = this.groups ? this.groups.length : 0;
-        var show = count > 1;
-        this.toolbarEl.classList.toggle('is-hidden', !show);
-        this.toolbarEl.style.display = show ? '' : 'none';
-        if (!show) return;
+        var showNav = count > 1;
+
+        this.toolbarEl.classList.toggle('is-hidden', !showNav);
+        this.toolbarEl.style.display = showNav ? '' : 'none';
+
+        this.updateHints();
+        if (!showNav) return;
 
         var previewIndex = this.groupIndex || 0;
         var workspaceActive = getActiveLeaf(this.app);
@@ -958,8 +983,6 @@ var TabSwitcherModal = /** @class */ (function () {
                 })(i);
             }
         }
-
-        if (this.hintEl) this.hintEl.setText(this.getHintText());
     };
 
     /**
@@ -1661,7 +1684,10 @@ var TabSwitcherModal = /** @class */ (function () {
     };
 
     TabSwitcherModal.prototype._onPanelClick = function (e) {
-        if (e.target === this.panelEl || e.target === this.gridEl) {
+        if (e.target === this.panelEl
+            || e.target === this.gridWrapEl
+            || e.target === this.gridEl
+            || e.target === this.gridHintEl) {
             e.preventDefault();
             e.stopPropagation();
             this.close();
@@ -1696,7 +1722,7 @@ var TabSwitcherModal = /** @class */ (function () {
             // Grid: do not hijack wheel (no tab cycling)
             if (target.closest('.wpp-tab-switcher-grid')) return;
             var onMask = target.closest(
-                '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint'
+                '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-hint, .wpp-tab-switcher-grid-wrap'
             );
             if (!onMask) return;
         }
@@ -1869,7 +1895,9 @@ var TabSwitcherModal = /** @class */ (function () {
             this.panelEl.remove();
             this.panelEl = null;
         }
+        this.gridWrapEl = null;
         this.gridEl = null;
+        this.gridHintEl = null;
         this.cardEls = [];
 
         if (this.backdropEl) {
@@ -1880,6 +1908,10 @@ var TabSwitcherModal = /** @class */ (function () {
         if (this.hintEl) {
             this.hintEl.remove();
             this.hintEl = null;
+        }
+        if (this.toolbarHintEl) {
+            this.toolbarHintEl.remove();
+            this.toolbarHintEl = null;
         }
         if (this.toolbarEl) {
             this.toolbarEl.remove();

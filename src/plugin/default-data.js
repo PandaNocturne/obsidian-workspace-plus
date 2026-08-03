@@ -16,6 +16,7 @@ module.exports = {
     restoreSidebars: true,
     taskViewThumbnailRatio: '4:3',
     taskViewContentZoom: 0.45,
+    showTaskViewHints: true,
     // zenMode is per-session (session.zenMode); kept here only for one-time migration
     zenMode: false,
     zenHideInactiveTabs: true,

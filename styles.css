@@ -1665,6 +1665,10 @@ body.wpp-mission-control-open {
     --wpp-mc-leaf-height: calc(var(--wpp-mc-source-height) * var(--wpp-mc-layout-scale));
     --wpp-mc-panel-max-width: 80vw;
     --wpp-mc-panel-max-height: 80vh;
+    /* Shared gap above both task-view hints (nav hint / grid hint) */
+    --wpp-mc-hint-gap: 18px;
+    --wpp-mc-toolbar-top: 18px;
+    --wpp-mc-toolbar-height: 36px; /* padding 4+4 + control 28 */
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-backdrop {
@@ -1700,6 +1704,15 @@ body.wpp-mission-control-open .wpp-tab-switcher-panel {
     pointer-events: none;
 }
 
+body.wpp-mission-control-open .wpp-tab-switcher-grid-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--wpp-mc-hint-gap);
+    max-width: var(--wpp-mc-panel-max-width);
+    pointer-events: none;
+}
+
 body.wpp-mission-control-open .wpp-tab-switcher-grid {
     display: flex;
     flex-wrap: wrap;
@@ -1709,7 +1722,7 @@ body.wpp-mission-control-open .wpp-tab-switcher-grid {
     align-items: flex-start;
     box-sizing: border-box;
     width: max-content;
-    max-width: var(--wpp-mc-panel-max-width);
+    max-width: 100%;
     max-height: var(--wpp-mc-panel-max-height);
     min-height: 0;
     overflow: auto;
@@ -2080,28 +2093,42 @@ body.wpp-mission-control-open .wpp-tab-switcher-preview-icon {
     --icon-size: 40px;
 }
 
-body.wpp-mission-control-open .wpp-tab-switcher-floating-hint {
-    position: fixed;
-    left: 50%;
-    bottom: 24px;
-    transform: translateX(-50%);
-    z-index: 1002;
-    padding: 6px 14px;
+body.wpp-mission-control-open .wpp-tab-switcher-floating-hint,
+body.wpp-mission-control-open .wpp-tab-switcher-hint {
+    padding: 4px 10px;
     border-radius: var(--radius-m);
     background: rgba(0, 0, 0, 0.45);
     color: var(--text-on-accent, #fff);
     font-size: var(--font-ui-smaller);
     pointer-events: none;
     white-space: nowrap;
-    max-width: 90vw;
+    max-width: min(90vw, var(--wpp-mc-panel-max-width));
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.35;
+    text-align: center;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-floating-hint {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    z-index: 1002;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-grid-hint {
+    flex: 0 0 auto;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-hint.is-hidden {
+    display: none;
 }
 
 /* Top controls: cycle which split's tabs are shown */
 body.wpp-mission-control-open .wpp-tab-switcher-toolbar {
     position: fixed;
-    top: 18px;
+    top: var(--wpp-mc-toolbar-top);
     left: 50%;
     transform: translateX(-50%);
     z-index: 1003;
@@ -2118,6 +2145,27 @@ body.wpp-mission-control-open .wpp-tab-switcher-toolbar {
 
 body.wpp-mission-control-open .wpp-tab-switcher-toolbar.is-hidden {
     display: none;
+}
+
+/* Separate hint under split nav — own container, not inside toolbar */
+body.wpp-mission-control-open .wpp-tab-switcher-toolbar-hint {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1002;
+    max-width: 70vw;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-toolbar-hint.is-below-nav {
+    top: calc(
+        var(--wpp-mc-toolbar-top)
+        + var(--wpp-mc-toolbar-height)
+        + var(--wpp-mc-hint-gap)
+    );
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-toolbar-hint.is-top-only {
+    top: var(--wpp-mc-toolbar-top);
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-split-btn {

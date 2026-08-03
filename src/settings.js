@@ -168,6 +168,15 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
             });
 
             addToggleSetting(contentEl, {
+                name: L.settingsShowTaskViewHints,
+                desc: L.settingsShowTaskViewHintsDesc,
+                value: self.plugin.isTaskViewHintsEnabled(),
+                onChange: function (value) {
+                    self.plugin.setShowTaskViewHints(value);
+                },
+            });
+
+            addToggleSetting(contentEl, {
                 name: L.settingsZenMode,
                 desc: L.settingsZenModeDesc,
                 value: self.plugin.isZenModeEnabled(),
