@@ -105,8 +105,71 @@ function cloneLooksEmpty(clone) {
     return true;
 }
 
+/** Reject Canvas / Excalidraw JSON / markdown-source dumps shown as "preview". */
+function cloneLooksLikeSourceCode(clone) {
+    if (!clone) return true;
+    if (clone.querySelector(
+        '.canvas-wrapper, .canvas-node, .excalidraw, .excalidraw-wrapper, .layer-ui__wrapper, canvas'
+    )) {
+        return false;
+    }
+    var text = String(clone.textContent || '').replace(/\s+/g, ' ').trim();
+    if (!text) return false;
+    if (text.charAt(0) === '{' && (
+        text.indexOf('"nodes"') >= 0
+        || text.indexOf('"elements"') >= 0
+        || text.indexOf('"type"') >= 0
+        || text.indexOf('excalidraw') >= 0
+    )) {
+        return true;
+    }
+    if (clone.querySelector('.cm-editor, .cm-content, .markdown-source-view, .mod-cm6')) {
+        if (text.charAt(0) === '{' || text.indexOf('"elements"') >= 0 || text.indexOf('"nodes"') >= 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getLeafViewType(leaf) {
+    try {
+        if (leaf && leaf.view && typeof leaf.view.getViewType === 'function') {
+            var type = leaf.view.getViewType();
+            if (type) return type;
+        }
+        var vs = leaf && typeof leaf.getViewState === 'function' ? leaf.getViewState() : null;
+        if (vs && typeof vs.type === 'string') return vs.type;
+    } catch (err) { /* ignore */ }
+    return '';
+}
+
+function isCanvasFile(file) {
+    return !!(file && file.extension === 'canvas');
+}
+
+function isExcalidrawFile(app, file) {
+    if (!file) return false;
+    if (file.extension === 'excalidraw') return true;
+    var name = file.name || '';
+    if (/\.excalidraw\.md$/i.test(name)) return true;
+    if (file.extension !== 'md') return false;
+    try {
+        var cache = app && app.metadataCache && app.metadataCache.getFileCache(file);
+        var fm = cache && cache.frontmatter;
+        if (fm && (fm['excalidraw-plugin'] != null || fm.excalidraw != null)) return true;
+    } catch (err) { /* ignore */ }
+    return false;
+}
+
+function isCanvasOrExcalidrawLeaf(app, leaf) {
+    var type = getLeafViewType(leaf);
+    if (type === 'canvas' || type === 'excalidraw') return true;
+    var file = getLeafFile(app, leaf);
+    return isCanvasFile(file) || isExcalidrawFile(app, file);
+}
+
 /** Deep-clone a tab's view DOM for thumbnail preview (does not touch the live leaf). */
-function buildLeafViewClone(leaf) {
+function buildLeafViewClone(leaf, options) {
     var source = getCloneSourceEl(leaf);
     if (!source) return null;
     try {
@@ -114,10 +177,40 @@ function buildLeafViewClone(leaf) {
         sanitizeClone(clone);
         clone.classList.add('wpp-tab-switcher-clone');
         if (cloneLooksEmpty(clone)) return null;
+        if (options && options.rejectSource && cloneLooksLikeSourceCode(clone)) return null;
         return clone;
     } catch (err) {
         return null;
     }
+}
+
+function leafHasVisualPreview(leaf) {
+    var source = getCloneSourceEl(leaf);
+    if (!source) return false;
+    return !!source.querySelector(
+        'canvas, .canvas-wrapper, .canvas-node, .excalidraw, .excalidraw-wrapper, .layer-ui__wrapper'
+    );
+}
+
+function waitForVisualPreview(leaf, maxAttempts) {
+    var attempts = Math.max(1, maxAttempts || 10);
+    return new Promise(function (resolve) {
+        function tick() {
+            if (leafHasVisualPreview(leaf) || attempts <= 1) {
+                resolve();
+                return;
+            }
+            attempts -= 1;
+            if (typeof requestAnimationFrame === 'function') {
+                requestAnimationFrame(function () {
+                    setTimeout(tick, 40);
+                });
+            } else {
+                setTimeout(tick, 50);
+            }
+        }
+        tick();
+    });
 }
 
 function isTFile(file) {
@@ -178,6 +271,12 @@ function ensureLeafLoaded(leaf) {
     return Promise.resolve();
 }
 
+function fillIconOnly(host, leaf) {
+    host.empty();
+    var iconWrap = host.createDiv({ cls: 'wpp-tab-switcher-preview-icon' });
+    obsidian.setIcon(iconWrap, getLeafIcon(leaf));
+}
+
 function fillTextOrIcon(host, leaf) {
     var previewText = getLeafPreviewText(leaf);
     if (previewText) {
@@ -187,8 +286,7 @@ function fillTextOrIcon(host, leaf) {
         });
         return;
     }
-    var iconWrap = host.createDiv({ cls: 'wpp-tab-switcher-preview-icon' });
-    obsidian.setIcon(iconWrap, getLeafIcon(leaf));
+    fillIconOnly(host, leaf);
 }
 
 function renderMarkdownInto(app, plugin, host, file, markdown) {
@@ -200,7 +298,7 @@ function renderMarkdownInto(app, plugin, host, file, markdown) {
     if (!renderer) return Promise.resolve(false);
 
     var source = String(markdown || '').slice(0, 5000);
-    var path = file.path || '';
+    var path = (file && file.path) || '';
 
     // Prefer modern API; fall back to deprecated renderMarkdown
     if (typeof renderer.render === 'function') {
@@ -217,6 +315,75 @@ function renderMarkdownInto(app, plugin, host, file, markdown) {
         }
     }
     return Promise.resolve(false);
+}
+
+/** Build Obsidian wiki-embed markdown for a vault file (![[path]]). */
+function buildWikiEmbedMarkdown(file) {
+    if (!file || typeof file.path !== 'string' || !file.path) return '';
+    // Escape pipe so display-text separators cannot break the link target
+    var path = file.path.replace(/\|/g, '\\|');
+    return '![[' + path + ']]';
+}
+
+function embedLooksReady(host) {
+    if (!host) return false;
+    return !!host.querySelector(
+        '.internal-embed, .markdown-embed, .media-embed, .canvas-wrapper, .canvas-node,'
+        + ' .excalidraw, .excalidraw-wrapper, .layer-ui__wrapper, canvas, img, iframe, svg'
+    );
+}
+
+function waitForEmbedReady(host, maxAttempts) {
+    var attempts = Math.max(1, maxAttempts || 16);
+    return new Promise(function (resolve) {
+        function tick() {
+            if (embedLooksReady(host) || attempts <= 1) {
+                resolve(embedLooksReady(host));
+                return;
+            }
+            attempts -= 1;
+            if (typeof requestAnimationFrame === 'function') {
+                requestAnimationFrame(function () {
+                    setTimeout(tick, 40);
+                });
+            } else {
+                setTimeout(tick, 50);
+            }
+        }
+        tick();
+    });
+}
+
+/** Render a file as an Obsidian document embed (used for Canvas / Excalidraw). */
+function renderFileEmbedInto(app, plugin, host, file) {
+    var md = buildWikiEmbedMarkdown(file);
+    if (!md) return Promise.resolve(false);
+
+    host.empty();
+    host.addClass('wpp-tab-switcher-clone');
+    host.addClass('wpp-tab-switcher-embed');
+
+    var renderer = obsidian.MarkdownRenderer;
+    if (!renderer) return Promise.resolve(false);
+
+    var path = file.path || '';
+    var renderPromise;
+    if (typeof renderer.render === 'function') {
+        renderPromise = Promise.resolve(renderer.render(app, md, host, path, plugin));
+    } else if (typeof renderer.renderMarkdown === 'function') {
+        try {
+            renderer.renderMarkdown(md, host, path, plugin);
+            renderPromise = Promise.resolve();
+        } catch (err) {
+            return Promise.resolve(false);
+        }
+    } else {
+        return Promise.resolve(false);
+    }
+
+    return renderPromise
+        .then(function () { return waitForEmbedReady(host, 20); })
+        .catch(function () { return false; });
 }
 
 function collectGroupLeaves(app) {
@@ -625,6 +792,13 @@ var TabSwitcherModal = /** @class */ (function () {
         var self = this;
         var file = getLeafFile(this.app, leaf);
 
+        // Canvas / Excalidraw: show as document embed (![[path]]), never dump JSON / md source
+        if (isCanvasOrExcalidrawLeaf(this.app, leaf)
+            || isCanvasFile(file)
+            || isExcalidrawFile(this.app, file)) {
+            return this.fillCardPreviewEmbed(leaf, scaleEl, file);
+        }
+
         // Markdown notes: always render from vault first — works for never-opened / deferred tabs
         if (file && file.extension === 'md') {
             return this.app.vault.cachedRead(file).then(function (md) {
@@ -646,23 +820,62 @@ var TabSwitcherModal = /** @class */ (function () {
         return this.fillCardPreviewFromLeaf(leaf, scaleEl);
     };
 
-    TabSwitcherModal.prototype.fillCardPreviewFromLeaf = function (leaf, scaleEl) {
+    /**
+     * Canvas / Excalidraw preview via wiki-embed (![[file]]).
+     * Falls back to visual DOM clone, then icon-only.
+     */
+    TabSwitcherModal.prototype.fillCardPreviewEmbed = function (leaf, scaleEl, file) {
         var self = this;
+        if (!file) {
+            return this.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+        }
+
+        if (!scaleEl || !scaleEl.isConnected) return Promise.resolve();
+        scaleEl.empty();
+        var host = scaleEl.createDiv();
+
+        return renderFileEmbedInto(this.app, this.plugin, host, file).then(function (ok) {
+            if (!scaleEl.isConnected) return;
+            if (ok) return;
+            // Embed did not materialize — try live leaf clone, then icon
+            return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+        }).catch(function () {
+            if (!scaleEl || !scaleEl.isConnected) return;
+            return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+        });
+    };
+
+    TabSwitcherModal.prototype.fillCardPreviewFromLeaf = function (leaf, scaleEl, options) {
+        var self = this;
+        var visualOnly = !!(options && options.visualOnly);
         return ensureLeafLoaded(leaf)
-            .then(function () { return waitFrames(3); })
+            .then(function () {
+                if (visualOnly) {
+                    return waitFrames(3).then(function () {
+                        return waitForVisualPreview(leaf, 12);
+                    });
+                }
+                return waitFrames(3);
+            })
             .then(function () {
                 if (!scaleEl || !scaleEl.isConnected) return;
 
-                var clone = buildLeafViewClone(leaf);
+                var clone = buildLeafViewClone(leaf, { rejectSource: visualOnly });
                 if (clone) {
                     scaleEl.empty();
                     scaleEl.appendChild(clone);
                     return;
                 }
 
+                if (visualOnly) {
+                    scaleEl.empty();
+                    fillIconOnly(scaleEl, leaf);
+                    return;
+                }
+
                 // After load, file may now be available
                 var file = getLeafFile(self.app, leaf);
-                if (file && file.extension === 'md') {
+                if (file && file.extension === 'md' && !isExcalidrawFile(self.app, file)) {
                     return self.app.vault.cachedRead(file).then(function (md) {
                         if (!scaleEl.isConnected) return;
                         scaleEl.empty();
@@ -681,7 +894,8 @@ var TabSwitcherModal = /** @class */ (function () {
             .catch(function () {
                 if (!scaleEl || !scaleEl.isConnected) return;
                 scaleEl.empty();
-                fillTextOrIcon(scaleEl, leaf);
+                if (visualOnly) fillIconOnly(scaleEl, leaf);
+                else fillTextOrIcon(scaleEl, leaf);
             });
     };
 

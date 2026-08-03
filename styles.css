@@ -1812,6 +1812,52 @@ body.wpp-mission-control-open .wpp-tab-switcher-md-fallback {
     background: var(--background-primary);
 }
 
+/* Canvas / Excalidraw: document embed (![[path]]) fills the scaled thumbnail */
+body.wpp-mission-control-open .wpp-tab-switcher-embed {
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background: var(--background-primary);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-embed > p {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-embed .internal-embed,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .markdown-embed,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .media-embed {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    background: transparent;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-embed .markdown-embed-title,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .embed-title {
+    display: none !important;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-embed .markdown-embed-content,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .canvas-wrapper,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .excalidraw-wrapper,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .excalidraw {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+}
+
 body.wpp-mission-control-open .wpp-tab-switcher-md-fallback p,
 body.wpp-mission-control-open .wpp-tab-switcher-md-fallback li,
 body.wpp-mission-control-open .wpp-tab-switcher-md-fallback h1,
