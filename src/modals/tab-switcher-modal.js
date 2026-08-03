@@ -564,6 +564,7 @@ var TabSwitcherModal = /** @class */ (function () {
                 role: 'option',
                 'data-index': String(index),
                 'aria-selected': 'false',
+                'aria-current': isActive ? 'true' : 'false',
             },
         });
 

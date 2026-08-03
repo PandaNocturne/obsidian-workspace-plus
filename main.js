@@ -14025,7 +14025,8 @@ var require_tab_switcher_modal = __commonJS({
             attr: {
               role: "option",
               "data-index": String(index),
-              "aria-selected": "false"
+              "aria-selected": "false",
+              "aria-current": isActive ? "true" : "false"
             }
           });
           var header = card.createDiv({ cls: "wpp-tab-switcher-header" });

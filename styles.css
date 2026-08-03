@@ -1599,6 +1599,12 @@ body.wpp-mission-control-open .wpp-tab-switcher-card {
     cursor: default;
 }
 
+/* Current workspace leaf — simple accent border */
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-active-tab {
+    border-color: var(--interactive-accent);
+}
+
+/* Keyboard / hover focus — selection ring (what Enter will activate) */
 body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused {
     border-color: var(--interactive-accent);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--interactive-accent) 35%, transparent);
