@@ -1310,6 +1310,65 @@ body.wpp-session-list-dragging * {
     color: var(--text-on-accent);
 }
 
+.wpp-settings-footer {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--background-modifier-border);
+    font-size: var(--font-ui-smaller);
+    color: var(--text-faint);
+    line-height: 1.5;
+}
+
+.wpp-settings-credit {
+    margin: 0;
+}
+
+.wpp-settings-credit-link {
+    text-decoration: underline;
+}
+
+/* ============================================================
+   Zen / focus tab mode (inspired by Vertical Tabs)
+   ============================================================ */
+
+body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-tabs:not(.mod-active):not(.wpp-zen-active) {
+    display: none;
+    flex-basis: unset;
+}
+
+body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-tabs.mod-active,
+body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-tabs.wpp-zen-active {
+    display: flex;
+    flex-basis: 100%;
+}
+
+body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-split:has(.workspace-tabs.mod-active),
+body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-split:has(.workspace-tabs.wpp-zen-active) {
+    flex-basis: 100%;
+}
+
+body.wpp-zen-mode.wpp-zen-hide-inactive-tabs:not(.is-popout-window)
+    .workspace-split.mod-root
+    .workspace-tabs
+    > .workspace-tab-header-container
+    .workspace-tab-header:not(.is-active) {
+    display: none;
+}
+
+body.wpp-zen-mode.wpp-zen-hide-inactive-tabs:not(.is-popout-window)
+    .workspace-split.mod-root
+    .workspace-tabs
+    > .workspace-tab-header-container
+    .workspace-tab-header.is-active {
+    container-type: unset;
+    max-width: unset;
+    width: unset;
+}
+
+body.wpp-zen-mode {
+    --tab-stacked-pane-width: 100%;
+}
+
 /* Settings: nested sub-toggles below parent */
 .wpp-has-nested {
     flex-wrap: wrap;

@@ -7905,6 +7905,82 @@ for (var tabSwitcherLangIndex = 0; tabSwitcherLangIndex < tabSwitcherLangs.lengt
     }
 }
 
+var FORK_CREDIT_STRINGS = {
+    en: {
+        settingsForkCreditBefore: 'This plugin is a modified fork of ',
+        settingsForkCreditAfter: ' by s1m4ne. Please support the original plugin.',
+        settingsForkCreditLink: 'Workspace++',
+        cmdToggleZenMode: 'Toggle focus tab mode',
+        settingsZenMode: 'Focus tab mode',
+        settingsZenModeDesc: 'Hide inactive tab groups and maximize the active split (like Vertical Tabs zen mode).',
+        settingsZenHideInactiveTabs: 'Hide inactive tabs in focus mode',
+        settingsZenHideInactiveTabsDesc: 'When focus mode is on, only show the active tab header in the current group.',
+        zenModeEnabled: 'Focus tab mode on',
+        zenModeDisabled: 'Focus tab mode off',
+    },
+    zh: {
+        settingsForkCreditBefore: '本插件基于 ',
+        settingsForkCreditAfter: '（作者 s1m4ne）魔改，请支持原插件。',
+        settingsForkCreditLink: 'Workspace++',
+        cmdToggleZenMode: '切换专注标签模式',
+        settingsZenMode: '专注标签模式',
+        settingsZenModeDesc: '隐藏其他分栏标签组，放大当前分栏（参考 Vertical Tabs 的 Zen mode）。',
+        settingsZenHideInactiveTabs: '专注模式下隐藏非活动标签',
+        settingsZenHideInactiveTabsDesc: '开启专注模式时，当前分组仅显示活动标签页标题。',
+        zenModeEnabled: '已开启专注标签模式',
+        zenModeDisabled: '已关闭专注标签模式',
+    },
+    'zh-TW': {
+        settingsForkCreditBefore: '本外掛基於 ',
+        settingsForkCreditAfter: '（作者 s1m4ne）魔改，請支持原外掛。',
+        settingsForkCreditLink: 'Workspace++',
+        cmdToggleZenMode: '切換專注分頁模式',
+        settingsZenMode: '專注分頁模式',
+        settingsZenModeDesc: '隱藏其他分欄分頁組，放大目前分欄（參考 Vertical Tabs 的 Zen mode）。',
+        settingsZenHideInactiveTabs: '專注模式下隱藏非使用中分頁',
+        settingsZenHideInactiveTabsDesc: '開啟專注模式時，目前分組僅顯示使用中分頁標題。',
+        zenModeEnabled: '已開啟專注分頁模式',
+        zenModeDisabled: '已關閉專注分頁模式',
+    },
+    ja: {
+        settingsForkCreditBefore: '本プラグインは s1m4ne 氏の ',
+        settingsForkCreditAfter: ' を改変したものです。原作プラグインへの応援をお願いします。',
+        settingsForkCreditLink: 'Workspace++',
+        cmdToggleZenMode: 'フォーカスタブモードを切り替え',
+        settingsZenMode: 'フォーカスタブモード',
+        settingsZenModeDesc: '非アクティブなタブグループを隠し、アクティブな分割を最大化します（Vertical Tabs の Zen mode 相当）。',
+        settingsZenHideInactiveTabs: 'フォーカス時に非アクティブタブを隠す',
+        settingsZenHideInactiveTabsDesc: 'フォーカスモード中は、現在のグループでアクティブなタブ見出しのみ表示します。',
+        zenModeEnabled: 'フォーカスタブモードをオンにしました',
+        zenModeDisabled: 'フォーカスタブモードをオフにしました',
+    },
+    ko: {
+        settingsForkCreditBefore: '이 플러그인은 s1m4ne의 ',
+        settingsForkCreditAfter: '를 수정한 포크입니다. 원작 플러그인을 지원해 주세요.',
+        settingsForkCreditLink: 'Workspace++',
+        cmdToggleZenMode: '집중 탭 모드 전환',
+        settingsZenMode: '집중 탭 모드',
+        settingsZenModeDesc: '비활성 탭 그룹을 숨기고 활성 분할을 최대화합니다(Vertical Tabs Zen mode와 유사).',
+        settingsZenHideInactiveTabs: '집중 모드에서 비활성 탭 숨기기',
+        settingsZenHideInactiveTabsDesc: '집중 모드에서는 현재 그룹의 활성 탭 헤더만 표시합니다.',
+        zenModeEnabled: '집중 탭 모드 켜짐',
+        zenModeDisabled: '집중 탭 모드 꺼짐',
+    },
+};
+
+var forkCreditLangs = Object.keys(STRINGS);
+for (var forkCreditLangIndex = 0; forkCreditLangIndex < forkCreditLangs.length; forkCreditLangIndex++) {
+    var forkCreditLang = forkCreditLangs[forkCreditLangIndex];
+    var forkCreditStrings = FORK_CREDIT_STRINGS[forkCreditLang] || FORK_CREDIT_STRINGS.en;
+    var forkCreditKeys = Object.keys(forkCreditStrings);
+    for (var forkCreditKeyIndex = 0; forkCreditKeyIndex < forkCreditKeys.length; forkCreditKeyIndex++) {
+        var forkCreditKey = forkCreditKeys[forkCreditKeyIndex];
+        if (STRINGS[forkCreditLang][forkCreditKey] === undefined) {
+            STRINGS[forkCreditLang][forkCreditKey] = forkCreditStrings[forkCreditKey];
+        }
+    }
+}
+
 var LANG_OPTIONS = {
     en: 'English',
     zh: '简体中文',

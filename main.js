@@ -10321,6 +10321,86 @@ var require_i18n = __commonJS({
     var tabSwitcherKey;
     var tabSwitcherKeyIndex;
     var tabSwitcherLangIndex;
+    var FORK_CREDIT_STRINGS = {
+      en: {
+        settingsForkCreditBefore: "This plugin is a modified fork of ",
+        settingsForkCreditAfter: " by s1m4ne. Please support the original plugin.",
+        settingsForkCreditLink: "Workspace++",
+        cmdToggleZenMode: "Toggle focus tab mode",
+        settingsZenMode: "Focus tab mode",
+        settingsZenModeDesc: "Hide inactive tab groups and maximize the active split (like Vertical Tabs zen mode).",
+        settingsZenHideInactiveTabs: "Hide inactive tabs in focus mode",
+        settingsZenHideInactiveTabsDesc: "When focus mode is on, only show the active tab header in the current group.",
+        zenModeEnabled: "Focus tab mode on",
+        zenModeDisabled: "Focus tab mode off"
+      },
+      zh: {
+        settingsForkCreditBefore: "\u672C\u63D2\u4EF6\u57FA\u4E8E ",
+        settingsForkCreditAfter: "\uFF08\u4F5C\u8005 s1m4ne\uFF09\u9B54\u6539\uFF0C\u8BF7\u652F\u6301\u539F\u63D2\u4EF6\u3002",
+        settingsForkCreditLink: "Workspace++",
+        cmdToggleZenMode: "\u5207\u6362\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
+        settingsZenMode: "\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
+        settingsZenModeDesc: "\u9690\u85CF\u5176\u4ED6\u5206\u680F\u6807\u7B7E\u7EC4\uFF0C\u653E\u5927\u5F53\u524D\u5206\u680F\uFF08\u53C2\u8003 Vertical Tabs \u7684 Zen mode\uFF09\u3002",
+        settingsZenHideInactiveTabs: "\u4E13\u6CE8\u6A21\u5F0F\u4E0B\u9690\u85CF\u975E\u6D3B\u52A8\u6807\u7B7E",
+        settingsZenHideInactiveTabsDesc: "\u5F00\u542F\u4E13\u6CE8\u6A21\u5F0F\u65F6\uFF0C\u5F53\u524D\u5206\u7EC4\u4EC5\u663E\u793A\u6D3B\u52A8\u6807\u7B7E\u9875\u6807\u9898\u3002",
+        zenModeEnabled: "\u5DF2\u5F00\u542F\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
+        zenModeDisabled: "\u5DF2\u5173\u95ED\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F"
+      },
+      "zh-TW": {
+        settingsForkCreditBefore: "\u672C\u5916\u639B\u57FA\u65BC ",
+        settingsForkCreditAfter: "\uFF08\u4F5C\u8005 s1m4ne\uFF09\u9B54\u6539\uFF0C\u8ACB\u652F\u6301\u539F\u5916\u639B\u3002",
+        settingsForkCreditLink: "Workspace++",
+        cmdToggleZenMode: "\u5207\u63DB\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F",
+        settingsZenMode: "\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F",
+        settingsZenModeDesc: "\u96B1\u85CF\u5176\u4ED6\u5206\u6B04\u5206\u9801\u7D44\uFF0C\u653E\u5927\u76EE\u524D\u5206\u6B04\uFF08\u53C3\u8003 Vertical Tabs \u7684 Zen mode\uFF09\u3002",
+        settingsZenHideInactiveTabs: "\u5C08\u6CE8\u6A21\u5F0F\u4E0B\u96B1\u85CF\u975E\u4F7F\u7528\u4E2D\u5206\u9801",
+        settingsZenHideInactiveTabsDesc: "\u958B\u555F\u5C08\u6CE8\u6A21\u5F0F\u6642\uFF0C\u76EE\u524D\u5206\u7D44\u50C5\u986F\u793A\u4F7F\u7528\u4E2D\u5206\u9801\u6A19\u984C\u3002",
+        zenModeEnabled: "\u5DF2\u958B\u555F\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F",
+        zenModeDisabled: "\u5DF2\u95DC\u9589\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F"
+      },
+      ja: {
+        settingsForkCreditBefore: "\u672C\u30D7\u30E9\u30B0\u30A4\u30F3\u306F s1m4ne \u6C0F\u306E ",
+        settingsForkCreditAfter: " \u3092\u6539\u5909\u3057\u305F\u3082\u306E\u3067\u3059\u3002\u539F\u4F5C\u30D7\u30E9\u30B0\u30A4\u30F3\u3078\u306E\u5FDC\u63F4\u3092\u304A\u9858\u3044\u3057\u307E\u3059\u3002",
+        settingsForkCreditLink: "Workspace++",
+        cmdToggleZenMode: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9\u3092\u5207\u308A\u66FF\u3048",
+        settingsZenMode: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9",
+        settingsZenModeDesc: "\u975E\u30A2\u30AF\u30C6\u30A3\u30D6\u306A\u30BF\u30D6\u30B0\u30EB\u30FC\u30D7\u3092\u96A0\u3057\u3001\u30A2\u30AF\u30C6\u30A3\u30D6\u306A\u5206\u5272\u3092\u6700\u5927\u5316\u3057\u307E\u3059\uFF08Vertical Tabs \u306E Zen mode \u76F8\u5F53\uFF09\u3002",
+        settingsZenHideInactiveTabs: "\u30D5\u30A9\u30FC\u30AB\u30B9\u6642\u306B\u975E\u30A2\u30AF\u30C6\u30A3\u30D6\u30BF\u30D6\u3092\u96A0\u3059",
+        settingsZenHideInactiveTabsDesc: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30E2\u30FC\u30C9\u4E2D\u306F\u3001\u73FE\u5728\u306E\u30B0\u30EB\u30FC\u30D7\u3067\u30A2\u30AF\u30C6\u30A3\u30D6\u306A\u30BF\u30D6\u898B\u51FA\u3057\u306E\u307F\u8868\u793A\u3057\u307E\u3059\u3002",
+        zenModeEnabled: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9\u3092\u30AA\u30F3\u306B\u3057\u307E\u3057\u305F",
+        zenModeDisabled: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9\u3092\u30AA\u30D5\u306B\u3057\u307E\u3057\u305F"
+      },
+      ko: {
+        settingsForkCreditBefore: "\uC774 \uD50C\uB7EC\uADF8\uC778\uC740 s1m4ne\uC758 ",
+        settingsForkCreditAfter: "\uB97C \uC218\uC815\uD55C \uD3EC\uD06C\uC785\uB2C8\uB2E4. \uC6D0\uC791 \uD50C\uB7EC\uADF8\uC778\uC744 \uC9C0\uC6D0\uD574 \uC8FC\uC138\uC694.",
+        settingsForkCreditLink: "Workspace++",
+        cmdToggleZenMode: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC \uC804\uD658",
+        settingsZenMode: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC",
+        settingsZenModeDesc: "\uBE44\uD65C\uC131 \uD0ED \uADF8\uB8F9\uC744 \uC228\uAE30\uACE0 \uD65C\uC131 \uBD84\uD560\uC744 \uCD5C\uB300\uD654\uD569\uB2C8\uB2E4(Vertical Tabs Zen mode\uC640 \uC720\uC0AC).",
+        settingsZenHideInactiveTabs: "\uC9D1\uC911 \uBAA8\uB4DC\uC5D0\uC11C \uBE44\uD65C\uC131 \uD0ED \uC228\uAE30\uAE30",
+        settingsZenHideInactiveTabsDesc: "\uC9D1\uC911 \uBAA8\uB4DC\uC5D0\uC11C\uB294 \uD604\uC7AC \uADF8\uB8F9\uC758 \uD65C\uC131 \uD0ED \uD5E4\uB354\uB9CC \uD45C\uC2DC\uD569\uB2C8\uB2E4.",
+        zenModeEnabled: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC \uCF1C\uC9D0",
+        zenModeDisabled: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC \uAEBC\uC9D0"
+      }
+    };
+    var forkCreditLangs = Object.keys(STRINGS);
+    for (forkCreditLangIndex = 0; forkCreditLangIndex < forkCreditLangs.length; forkCreditLangIndex++) {
+      forkCreditLang = forkCreditLangs[forkCreditLangIndex];
+      forkCreditStrings = FORK_CREDIT_STRINGS[forkCreditLang] || FORK_CREDIT_STRINGS.en;
+      forkCreditKeys = Object.keys(forkCreditStrings);
+      for (forkCreditKeyIndex = 0; forkCreditKeyIndex < forkCreditKeys.length; forkCreditKeyIndex++) {
+        forkCreditKey = forkCreditKeys[forkCreditKeyIndex];
+        if (STRINGS[forkCreditLang][forkCreditKey] === void 0) {
+          STRINGS[forkCreditLang][forkCreditKey] = forkCreditStrings[forkCreditKey];
+        }
+      }
+    }
+    var forkCreditLang;
+    var forkCreditStrings;
+    var forkCreditKeys;
+    var forkCreditKey;
+    var forkCreditKeyIndex;
+    var forkCreditLangIndex;
     var LANG_OPTIONS = {
       en: "English",
       zh: "\u7B80\u4F53\u4E2D\u6587",
@@ -14867,6 +14947,26 @@ var require_settings = __commonJS({
                 });
               });
             });
+            addToggleSetting(contentEl, {
+              name: L.settingsZenMode,
+              desc: L.settingsZenModeDesc,
+              value: self.plugin.isZenModeEnabled(),
+              onChange: function(value) {
+                self.plugin.setZenMode(value).then(function() {
+                  self.display();
+                });
+              }
+            });
+            if (self.plugin.isZenModeEnabled()) {
+              addToggleSetting(contentEl, {
+                name: L.settingsZenHideInactiveTabs,
+                desc: L.settingsZenHideInactiveTabsDesc,
+                value: self.plugin.isZenHideInactiveTabsEnabled(),
+                onChange: function(value) {
+                  self.plugin.setZenHideInactiveTabs(value);
+                }
+              });
+            }
           }
           if (self.activeTab === "sessions") {
             addSubsection(contentEl, L.settingsSubsectionAutoSaveMode);
@@ -15294,16 +15394,16 @@ var require_settings = __commonJS({
             addDevCardRow(L.settingsStorageFieldSessionCount, diagnosticsInfo.sessionCount);
             addDevCardRow(L.settingsStorageFieldUpdatedAt, diagnosticsUpdatedText);
           }
-          var footerEl = containerEl.createDiv();
-          footerEl.style.fontSize = "12px";
-          footerEl.style.color = "var(--text-faint)";
-          footerEl.style.marginTop = "24px";
-          var helpEl = footerEl.createEl("p", { text: L.settingsTranslationHelp });
-          helpEl.style.margin = "0 0 4px";
-          footerEl.createEl("a", {
-            text: L.settingsGitHubLink,
-            href: "https://github.com/s1m4ne/obsidian-workspace-plus"
+          var footerEl = containerEl.createDiv({ cls: "wpp-settings-footer" });
+          var creditEl = footerEl.createEl("p", { cls: "wpp-settings-credit" });
+          creditEl.appendText(L.settingsForkCreditBefore);
+          creditEl.createEl("a", {
+            cls: "wpp-settings-credit-link",
+            text: L.settingsForkCreditLink,
+            href: "https://github.com/s1m4ne/obsidian-workspace-plus",
+            attr: { target: "_blank", rel: "noopener" }
           });
+          creditEl.appendText(L.settingsForkCreditAfter);
         };
         return WorkspacePlusPlusSettingTab2;
       }(obsidian2.PluginSettingTab)
@@ -15332,6 +15432,8 @@ var require_default_data = __commonJS({
       restoreSidebars: true,
       taskViewThumbnailRatio: "4:3",
       taskViewContentZoom: 0.45,
+      zenMode: false,
+      zenHideInactiveTabs: true,
       statusBarQuickSwitcher: false,
       groupFeatureEnabled: true,
       showFilterInput: false,
@@ -15404,6 +15506,9 @@ var require_register_commands = __commonJS({
           plugin.tabSwitcherModal = new modals2.TabSwitcherModal(plugin.app, plugin);
         }
         plugin.tabSwitcherModal.open();
+      });
+      addSimpleCommand("toggle-zen-mode", L.cmdToggleZenMode, function() {
+        plugin.toggleZenMode({ notify: true });
       });
       addSimpleCommand("save-current-session", L.cmdSaveCurrent, function() {
         plugin.saveActiveSession();
@@ -16953,7 +17058,9 @@ var require_persistence = __commonJS({
       "sessionManagerViewGroupId",
       "restoreSidebars",
       "taskViewThumbnailRatio",
-      "taskViewContentZoom"
+      "taskViewContentZoom",
+      "zenMode",
+      "zenHideInactiveTabs"
     ];
     function joinPath(base, child) {
       return String(base || "").replace(/\/+$/, "") + "/" + child;
@@ -21063,6 +21170,99 @@ var require_settings_state = __commonJS({
   }
 });
 
+// src/plugin/methods/zen-mode.js
+var require_zen_mode = __commonJS({
+  "src/plugin/methods/zen-mode.js"(exports2, module2) {
+    "use strict";
+    var obsidian2 = require("obsidian");
+    var i18n2 = require_i18n();
+    function getWorkspaceBody(app) {
+      try {
+        var el = app && app.workspace && app.workspace.containerEl;
+        if (el && el.ownerDocument && el.ownerDocument.body) return el.ownerDocument.body;
+      } catch (err) {
+      }
+      return document.body;
+    }
+    function clearZenActiveFlags(body) {
+      if (!body) return;
+      var marked = body.querySelectorAll(".wpp-zen-active");
+      for (var i = 0; i < marked.length; i++) {
+        marked[i].classList.remove("wpp-zen-active");
+      }
+    }
+    function lockZenFocus(app) {
+      var body = getWorkspaceBody(app);
+      clearZenActiveFlags(body);
+      var leaf = app && app.workspace && app.workspace.activeLeaf;
+      if (!leaf || typeof leaf.getRoot !== "function") return;
+      try {
+        if (leaf.getRoot() !== app.workspace.rootSplit) return;
+      } catch (err) {
+        return;
+      }
+      var parent = leaf.parent;
+      if (parent && parent.containerEl) {
+        parent.containerEl.classList.add("wpp-zen-active");
+      }
+    }
+    function persistIfNeeded(plugin, options) {
+      options = options || {};
+      if (options.persist === false) return Promise.resolve(true);
+      return plugin.persistData();
+    }
+    function attachZenModeMethods(WorkspacePlusPlus2) {
+      WorkspacePlusPlus2.prototype.isZenModeEnabled = function() {
+        return !!this.data.zenMode;
+      };
+      WorkspacePlusPlus2.prototype.isZenHideInactiveTabsEnabled = function() {
+        return this.data.zenHideInactiveTabs !== false;
+      };
+      WorkspacePlusPlus2.prototype.applyZenModeClasses = function() {
+        var body = getWorkspaceBody(this.app);
+        var enabled = this.isZenModeEnabled();
+        body.classList.toggle("wpp-zen-mode", enabled);
+        body.classList.toggle(
+          "wpp-zen-hide-inactive-tabs",
+          enabled && this.isZenHideInactiveTabsEnabled()
+        );
+        if (enabled) lockZenFocus(this.app);
+        else clearZenActiveFlags(body);
+      };
+      WorkspacePlusPlus2.prototype.clearZenModeClasses = function() {
+        var body = getWorkspaceBody(this.app);
+        body.classList.remove("wpp-zen-mode");
+        body.classList.remove("wpp-zen-hide-inactive-tabs");
+        clearZenActiveFlags(body);
+      };
+      WorkspacePlusPlus2.prototype.setZenMode = function(enabled, options) {
+        options = options || {};
+        this.data.zenMode = !!enabled;
+        this.applyZenModeClasses();
+        if (options.notify) {
+          new obsidian2.Notice(
+            enabled ? i18n2.L.zenModeEnabled : i18n2.L.zenModeDisabled
+          );
+        }
+        return persistIfNeeded(this, options);
+      };
+      WorkspacePlusPlus2.prototype.toggleZenMode = function(options) {
+        return this.setZenMode(!this.isZenModeEnabled(), options);
+      };
+      WorkspacePlusPlus2.prototype.setZenHideInactiveTabs = function(enabled, options) {
+        this.data.zenHideInactiveTabs = !!enabled;
+        this.applyZenModeClasses();
+        return persistIfNeeded(this, options);
+      };
+      WorkspacePlusPlus2.prototype.refreshZenModeFocus = function() {
+        if (!this.isZenModeEnabled()) return;
+        lockZenFocus(this.app);
+      };
+    }
+    module2.exports = attachZenModeMethods;
+  }
+});
+
 // src/plugin/methods/index.js
 var require_methods = __commonJS({
   "src/plugin/methods/index.js"(exports2, module2) {
@@ -21084,6 +21284,7 @@ var require_methods = __commonJS({
     var attachHistoryMethods = require_history();
     var attachFrontmatterMethods = require_frontmatter();
     var attachSettingsStateMethods = require_settings_state();
+    var attachZenModeMethods = require_zen_mode();
     function attachPluginMethods2(WorkspacePlusPlus2) {
       attachHotkeyMethods(WorkspacePlusPlus2);
       attachOverlayMethods(WorkspacePlusPlus2);
@@ -21102,6 +21303,7 @@ var require_methods = __commonJS({
       attachHistoryMethods(WorkspacePlusPlus2);
       attachFrontmatterMethods(WorkspacePlusPlus2);
       attachSettingsStateMethods(WorkspacePlusPlus2);
+      attachZenModeMethods(WorkspacePlusPlus2);
     }
     module2.exports = attachPluginMethods2;
   }
@@ -21180,11 +21382,13 @@ var WorkspacePlusPlus = (
         self.registerEvent(self.app.workspace.on("layout-change", function() {
           self.noteStartupLayoutChange();
           self.updateStatusBar();
+          self.refreshZenModeFocus();
         }));
         self.registerEvent(self.app.workspace.on("active-leaf-change", function() {
           if (self.isSwitchingSession) return;
           setTimeout(function() {
             self.updateStatusBar();
+            self.refreshZenModeFocus();
           }, 0);
         }));
         self.app.workspace.onLayoutReady(function() {
@@ -21196,10 +21400,12 @@ var WorkspacePlusPlus = (
           self.initRotationBackupTimestamp();
           self.registerFrontmatterListeners();
           self.scheduleStartupSessionStorageChecks();
+          self.applyZenModeClasses();
         });
       });
     };
     WorkspacePlusPlus2.prototype.onunload = function() {
+      this.clearZenModeClasses();
       this.stopHistorySnapshotTimer();
       this.hideSwitchOverlay();
       this.hideSearchOverlay();

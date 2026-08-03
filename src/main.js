@@ -64,11 +64,13 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
             self.registerEvent(self.app.workspace.on('layout-change', function () {
                 self.noteStartupLayoutChange();
                 self.updateStatusBar();
+                self.refreshZenModeFocus();
             }));
             self.registerEvent(self.app.workspace.on('active-leaf-change', function () {
                 if (self.isSwitchingSession) return;
                 setTimeout(function () {
                     self.updateStatusBar();
+                    self.refreshZenModeFocus();
                 }, 0);
             }));
 
@@ -82,11 +84,13 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
                 self.initRotationBackupTimestamp();
                 self.registerFrontmatterListeners();
                 self.scheduleStartupSessionStorageChecks();
+                self.applyZenModeClasses();
             });
         });
     };
 
     WorkspacePlusPlus.prototype.onunload = function () {
+        this.clearZenModeClasses();
         this.stopHistorySnapshotTimer();
         this.hideSwitchOverlay();
         this.hideSearchOverlay();

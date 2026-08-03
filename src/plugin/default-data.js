@@ -16,6 +16,8 @@ module.exports = {
     restoreSidebars: true,
     taskViewThumbnailRatio: '4:3',
     taskViewContentZoom: 0.45,
+    zenMode: false,
+    zenHideInactiveTabs: true,
     statusBarQuickSwitcher: false,
     groupFeatureEnabled: true,
     showFilterInput: false,

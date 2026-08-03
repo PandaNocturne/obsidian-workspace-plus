@@ -149,6 +149,28 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
                 });
             });
 
+            addToggleSetting(contentEl, {
+                name: L.settingsZenMode,
+                desc: L.settingsZenModeDesc,
+                value: self.plugin.isZenModeEnabled(),
+                onChange: function (value) {
+                    self.plugin.setZenMode(value).then(function () {
+                        self.display();
+                    });
+                },
+            });
+
+            if (self.plugin.isZenModeEnabled()) {
+                addToggleSetting(contentEl, {
+                    name: L.settingsZenHideInactiveTabs,
+                    desc: L.settingsZenHideInactiveTabsDesc,
+                    value: self.plugin.isZenHideInactiveTabsEnabled(),
+                    onChange: function (value) {
+                        self.plugin.setZenHideInactiveTabs(value);
+                    },
+                });
+            }
+
         }
 
         // ── Sessions tab ──
@@ -673,18 +695,17 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
         }
 
         // ── Footer (all tabs) ──
-        var footerEl = containerEl.createDiv();
-        footerEl.style.fontSize = '12px';
-        footerEl.style.color = 'var(--text-faint)';
-        footerEl.style.marginTop = '24px';
+        var footerEl = containerEl.createDiv({ cls: 'wpp-settings-footer' });
 
-        var helpEl = footerEl.createEl('p', { text: L.settingsTranslationHelp });
-        helpEl.style.margin = '0 0 4px';
-
-        footerEl.createEl('a', {
-            text: L.settingsGitHubLink,
+        var creditEl = footerEl.createEl('p', { cls: 'wpp-settings-credit' });
+        creditEl.appendText(L.settingsForkCreditBefore);
+        creditEl.createEl('a', {
+            cls: 'wpp-settings-credit-link',
+            text: L.settingsForkCreditLink,
             href: 'https://github.com/s1m4ne/obsidian-workspace-plus',
+            attr: { target: '_blank', rel: 'noopener' },
         });
+        creditEl.appendText(L.settingsForkCreditAfter);
     };
 
     return WorkspacePlusPlusSettingTab;

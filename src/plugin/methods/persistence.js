@@ -60,6 +60,8 @@ var SETTINGS_KEYS = [
     'restoreSidebars',
     'taskViewThumbnailRatio',
     'taskViewContentZoom',
+    'zenMode',
+    'zenHideInactiveTabs',
 ];
 
 function joinPath(base, child) {

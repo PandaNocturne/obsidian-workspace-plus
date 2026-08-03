@@ -30,6 +30,10 @@ function registerCommands(plugin) {
         plugin.tabSwitcherModal.open();
     });
 
+    addSimpleCommand('toggle-zen-mode', L.cmdToggleZenMode, function () {
+        plugin.toggleZenMode({ notify: true });
+    });
+
     addSimpleCommand('save-current-session', L.cmdSaveCurrent, function () {
         plugin.saveActiveSession();
     });
