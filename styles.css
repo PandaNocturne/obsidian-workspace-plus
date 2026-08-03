@@ -1948,7 +1948,7 @@ body.wpp-mission-control-open .wpp-tab-switcher-md-fallback {
     background: var(--background-primary);
 }
 
-/* Canvas / Excalidraw: document embed (![[path]]) fills the scaled thumbnail */
+/* Canvas: document embed (![[path]]) fills the scaled thumbnail */
 body.wpp-mission-control-open .wpp-tab-switcher-embed {
     padding: 0;
     overflow: hidden;
@@ -1956,6 +1956,37 @@ body.wpp-mission-control-open .wpp-tab-switcher-embed {
     height: 100%;
     box-sizing: border-box;
     background: var(--background-primary);
+}
+
+/* Excalidraw: static SVG/PNG / canvas snapshot — no interactive embed */
+body.wpp-mission-control-open .wpp-tab-switcher-static-preview {
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background: var(--background-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Static / icon previews already match the card frame — skip content-zoom */
+body.wpp-mission-control-open .wpp-tab-switcher-scale > .wpp-tab-switcher-static-preview,
+body.wpp-mission-control-open .wpp-tab-switcher-scale > .wpp-tab-switcher-preview-icon {
+    zoom: 1;
+    width: 100%;
+    height: 100%;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-static-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+    user-select: none;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-embed > p {

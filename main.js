@@ -13872,11 +13872,72 @@ var require_tab_switcher_modal = __commonJS({
       }
       return false;
     }
-    function isCanvasOrExcalidrawLeaf(app, leaf) {
-      var type = getLeafViewType(leaf);
-      if (type === "canvas" || type === "excalidraw") return true;
-      var file = getLeafFile(app, leaf);
-      return isCanvasFile(file) || isExcalidrawFile(app, file);
+    function isAppDarkTheme() {
+      try {
+        var doc = typeof activeDocument !== "undefined" && activeDocument || document;
+        return !!(doc && doc.body && doc.body.classList.contains("theme-dark"));
+      } catch (err) {
+        return false;
+      }
+    }
+    function getExcalidrawExportPath(filePath, exportType) {
+      if (!filePath || !exportType) return "";
+      var lastDot = filePath.lastIndexOf(".");
+      if (lastDot < 0) return filePath + "." + exportType;
+      return filePath.substring(0, lastDot) + "." + exportType;
+    }
+    function findExcalidrawExportFile(app, file) {
+      if (!app || !app.vault || !file || !file.path) return null;
+      var preferDark = isAppDarkTheme();
+      var types = preferDark ? ["dark.svg", "dark.png", "svg", "png", "light.svg", "light.png"] : ["light.svg", "light.png", "svg", "png", "dark.svg", "dark.png"];
+      for (var i = 0; i < types.length; i++) {
+        var path = getExcalidrawExportPath(file.path, types[i]);
+        if (!path) continue;
+        try {
+          var af = app.vault.getAbstractFileByPath(path);
+          if (isTFile(af)) return af;
+        } catch (err) {
+        }
+      }
+      return null;
+    }
+    function fillStaticImagePreview(host, src) {
+      if (!host || !src) return false;
+      host.empty();
+      var wrap = host.createDiv({ cls: "wpp-tab-switcher-clone wpp-tab-switcher-static-preview" });
+      wrap.createEl("img", {
+        attr: {
+          src,
+          alt: "",
+          draggable: "false"
+        }
+      });
+      return true;
+    }
+    function captureLeafCanvasPreview(leaf) {
+      var source = getCloneSourceEl(leaf);
+      if (!source || typeof source.querySelectorAll !== "function") return null;
+      var canvases = source.querySelectorAll("canvas");
+      var best = null;
+      var bestArea = 0;
+      for (var i = 0; i < canvases.length; i++) {
+        var canvas = canvases[i];
+        var area = (canvas.width || 0) * (canvas.height || 0);
+        if (area > bestArea) {
+          bestArea = area;
+          best = canvas;
+        }
+      }
+      if (!best || bestArea < 64) return null;
+      try {
+        return best.toDataURL("image/jpeg", 0.55);
+      } catch (err) {
+        try {
+          return best.toDataURL("image/png");
+        } catch (err2) {
+          return null;
+        }
+      }
     }
     function buildLeafViewClone(leaf, options) {
       var source = getCloneSourceEl(leaf);
@@ -14158,6 +14219,10 @@ var require_tab_switcher_modal = __commonJS({
           this.group = null;
           this.cardEls = [];
           this.focusedIndex = 0;
+          this._previewQueue = [];
+          this._previewActive = 0;
+          this._previewConcurrency = 1;
+          this._previewGeneration = 0;
           this.open = this.open.bind(this);
           this.close = this.close.bind(this);
           this._onKeyDown = this._onKeyDown.bind(this);
@@ -14165,6 +14230,41 @@ var require_tab_switcher_modal = __commonJS({
           this._onPanelClick = this._onPanelClick.bind(this);
           this._onPanelMove = this._onPanelMove.bind(this);
         }
+        TabSwitcherModal2.prototype.enqueuePreview = function(task) {
+          var self = this;
+          var generation = this._previewGeneration;
+          return new Promise(function(resolve) {
+            self._previewQueue.push(function() {
+              if (generation !== self._previewGeneration) {
+                resolve();
+                return;
+              }
+              return Promise.resolve().then(task).then(resolve, function() {
+                resolve();
+              });
+            });
+            self.pumpPreviewQueue();
+          });
+        };
+        TabSwitcherModal2.prototype.pumpPreviewQueue = function() {
+          var self = this;
+          var concurrency = Math.max(1, this._previewConcurrency || 1);
+          while (this._previewActive < concurrency && this._previewQueue.length > 0) {
+            var job = this._previewQueue.shift();
+            this._previewActive += 1;
+            Promise.resolve().then(job).then(function() {
+            }, function() {
+            }).then(function() {
+              self._previewActive = Math.max(0, self._previewActive - 1);
+              self.pumpPreviewQueue();
+            });
+          }
+        };
+        TabSwitcherModal2.prototype.cancelPreviewQueue = function() {
+          this._previewGeneration += 1;
+          this._previewQueue = [];
+          this._previewActive = 0;
+        };
         TabSwitcherModal2.prototype.open = function() {
           var collected = collectGroupLeaves(this.app);
           var doc = getDoc(collected.active);
@@ -14222,6 +14322,7 @@ var require_tab_switcher_modal = __commonJS({
         };
         TabSwitcherModal2.prototype.renderCards = function() {
           if (!this.gridEl) return;
+          this.cancelPreviewQueue();
           this.gridEl.empty();
           this.cardEls = [];
           for (var i = 0; i < this.leaves.length; i++) {
@@ -14435,55 +14536,85 @@ var require_tab_switcher_modal = __commonJS({
         };
         TabSwitcherModal2.prototype.fillCardPreview = function(leaf, scaleEl) {
           var file = getLeafFile(this.app, leaf);
-          var isCanvasExcalidraw = isCanvasOrExcalidrawLeaf(this.app, leaf) || isCanvasFile(file) || isExcalidrawFile(this.app, file);
-          if (file && (file.extension === "md" || isCanvasFile(file) || isCanvasExcalidraw)) {
+          var isExcali = getLeafViewType(leaf) === "excalidraw" || isExcalidrawFile(this.app, file);
+          var isCanvas = getLeafViewType(leaf) === "canvas" || isCanvasFile(file);
+          if (isExcali) {
+            return this.fillCardPreviewExcalidraw(leaf, scaleEl, file);
+          }
+          if (file && (file.extension === "md" || isCanvas)) {
             return this.fillCardPreviewEmbed(leaf, scaleEl, file, {
-              visualOnlyFallback: isCanvasExcalidraw
+              visualOnlyFallback: isCanvas,
+              staggered: isCanvas
             });
           }
-          if (isCanvasExcalidraw) {
+          if (isCanvas) {
             return this.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
           }
           return this.fillCardPreviewFromLeaf(leaf, scaleEl);
         };
+        TabSwitcherModal2.prototype.fillCardPreviewExcalidraw = function(leaf, scaleEl, file) {
+          if (!scaleEl || !scaleEl.isConnected) return Promise.resolve();
+          var exportFile = findExcalidrawExportFile(this.app, file);
+          if (exportFile) {
+            try {
+              var src = this.app.vault.getResourcePath(exportFile);
+              if (src && fillStaticImagePreview(scaleEl, src)) {
+                return Promise.resolve();
+              }
+            } catch (err) {
+            }
+          }
+          var dataUrl = captureLeafCanvasPreview(leaf);
+          if (dataUrl && fillStaticImagePreview(scaleEl, dataUrl)) {
+            return Promise.resolve();
+          }
+          fillIconOnly(scaleEl, leaf);
+          return Promise.resolve();
+        };
         TabSwitcherModal2.prototype.fillCardPreviewEmbed = function(leaf, scaleEl, file, options) {
           var self = this;
           var visualOnlyFallback = !!(options && options.visualOnlyFallback);
+          var staggered = !!(options && options.staggered);
           if (!file) {
             return this.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: visualOnlyFallback });
           }
           if (!scaleEl || !scaleEl.isConnected) return Promise.resolve();
-          scaleEl.empty();
-          var host = scaleEl.createDiv();
-          return renderFileEmbedInto(this.app, this.plugin, host, file).then(function(ok) {
-            if (!scaleEl.isConnected) return;
-            if (ok) return;
-            if (visualOnlyFallback) {
-              return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
-            }
-            if (file.extension === "md" && !isExcalidrawFile(self.app, file)) {
-              return self.app.vault.cachedRead(file).then(function(md) {
-                if (!scaleEl.isConnected) return;
-                scaleEl.empty();
-                var mdHost = scaleEl.createDiv();
-                return renderMarkdownInto(self.app, self.plugin, mdHost, file, md).then(function(rendered) {
-                  if (rendered || !scaleEl.isConnected) return;
+          function runEmbed() {
+            if (!scaleEl.isConnected) return Promise.resolve();
+            scaleEl.empty();
+            var host = scaleEl.createDiv();
+            return renderFileEmbedInto(self.app, self.plugin, host, file).then(function(ok) {
+              if (!scaleEl.isConnected) return;
+              if (ok) return;
+              if (visualOnlyFallback) {
+                return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+              }
+              if (file.extension === "md" && !isExcalidrawFile(self.app, file)) {
+                return self.app.vault.cachedRead(file).then(function(md) {
+                  if (!scaleEl.isConnected) return;
                   scaleEl.empty();
-                  fillTextOrIcon(scaleEl, leaf);
+                  var mdHost = scaleEl.createDiv();
+                  return renderMarkdownInto(self.app, self.plugin, mdHost, file, md).then(function(rendered) {
+                    if (rendered || !scaleEl.isConnected) return;
+                    scaleEl.empty();
+                    fillTextOrIcon(scaleEl, leaf);
+                  });
+                }).catch(function() {
+                  if (!scaleEl.isConnected) return;
+                  return self.fillCardPreviewFromLeaf(leaf, scaleEl);
                 });
-              }).catch(function() {
-                if (!scaleEl.isConnected) return;
-                return self.fillCardPreviewFromLeaf(leaf, scaleEl);
-              });
-            }
-            return self.fillCardPreviewFromLeaf(leaf, scaleEl);
-          }).catch(function() {
-            if (!scaleEl || !scaleEl.isConnected) return;
-            if (visualOnlyFallback) {
-              return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
-            }
-            return self.fillCardPreviewFromLeaf(leaf, scaleEl);
-          });
+              }
+              return self.fillCardPreviewFromLeaf(leaf, scaleEl);
+            }).catch(function() {
+              if (!scaleEl || !scaleEl.isConnected) return;
+              if (visualOnlyFallback) {
+                return self.fillCardPreviewFromLeaf(leaf, scaleEl, { visualOnly: true });
+              }
+              return self.fillCardPreviewFromLeaf(leaf, scaleEl);
+            });
+          }
+          if (staggered) return this.enqueuePreview(runEmbed);
+          return runEmbed();
         };
         TabSwitcherModal2.prototype.fillCardPreviewFromLeaf = function(leaf, scaleEl, options) {
           var self = this;
@@ -14644,6 +14775,7 @@ var require_tab_switcher_modal = __commonJS({
         };
         TabSwitcherModal2.prototype.close = function() {
           var doc = this._overlayDoc || getDoc(this.activeLeaf);
+          this.cancelPreviewQueue();
           try {
             doc.removeEventListener("keydown", this._onKeyDown, true);
           } catch (err) {
