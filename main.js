@@ -10237,7 +10237,7 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "Switch tab",
         tabSwitcherEmpty: "No open tabs to switch.",
         tabSwitcherHint: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
-        tabSwitcherHintNav: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
+        tabSwitcherHintNav: "Click preview to switch \xB7 Drag header to reorder \xB7 Double-click page for focus \xB7 Click outside to cancel",
         tabSwitcherHintGrid: "Scroll to switch split \xB7 Number keys to switch split",
         tabSwitcherHintSplit: "Scroll / 1\u20139 to switch split",
         tabSwitcherPrevSplit: "Previous split",
@@ -10261,7 +10261,7 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\u5207\u6362\u6807\u7B7E\u9875",
         tabSwitcherEmpty: "\u6CA1\u6709\u53EF\u5207\u6362\u7684\u6807\u7B7E\u9875\u3002",
         tabSwitcherHint: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintNav: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintNav: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u53CC\u51FB\u9875\u7801\u8FDB\u5165\u4E13\u6CE8 \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
         tabSwitcherHintGrid: "\u6EDA\u8F6E\u5207\u6362\u5206\u680F \xB7 \u6570\u5B57\u952E\u5207\u6362\u5206\u680F",
         tabSwitcherHintSplit: "\u6EDA\u8F6E / \u6570\u5B57\u952E\u5207\u6362\u5206\u680F",
         tabSwitcherPrevSplit: "\u4E0A\u4E00\u4E2A\u5206\u680F",
@@ -10285,7 +10285,7 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\u5207\u63DB\u5206\u9801",
         tabSwitcherEmpty: "\u6C92\u6709\u53EF\u5207\u63DB\u7684\u5206\u9801\u3002",
         tabSwitcherHint: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintNav: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintNav: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u96D9\u64CA\u9801\u78BC\u9032\u5165\u5C08\u6CE8 \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
         tabSwitcherHintGrid: "\u6EFE\u8F2A\u5207\u63DB\u5206\u6B04 \xB7 \u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04",
         tabSwitcherHintSplit: "\u6EFE\u8F2A / \u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04",
         tabSwitcherPrevSplit: "\u4E0A\u4E00\u500B\u5206\u6B04",
@@ -10309,8 +10309,8 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048",
         tabSwitcherEmpty: "\u5207\u308A\u66FF\u3048\u53EF\u80FD\u306A\u30BF\u30D6\u304C\u3042\u308A\u307E\u305B\u3093\u3002",
         tabSwitcherHint: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
-        tabSwitcherHintNav: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
-        tabSwitcherHintGrid: "\u30DE\u30B9\u30AF\u3092\u30B9\u30AF\u30ED\u30FC\u30EB\u3067\u30DA\u30A4\u30F3\u5207\u66FF \xB7 \u6570\u5B57\u30AD\u30FC\u3067\u30DA\u30A4\u30F3\u5207\u66FF",
+        tabSwitcherHintNav: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u30DA\u30FC\u30B8\u3092\u30C0\u30D6\u30EB\u30AF\u30EA\u30C3\u30AF\u3067\u30D5\u30A9\u30FC\u30AB\u30B9 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
+        tabSwitcherHintGrid: "\u30B9\u30AF\u30ED\u30FC\u30EB\u3067\u30DA\u30A4\u30F3\u5207\u66FF \xB7 \u6570\u5B57\u30AD\u30FC\u3067\u30DA\u30A4\u30F3\u5207\u66FF",
         tabSwitcherHintSplit: "\u30B9\u30AF\u30ED\u30FC\u30EB / \u6570\u5B57\u3067\u30DA\u30A4\u30F3\u5207\u66FF",
         tabSwitcherPrevSplit: "\u524D\u306E\u30DA\u30A4\u30F3",
         tabSwitcherNextSplit: "\u6B21\u306E\u30DA\u30A4\u30F3",
@@ -10333,9 +10333,9 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\uD0ED \uC804\uD658",
         tabSwitcherEmpty: "\uC804\uD658\uD560 \uD0ED\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
         tabSwitcherHint: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
-        tabSwitcherHintNav: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
-        tabSwitcherHintGrid: "\uB9C8\uC2A4\uD06C \uC2A4\uD06C\uB864\uB85C \uBD84\uD560 \uC804\uD658 \xB7 \uC22B\uC790 \uD0A4\uB85C \uBD84\uD560 \uC804\uD658",
-        tabSwitcherHintSplit: "\uB9C8\uC2A4\uD06C \uC2A4\uD06C\uB864 / \uC22B\uC790\uB85C \uBD84\uD560 \uC804\uD658",
+        tabSwitcherHintNav: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uD398\uC774\uC9C0 \uB354\uBE14\uD074\uB9AD\uC73C\uB85C \uC9D1\uC911 \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
+        tabSwitcherHintGrid: "\uC2A4\uD06C\uB864\uB85C \uBD84\uD560 \uC804\uD658 \xB7 \uC22B\uC790 \uD0A4\uB85C \uBD84\uD560 \uC804\uD658",
+        tabSwitcherHintSplit: "\uC2A4\uD06C\uB864 / \uC22B\uC790\uB85C \uBD84\uD560 \uC804\uD658",
         tabSwitcherPrevSplit: "\uC774\uC804 \uBD84\uD560",
         tabSwitcherNextSplit: "\uB2E4\uC74C \uBD84\uD560",
         tabSwitcherSplitLabel: function(i, n) {
@@ -14569,6 +14569,11 @@ var require_tab_switcher_modal = __commonJS({
                   e.stopPropagation();
                   self.goToSplitGroup(pageIndex);
                 });
+                page.addEventListener("dblclick", function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  self.enterZenOnSplit(pageIndex);
+                });
               })(i);
             }
           }
@@ -14609,6 +14614,49 @@ var require_tab_switcher_modal = __commonJS({
           this.renderCards();
           this.updateFocus(true);
           this.updateSplitToolbar();
+        };
+        TabSwitcherModal2.prototype.enterZenOnSplit = function(index) {
+          this.groups = collectRootTabGroups(this.app);
+          if (!this.groups.length) return;
+          var len = this.groups.length;
+          var target = (index % len + len) % len;
+          var group = this.groups[target];
+          if (!group) return;
+          var preferred = null;
+          if (this.group === group && this.leaves && this.leaves.length) {
+            preferred = this.leaves[this.focusedIndex] || this.activeLeaf || null;
+          }
+          var leaf = pickLeafInGroup(this.app, group, preferred);
+          if (!leaf) {
+            var leaves = collectLeavesFromGroup(group);
+            leaf = leaves[0] || null;
+          }
+          if (!leaf) return;
+          var plugin = this.plugin;
+          this.close();
+          try {
+            if (typeof this.app.workspace.setActiveLeaf === "function") {
+              this.app.workspace.setActiveLeaf(leaf, { focus: true });
+            }
+            if (typeof this.app.workspace.revealLeaf === "function") {
+              this.app.workspace.revealLeaf(leaf);
+            }
+          } catch (err) {
+          }
+          if (!plugin) return;
+          var finish = function() {
+            if (typeof plugin.rememberZenFocusLeaf === "function") {
+              plugin.rememberZenFocusLeaf(leaf, { force: true });
+            }
+            if (typeof plugin.refreshZenModeFocus === "function") {
+              plugin.refreshZenModeFocus();
+            }
+          };
+          if (typeof plugin.setZenMode === "function") {
+            Promise.resolve(plugin.setZenMode(true)).then(finish).catch(finish);
+          } else {
+            finish();
+          }
         };
         TabSwitcherModal2.prototype.shiftSplitGroup = function(delta) {
           this.groups = collectRootTabGroups(this.app);

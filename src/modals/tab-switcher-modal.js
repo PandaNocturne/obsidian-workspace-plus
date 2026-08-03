@@ -980,6 +980,11 @@ var TabSwitcherModal = /** @class */ (function () {
                         e.stopPropagation();
                         self.goToSplitGroup(pageIndex);
                     });
+                    page.addEventListener('dblclick', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.enterZenOnSplit(pageIndex);
+                    });
                 })(i);
             }
         }
@@ -1035,6 +1040,59 @@ var TabSwitcherModal = /** @class */ (function () {
         this.renderCards();
         this.updateFocus(true);
         this.updateSplitToolbar();
+    };
+
+    /**
+     * Double-click a split page → activate that split and enter zen/focus mode.
+     */
+    TabSwitcherModal.prototype.enterZenOnSplit = function (index) {
+        this.groups = collectRootTabGroups(this.app);
+        if (!this.groups.length) return;
+
+        var len = this.groups.length;
+        var target = ((index % len) + len) % len;
+        var group = this.groups[target];
+        if (!group) return;
+
+        var preferred = null;
+        if (this.group === group && this.leaves && this.leaves.length) {
+            preferred = this.leaves[this.focusedIndex] || this.activeLeaf || null;
+        }
+        var leaf = pickLeafInGroup(this.app, group, preferred);
+        if (!leaf) {
+            var leaves = collectLeavesFromGroup(group);
+            leaf = leaves[0] || null;
+        }
+        if (!leaf) return;
+
+        var plugin = this.plugin;
+        this.close();
+
+        try {
+            if (typeof this.app.workspace.setActiveLeaf === 'function') {
+                this.app.workspace.setActiveLeaf(leaf, { focus: true });
+            }
+            if (typeof this.app.workspace.revealLeaf === 'function') {
+                this.app.workspace.revealLeaf(leaf);
+            }
+        } catch (err) { /* ignore */ }
+
+        if (!plugin) return;
+
+        var finish = function () {
+            if (typeof plugin.rememberZenFocusLeaf === 'function') {
+                plugin.rememberZenFocusLeaf(leaf, { force: true });
+            }
+            if (typeof plugin.refreshZenModeFocus === 'function') {
+                plugin.refreshZenModeFocus();
+            }
+        };
+
+        if (typeof plugin.setZenMode === 'function') {
+            Promise.resolve(plugin.setZenMode(true)).then(finish).catch(finish);
+        } else {
+            finish();
+        }
     };
 
     TabSwitcherModal.prototype.shiftSplitGroup = function (delta) {
