@@ -69,12 +69,144 @@ function isLeafInRootSplit(app, leaf) {
     }
 }
 
-function getZenFocusLeaf(app) {
+function findLeafById(app, leafId) {
+    if (!leafId || !app || !app.workspace) return null;
+    var workspace = app.workspace;
+    var found = null;
+
+    try {
+        if (typeof workspace.getLeafById === 'function') {
+            found = workspace.getLeafById(leafId);
+        }
+    } catch (err) { /* ignore */ }
+
+    if (!found && typeof workspace.iterateAllLeaves === 'function') {
+        try {
+            workspace.iterateAllLeaves(function (leaf) {
+                if (!found && leaf && leaf.id === leafId) found = leaf;
+            });
+        } catch (err2) { /* ignore */ }
+    }
+
+    if (!found && typeof workspace.iterateRootLeaves === 'function') {
+        try {
+            workspace.iterateRootLeaves(function (leaf) {
+                if (!found && leaf && leaf.id === leafId) found = leaf;
+            });
+        } catch (err3) { /* ignore */ }
+    }
+
+    return isLeafInRootSplit(app, found) ? found : null;
+}
+
+function getLeafFilePath(app, leaf) {
+    if (!leaf) return null;
+    try {
+        if (leaf.view && leaf.view.file && leaf.view.file.path) {
+            return leaf.view.file.path;
+        }
+    } catch (err) { /* ignore */ }
+    try {
+        var vs = typeof leaf.getViewState === 'function' ? leaf.getViewState() : null;
+        if (vs && vs.state && typeof vs.state.file === 'string') return vs.state.file;
+    } catch (err2) { /* ignore */ }
+    return null;
+}
+
+function findRootLeafByFilePath(app, filePath) {
+    if (!filePath || !app || !app.workspace) return null;
+    var found = null;
+    function consider(leaf) {
+        if (found || !isLeafInRootSplit(app, leaf)) return;
+        var path = getLeafFilePath(app, leaf);
+        if (path === filePath) found = leaf;
+    }
+    try {
+        if (typeof app.workspace.iterateRootLeaves === 'function') {
+            app.workspace.iterateRootLeaves(consider);
+        } else if (typeof app.workspace.iterateAllLeaves === 'function') {
+            app.workspace.iterateAllLeaves(consider);
+        }
+    } catch (err) { /* ignore */ }
+    return found;
+}
+
+function collectRootTabGroups(app) {
+    var groups = [];
+    var root = app && app.workspace && app.workspace.rootSplit;
+    if (!root) return groups;
+
+    function isTabGroupNode(node) {
+        return !!(node
+            && Array.isArray(node.children)
+            && (typeof node.selectTab === 'function'
+                || typeof node.selectTabIndex === 'function'
+                || node.type === 'tabs'));
+    }
+
+    function walk(node) {
+        if (!node) return;
+        if (isTabGroupNode(node)) {
+            groups.push(node);
+            return;
+        }
+        if (!Array.isArray(node.children)) return;
+        for (var i = 0; i < node.children.length; i++) {
+            walk(node.children[i]);
+        }
+    }
+
+    walk(root);
+    return groups;
+}
+
+function getLeafSplitIndex(app, leaf) {
+    if (!leaf) return -1;
+    var groups = collectRootTabGroups(app);
+    var parent = leaf.parent;
+    var depth = 0;
+    while (parent && depth < 8) {
+        var idx = groups.indexOf(parent);
+        if (idx >= 0) return idx;
+        parent = parent.parent;
+        depth += 1;
+    }
+    return -1;
+}
+
+function findLeafInSplitIndex(app, splitIndex) {
+    if (typeof splitIndex !== 'number' || splitIndex < 0) return null;
+    var groups = collectRootTabGroups(app);
+    var group = groups[splitIndex];
+    if (!group || !Array.isArray(group.children)) return null;
+    for (var i = 0; i < group.children.length; i++) {
+        var child = group.children[i];
+        if (isLeafInRootSplit(app, child)) return child;
+    }
+    return null;
+}
+
+function resolveRememberedZenLeaf(app, options) {
+    options = options || {};
+    var leaf = findLeafById(app, options.rememberedLeafId);
+    if (leaf) return leaf;
+    leaf = findRootLeafByFilePath(app, options.rememberedFilePath);
+    if (leaf) return leaf;
+    return findLeafInSplitIndex(app, options.rememberedSplitIndex);
+}
+
+function getZenFocusLeaf(app, options) {
+    options = options || {};
     var workspace = app && app.workspace;
     if (!workspace) return null;
 
+    var remembered = resolveRememberedZenLeaf(app, options);
+    if (options.preferRemembered && remembered) return remembered;
+
     var active = workspace.activeLeaf;
     if (isLeafInRootSplit(app, active)) return active;
+
+    if (remembered) return remembered;
 
     if (typeof workspace.getMostRecentLeaf === 'function') {
         try {
@@ -126,8 +258,8 @@ function getLeafTabsContainerEl(leaf) {
     return isConnectedEl(fallback) ? fallback : null;
 }
 
-function findZenTabsEl(app, body) {
-    var leaf = getZenFocusLeaf(app);
+function findZenTabsEl(app, body, options) {
+    var leaf = getZenFocusLeaf(app, options);
     var tabsEl = leaf ? getLeafTabsContainerEl(leaf) : null;
     if (!isConnectedEl(tabsEl)) tabsEl = null;
 
@@ -169,12 +301,12 @@ function findZenTabsEl(app, body) {
  * Pin zen to the tab group only. Zero DOM writes when already correct —
  * never clear a live pin when the only candidate is a detached remount ghost.
  */
-function lockZenFocus(app) {
+function lockZenFocus(app, options) {
     var body = getWorkspaceBody(app);
     if (!body) return false;
 
     var existing = getConnectedZenActiveTabs(body);
-    var tabsEl = findZenTabsEl(app, body);
+    var tabsEl = findZenTabsEl(app, body, options);
 
     // Excalidraw first load can briefly expose detached containerEls — do not
     // clear live flags into the CSS ":has() miss → all panes visible" state.
@@ -250,6 +382,76 @@ function attachZenModeMethods(WorkspacePlusPlus) {
         return this.data.showStatusBarZenMode !== false;
     };
 
+    WorkspacePlusPlus.prototype.getZenFocusLockOptions = function () {
+        var session = this.getActiveSession && this.getActiveSession();
+        var settling = !!(this.isStartupSettling && this.isStartupSettling());
+        return {
+            rememberedLeafId: session && session.zenFocusLeafId || null,
+            rememberedFilePath: session && session.zenFocusFilePath || null,
+            rememberedSplitIndex: session && typeof session.zenFocusSplitIndex === 'number'
+                ? session.zenFocusSplitIndex
+                : -1,
+            preferRemembered: settling || !!this._zenRestoringFocus,
+        };
+    };
+
+    WorkspacePlusPlus.prototype.rememberZenFocusLeaf = function (leaf, options) {
+        options = options || {};
+        if (!this.isZenModeEnabled()) return false;
+        if (!options.force && this.isStartupSettling && this.isStartupSettling()) return false;
+        if (!isLeafInRootSplit(this.app, leaf)) return false;
+
+        var session = this.getActiveSession && this.getActiveSession();
+        if (!session) return false;
+
+        var leafId = leaf.id || null;
+        var filePath = getLeafFilePath(this.app, leaf);
+        var splitIndex = getLeafSplitIndex(this.app, leaf);
+        var changed = session.zenFocusLeafId !== leafId
+            || session.zenFocusFilePath !== filePath
+            || session.zenFocusSplitIndex !== splitIndex;
+
+        session.zenFocusLeafId = leafId;
+        session.zenFocusFilePath = filePath;
+        session.zenFocusSplitIndex = splitIndex;
+
+        if (changed && options.persist !== false && typeof this.persistData === 'function') {
+            this.persistData();
+        }
+        return changed;
+    };
+
+    WorkspacePlusPlus.prototype.rememberZenFocusFromWorkspace = function (options) {
+        options = options || {};
+        var leaf = getZenFocusLeaf(this.app, {
+            preferRemembered: false,
+        });
+        return this.rememberZenFocusLeaf(leaf, options);
+    };
+
+    /**
+     * Re-activate the last zen-focused leaf so cold start does not pin the
+     * pre-plugin active page.
+     */
+    WorkspacePlusPlus.prototype.restoreZenFocusLeaf = function () {
+        if (!this.isZenModeEnabled()) return null;
+        var opts = this.getZenFocusLockOptions();
+        var leaf = resolveRememberedZenLeaf(this.app, opts);
+        if (!leaf) return null;
+
+        this._zenRestoringFocus = true;
+        try {
+            if (typeof this.app.workspace.setActiveLeaf === 'function') {
+                this.app.workspace.setActiveLeaf(leaf, { focus: true });
+            }
+            if (typeof this.app.workspace.revealLeaf === 'function') {
+                this.app.workspace.revealLeaf(leaf);
+            }
+        } catch (err) { /* ignore */ }
+        this._zenRestoringFocus = false;
+        return leaf;
+    };
+
     WorkspacePlusPlus.prototype.startZenDomGuard = function () {
         var self = this;
         this.stopZenDomGuard();
@@ -266,7 +468,7 @@ function attachZenModeMethods(WorkspacePlusPlus) {
             for (i = 0; i < records.length; i++) {
                 if (!isZenChromeMutation(records[i])) continue;
                 // Microtask before paint — re-pin without waiting for layout-change
-                lockZenFocus(self.app);
+                lockZenFocus(self.app, self.getZenFocusLockOptions());
                 return;
             }
         });
@@ -299,7 +501,10 @@ function attachZenModeMethods(WorkspacePlusPlus) {
             enabled && this.isZenHideInactiveTabsEnabled()
         );
         if (enabled) {
-            lockZenFocus(this.app);
+            if (this.isStartupSettling && this.isStartupSettling()) {
+                this.restoreZenFocusLeaf();
+            }
+            lockZenFocus(this.app, this.getZenFocusLockOptions());
             this.startZenDomGuard();
         } else {
             this.stopZenDomGuard();
@@ -368,6 +573,9 @@ function attachZenModeMethods(WorkspacePlusPlus) {
         options = options || {};
         this.setActiveSessionZenMode(enabled);
         this.applyZenModeClasses();
+        if (enabled) {
+            this.rememberZenFocusFromWorkspace({ force: true });
+        }
         if (options.notify) {
             new obsidian.Notice(
                 enabled ? i18n.L.zenModeEnabled : i18n.L.zenModeDisabled
@@ -390,7 +598,7 @@ function attachZenModeMethods(WorkspacePlusPlus) {
     WorkspacePlusPlus.prototype.refreshZenModeFocus = function () {
         if (!this.isZenModeEnabled()) return;
         if (isMissionControlOpen(this.app)) return;
-        lockZenFocus(this.app);
+        lockZenFocus(this.app, this.getZenFocusLockOptions());
     };
 
     WorkspacePlusPlus.prototype.scheduleZenModeRefresh = function (delayMs) {
@@ -405,7 +613,10 @@ function attachZenModeMethods(WorkspacePlusPlus) {
             }
             if (!self.isZenModeEnabled()) return;
             if (isMissionControlOpen(self.app)) return;
-            lockZenFocus(self.app);
+            if (self.isStartupSettling && self.isStartupSettling()) {
+                self.restoreZenFocusLeaf();
+            }
+            lockZenFocus(self.app, self.getZenFocusLockOptions());
         }, delay);
         this._zenRefreshTimers.push(timer);
     };

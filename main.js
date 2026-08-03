@@ -10277,7 +10277,7 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\u5207\u63DB\u5206\u9801",
         tabSwitcherEmpty: "\u6C92\u6709\u53EF\u5207\u63DB\u7684\u5206\u9801\u3002",
         tabSwitcherHint: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintSplit: "\u2039 \u203A \u6216\u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04 \xB7 \u62D6\u66F3\u5230\u5206\u6B04\u9801\u78BC\u53EF\u8DE8\u6B04\u79FB\u52D5",
+        tabSwitcherHintSplit: "\u2039 \u203A \u6216\u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04 \xB7 \u62D6\u5230\u76EE\u6A19\u5206\u6B04\u7DB2\u683C\u9B06\u958B\u4EE5\u8DE8\u6B04\u79FB\u52D5",
         tabSwitcherPrevSplit: "\u4E0A\u4E00\u500B\u5206\u6B04",
         tabSwitcherNextSplit: "\u4E0B\u4E00\u500B\u5206\u6B04",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10297,7 +10297,7 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048",
         tabSwitcherEmpty: "\u5207\u308A\u66FF\u3048\u53EF\u80FD\u306A\u30BF\u30D6\u304C\u3042\u308A\u307E\u305B\u3093\u3002",
         tabSwitcherHint: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
-        tabSwitcherHintSplit: "\u2039 \u203A \u307E\u305F\u306F\u6570\u5B57\u3067\u30DA\u30A4\u30F3\u5207\u66FF \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30DA\u30FC\u30B8\u756A\u53F7\u3078\u30C9\u30E9\u30C3\u30B0\u3067\u79FB\u52D5",
+        tabSwitcherHintSplit: "\u2039 \u203A \u307E\u305F\u306F\u6570\u5B57\u3067\u30DA\u30A4\u30F3\u5207\u66FF \xB7 \u30B0\u30EA\u30C3\u30C9\u3078\u30C9\u30ED\u30C3\u30D7\u3067\u79FB\u52D5",
         tabSwitcherPrevSplit: "\u524D\u306E\u30DA\u30A4\u30F3",
         tabSwitcherNextSplit: "\u6B21\u306E\u30DA\u30A4\u30F3",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10317,7 +10317,7 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\uD0ED \uC804\uD658",
         tabSwitcherEmpty: "\uC804\uD658\uD560 \uD0ED\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
         tabSwitcherHint: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
-        tabSwitcherHintSplit: "\u2039 \u203A \uB610\uB294 \uC22B\uC790\uB85C \uBD84\uD560 \uC804\uD658 \xB7 \uD5E4\uB354\uB97C \uD398\uC774\uC9C0\uB85C \uB4DC\uB798\uADF8\uD574 \uC774\uB3D9",
+        tabSwitcherHintSplit: "\u2039 \u203A \uB610\uB294 \uC22B\uC790\uB85C \uBD84\uD560 \uC804\uD658 \xB7 \uADF8\uB9AC\uB4DC\uC5D0 \uB193\uC544 \uC774\uB3D9",
         tabSwitcherPrevSplit: "\uC774\uC804 \uBD84\uD560",
         tabSwitcherNextSplit: "\uB2E4\uC74C \uBD84\uD560",
         tabSwitcherSplitLabel: function(i, n) {
@@ -20758,10 +20758,17 @@ var require_session_startup = __commonJS({
           self.startupSettleStartedAt = 0;
           self.startupSettleUntil = 0;
           self.startupSettleTimer = null;
+          if (typeof self.restoreZenFocusLeaf === "function") {
+            self.restoreZenFocusLeaf();
+          }
           if (typeof self.scheduleZenModeRefresh === "function") {
             self.scheduleZenModeRefresh(0);
           } else if (typeof self.applyZenModeClasses === "function") {
             self.applyZenModeClasses();
+          }
+          var session = self.getActiveSession && self.getActiveSession();
+          if (session && (session.zenFocusLeafId || session.zenFocusFilePath || typeof session.zenFocusSplitIndex === "number" && session.zenFocusSplitIndex >= 0) && typeof self.rememberZenFocusFromWorkspace === "function") {
+            self.rememberZenFocusFromWorkspace({ force: true });
           }
         }, nextDeadline - Date.now());
         return this.startupSettleUntil;
@@ -20810,6 +20817,12 @@ var require_session_startup = __commonJS({
         if (!this.isAutoSaveOnSwitchEnabled()) return;
         var session = this.getActiveSession();
         if (!session) return;
+        if (typeof this.restoreZenFocusLeaf === "function") {
+          this.restoreZenFocusLeaf();
+        }
+        if ((session.zenFocusLeafId || session.zenFocusFilePath || typeof session.zenFocusSplitIndex === "number" && session.zenFocusSplitIndex >= 0) && typeof this.rememberZenFocusFromWorkspace === "function") {
+          this.rememberZenFocusFromWorkspace({ force: true, persist: false });
+        }
         this.pushLayoutToHistory(session);
         session.layout = this.getCurrentWorkspaceLayout();
         session.modified = Date.now();
@@ -21040,6 +21053,9 @@ var require_session_switching = __commonJS({
           var current = self.getActiveSession();
           if (current) {
             current.zenMode = self.isZenModeEnabled();
+            if (typeof self.rememberZenFocusFromWorkspace === "function") {
+              self.rememberZenFocusFromWorkspace({ force: true, persist: false });
+            }
             if (!skipCurrentSave) {
               self.pushLayoutToHistory(current);
               current.layout = self.getCurrentWorkspaceLayout();
@@ -21050,6 +21066,9 @@ var require_session_switching = __commonJS({
           self.data.activeSessionId = targetId;
           var applyLayout = target.layout ? self.applyWorkspaceLayout(target.layout) : Promise.resolve();
           return applyLayout.then(function() {
+            if (typeof self.restoreZenFocusLeaf === "function") {
+              self.restoreZenFocusLeaf();
+            }
             self.applyZenModeClasses();
             self.scheduleZenModeRefresh(50);
             self.scheduleZenModeRefresh(300);
@@ -21986,11 +22005,129 @@ var require_zen_mode = __commonJS({
         return false;
       }
     }
-    function getZenFocusLeaf(app) {
+    function findLeafById(app, leafId) {
+      if (!leafId || !app || !app.workspace) return null;
+      var workspace = app.workspace;
+      var found = null;
+      try {
+        if (typeof workspace.getLeafById === "function") {
+          found = workspace.getLeafById(leafId);
+        }
+      } catch (err) {
+      }
+      if (!found && typeof workspace.iterateAllLeaves === "function") {
+        try {
+          workspace.iterateAllLeaves(function(leaf) {
+            if (!found && leaf && leaf.id === leafId) found = leaf;
+          });
+        } catch (err2) {
+        }
+      }
+      if (!found && typeof workspace.iterateRootLeaves === "function") {
+        try {
+          workspace.iterateRootLeaves(function(leaf) {
+            if (!found && leaf && leaf.id === leafId) found = leaf;
+          });
+        } catch (err3) {
+        }
+      }
+      return isLeafInRootSplit(app, found) ? found : null;
+    }
+    function getLeafFilePath(app, leaf) {
+      if (!leaf) return null;
+      try {
+        if (leaf.view && leaf.view.file && leaf.view.file.path) {
+          return leaf.view.file.path;
+        }
+      } catch (err) {
+      }
+      try {
+        var vs = typeof leaf.getViewState === "function" ? leaf.getViewState() : null;
+        if (vs && vs.state && typeof vs.state.file === "string") return vs.state.file;
+      } catch (err2) {
+      }
+      return null;
+    }
+    function findRootLeafByFilePath(app, filePath) {
+      if (!filePath || !app || !app.workspace) return null;
+      var found = null;
+      function consider(leaf) {
+        if (found || !isLeafInRootSplit(app, leaf)) return;
+        var path = getLeafFilePath(app, leaf);
+        if (path === filePath) found = leaf;
+      }
+      try {
+        if (typeof app.workspace.iterateRootLeaves === "function") {
+          app.workspace.iterateRootLeaves(consider);
+        } else if (typeof app.workspace.iterateAllLeaves === "function") {
+          app.workspace.iterateAllLeaves(consider);
+        }
+      } catch (err) {
+      }
+      return found;
+    }
+    function collectRootTabGroups(app) {
+      var groups = [];
+      var root = app && app.workspace && app.workspace.rootSplit;
+      if (!root) return groups;
+      function isTabGroupNode(node) {
+        return !!(node && Array.isArray(node.children) && (typeof node.selectTab === "function" || typeof node.selectTabIndex === "function" || node.type === "tabs"));
+      }
+      function walk(node) {
+        if (!node) return;
+        if (isTabGroupNode(node)) {
+          groups.push(node);
+          return;
+        }
+        if (!Array.isArray(node.children)) return;
+        for (var i = 0; i < node.children.length; i++) {
+          walk(node.children[i]);
+        }
+      }
+      walk(root);
+      return groups;
+    }
+    function getLeafSplitIndex(app, leaf) {
+      if (!leaf) return -1;
+      var groups = collectRootTabGroups(app);
+      var parent = leaf.parent;
+      var depth = 0;
+      while (parent && depth < 8) {
+        var idx = groups.indexOf(parent);
+        if (idx >= 0) return idx;
+        parent = parent.parent;
+        depth += 1;
+      }
+      return -1;
+    }
+    function findLeafInSplitIndex(app, splitIndex) {
+      if (typeof splitIndex !== "number" || splitIndex < 0) return null;
+      var groups = collectRootTabGroups(app);
+      var group = groups[splitIndex];
+      if (!group || !Array.isArray(group.children)) return null;
+      for (var i = 0; i < group.children.length; i++) {
+        var child = group.children[i];
+        if (isLeafInRootSplit(app, child)) return child;
+      }
+      return null;
+    }
+    function resolveRememberedZenLeaf(app, options) {
+      options = options || {};
+      var leaf = findLeafById(app, options.rememberedLeafId);
+      if (leaf) return leaf;
+      leaf = findRootLeafByFilePath(app, options.rememberedFilePath);
+      if (leaf) return leaf;
+      return findLeafInSplitIndex(app, options.rememberedSplitIndex);
+    }
+    function getZenFocusLeaf(app, options) {
+      options = options || {};
       var workspace = app && app.workspace;
       if (!workspace) return null;
+      var remembered = resolveRememberedZenLeaf(app, options);
+      if (options.preferRemembered && remembered) return remembered;
       var active = workspace.activeLeaf;
       if (isLeafInRootSplit(app, active)) return active;
+      if (remembered) return remembered;
       if (typeof workspace.getMostRecentLeaf === "function") {
         try {
           var recent = workspace.getMostRecentLeaf(workspace.rootSplit);
@@ -22036,8 +22173,8 @@ var require_zen_mode = __commonJS({
       var fallback = leaf && leaf.parent && leaf.parent.containerEl;
       return isConnectedEl(fallback) ? fallback : null;
     }
-    function findZenTabsEl(app, body) {
-      var leaf = getZenFocusLeaf(app);
+    function findZenTabsEl(app, body, options) {
+      var leaf = getZenFocusLeaf(app, options);
       var tabsEl = leaf ? getLeafTabsContainerEl(leaf) : null;
       if (!isConnectedEl(tabsEl)) tabsEl = null;
       if (!tabsEl) {
@@ -22071,11 +22208,11 @@ var require_zen_mode = __commonJS({
       }
       return tabsEl || null;
     }
-    function lockZenFocus(app) {
+    function lockZenFocus(app, options) {
       var body = getWorkspaceBody(app);
       if (!body) return false;
       var existing = getConnectedZenActiveTabs(body);
-      var tabsEl = findZenTabsEl(app, body);
+      var tabsEl = findZenTabsEl(app, body, options);
       if (!isConnectedEl(tabsEl)) {
         return !!existing;
       }
@@ -22135,6 +22272,60 @@ var require_zen_mode = __commonJS({
       WorkspacePlusPlus2.prototype.isStatusBarZenModeEnabled = function() {
         return this.data.showStatusBarZenMode !== false;
       };
+      WorkspacePlusPlus2.prototype.getZenFocusLockOptions = function() {
+        var session = this.getActiveSession && this.getActiveSession();
+        var settling = !!(this.isStartupSettling && this.isStartupSettling());
+        return {
+          rememberedLeafId: session && session.zenFocusLeafId || null,
+          rememberedFilePath: session && session.zenFocusFilePath || null,
+          rememberedSplitIndex: session && typeof session.zenFocusSplitIndex === "number" ? session.zenFocusSplitIndex : -1,
+          preferRemembered: settling || !!this._zenRestoringFocus
+        };
+      };
+      WorkspacePlusPlus2.prototype.rememberZenFocusLeaf = function(leaf, options) {
+        options = options || {};
+        if (!this.isZenModeEnabled()) return false;
+        if (!options.force && this.isStartupSettling && this.isStartupSettling()) return false;
+        if (!isLeafInRootSplit(this.app, leaf)) return false;
+        var session = this.getActiveSession && this.getActiveSession();
+        if (!session) return false;
+        var leafId = leaf.id || null;
+        var filePath = getLeafFilePath(this.app, leaf);
+        var splitIndex = getLeafSplitIndex(this.app, leaf);
+        var changed = session.zenFocusLeafId !== leafId || session.zenFocusFilePath !== filePath || session.zenFocusSplitIndex !== splitIndex;
+        session.zenFocusLeafId = leafId;
+        session.zenFocusFilePath = filePath;
+        session.zenFocusSplitIndex = splitIndex;
+        if (changed && options.persist !== false && typeof this.persistData === "function") {
+          this.persistData();
+        }
+        return changed;
+      };
+      WorkspacePlusPlus2.prototype.rememberZenFocusFromWorkspace = function(options) {
+        options = options || {};
+        var leaf = getZenFocusLeaf(this.app, {
+          preferRemembered: false
+        });
+        return this.rememberZenFocusLeaf(leaf, options);
+      };
+      WorkspacePlusPlus2.prototype.restoreZenFocusLeaf = function() {
+        if (!this.isZenModeEnabled()) return null;
+        var opts = this.getZenFocusLockOptions();
+        var leaf = resolveRememberedZenLeaf(this.app, opts);
+        if (!leaf) return null;
+        this._zenRestoringFocus = true;
+        try {
+          if (typeof this.app.workspace.setActiveLeaf === "function") {
+            this.app.workspace.setActiveLeaf(leaf, { focus: true });
+          }
+          if (typeof this.app.workspace.revealLeaf === "function") {
+            this.app.workspace.revealLeaf(leaf);
+          }
+        } catch (err) {
+        }
+        this._zenRestoringFocus = false;
+        return leaf;
+      };
       WorkspacePlusPlus2.prototype.startZenDomGuard = function() {
         var self = this;
         this.stopZenDomGuard();
@@ -22148,7 +22339,7 @@ var require_zen_mode = __commonJS({
           var i;
           for (i = 0; i < records.length; i++) {
             if (!isZenChromeMutation(records[i])) continue;
-            lockZenFocus(self.app);
+            lockZenFocus(self.app, self.getZenFocusLockOptions());
             return;
           }
         });
@@ -22181,7 +22372,10 @@ var require_zen_mode = __commonJS({
           enabled && this.isZenHideInactiveTabsEnabled()
         );
         if (enabled) {
-          lockZenFocus(this.app);
+          if (this.isStartupSettling && this.isStartupSettling()) {
+            this.restoreZenFocusLeaf();
+          }
+          lockZenFocus(this.app, this.getZenFocusLockOptions());
           this.startZenDomGuard();
         } else {
           this.stopZenDomGuard();
@@ -22240,6 +22434,9 @@ var require_zen_mode = __commonJS({
         options = options || {};
         this.setActiveSessionZenMode(enabled);
         this.applyZenModeClasses();
+        if (enabled) {
+          this.rememberZenFocusFromWorkspace({ force: true });
+        }
         if (options.notify) {
           new obsidian2.Notice(
             enabled ? i18n2.L.zenModeEnabled : i18n2.L.zenModeDisabled
@@ -22258,7 +22455,7 @@ var require_zen_mode = __commonJS({
       WorkspacePlusPlus2.prototype.refreshZenModeFocus = function() {
         if (!this.isZenModeEnabled()) return;
         if (isMissionControlOpen(this.app)) return;
-        lockZenFocus(this.app);
+        lockZenFocus(this.app, this.getZenFocusLockOptions());
       };
       WorkspacePlusPlus2.prototype.scheduleZenModeRefresh = function(delayMs) {
         var self = this;
@@ -22272,7 +22469,10 @@ var require_zen_mode = __commonJS({
           }
           if (!self.isZenModeEnabled()) return;
           if (isMissionControlOpen(self.app)) return;
-          lockZenFocus(self.app);
+          if (self.isStartupSettling && self.isStartupSettling()) {
+            self.restoreZenFocusLeaf();
+          }
+          lockZenFocus(self.app, self.getZenFocusLockOptions());
         }, delay);
         this._zenRefreshTimers.push(timer);
       };
@@ -22427,6 +22627,9 @@ var WorkspacePlusPlus = (
         self.registerEvent(self.app.workspace.on("active-leaf-change", function() {
           if (self.isSwitchingSession) return;
           self.refreshZenModeFocus();
+          if (typeof self.rememberZenFocusFromWorkspace === "function") {
+            self.rememberZenFocusFromWorkspace();
+          }
           setTimeout(function() {
             self.updateStatusBar();
           }, 0);
@@ -22440,6 +22643,9 @@ var WorkspacePlusPlus = (
           self.initRotationBackupTimestamp();
           self.registerFrontmatterListeners();
           self.scheduleStartupSessionStorageChecks();
+          if (typeof self.restoreZenFocusLeaf === "function") {
+            self.restoreZenFocusLeaf();
+          }
           self.applyZenModeClasses();
           self.scheduleZenModeRefresh(50);
           self.scheduleZenModeRefresh(400);

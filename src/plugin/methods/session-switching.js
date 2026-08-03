@@ -261,6 +261,9 @@ function attachSessionSwitchingMethods(WorkspacePlusPlus) {
             var current = self.getActiveSession();
             if (current) {
                 current.zenMode = self.isZenModeEnabled();
+                if (typeof self.rememberZenFocusFromWorkspace === 'function') {
+                    self.rememberZenFocusFromWorkspace({ force: true, persist: false });
+                }
                 if (!skipCurrentSave) {
                     self.pushLayoutToHistory(current);
                     current.layout = self.getCurrentWorkspaceLayout();
@@ -281,6 +284,9 @@ function attachSessionSwitchingMethods(WorkspacePlusPlus) {
                 : Promise.resolve();
 
             return applyLayout.then(function () {
+                if (typeof self.restoreZenFocusLeaf === 'function') {
+                    self.restoreZenFocusLeaf();
+                }
                 self.applyZenModeClasses();
                 self.scheduleZenModeRefresh(50);
                 self.scheduleZenModeRefresh(300);

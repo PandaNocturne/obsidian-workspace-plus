@@ -25,11 +25,23 @@ function attachSessionStartupMethods(WorkspacePlusPlus) {
             self.startupSettleStartedAt = 0;
             self.startupSettleUntil = 0;
             self.startupSettleTimer = null;
-            // Layout is stable — re-lock zen focus (activeLeaf may have been sidebar earlier)
+            // Layout is stable — restore last zen split, then re-lock focus
+            if (typeof self.restoreZenFocusLeaf === 'function') {
+                self.restoreZenFocusLeaf();
+            }
             if (typeof self.scheduleZenModeRefresh === 'function') {
                 self.scheduleZenModeRefresh(0);
             } else if (typeof self.applyZenModeClasses === 'function') {
                 self.applyZenModeClasses();
+            }
+            // Refresh stored pin only when we already had one (avoid baking in
+            // Obsidian's pre-plugin active leaf on first boot after upgrade).
+            var session = self.getActiveSession && self.getActiveSession();
+            if (session && (session.zenFocusLeafId
+                || session.zenFocusFilePath
+                || (typeof session.zenFocusSplitIndex === 'number' && session.zenFocusSplitIndex >= 0))
+                && typeof self.rememberZenFocusFromWorkspace === 'function') {
+                self.rememberZenFocusFromWorkspace({ force: true });
             }
         }, nextDeadline - Date.now());
         return this.startupSettleUntil;
@@ -94,6 +106,16 @@ function attachSessionStartupMethods(WorkspacePlusPlus) {
 
         var session = this.getActiveSession();
         if (!session) return;
+
+        if (typeof this.restoreZenFocusLeaf === 'function') {
+            this.restoreZenFocusLeaf();
+        }
+        if ((session.zenFocusLeafId
+            || session.zenFocusFilePath
+            || (typeof session.zenFocusSplitIndex === 'number' && session.zenFocusSplitIndex >= 0))
+            && typeof this.rememberZenFocusFromWorkspace === 'function') {
+            this.rememberZenFocusFromWorkspace({ force: true, persist: false });
+        }
 
         this.pushLayoutToHistory(session);
         session.layout = this.getCurrentWorkspaceLayout();

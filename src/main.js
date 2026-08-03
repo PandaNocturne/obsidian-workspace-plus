@@ -70,6 +70,9 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
             self.registerEvent(self.app.workspace.on('active-leaf-change', function () {
                 if (self.isSwitchingSession) return;
                 self.refreshZenModeFocus();
+                if (typeof self.rememberZenFocusFromWorkspace === 'function') {
+                    self.rememberZenFocusFromWorkspace();
+                }
                 setTimeout(function () {
                     self.updateStatusBar();
                 }, 0);
@@ -85,6 +88,9 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
                 self.initRotationBackupTimestamp();
                 self.registerFrontmatterListeners();
                 self.scheduleStartupSessionStorageChecks();
+                if (typeof self.restoreZenFocusLeaf === 'function') {
+                    self.restoreZenFocusLeaf();
+                }
                 self.applyZenModeClasses();
                 // Cold start: activeLeaf / tab headers often settle a beat later
                 self.scheduleZenModeRefresh(50);
