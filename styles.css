@@ -1708,7 +1708,6 @@ body.wpp-mission-control-open .wpp-tab-switcher-grid-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--wpp-mc-hint-gap);
     max-width: var(--wpp-mc-panel-max-width);
     pointer-events: none;
 }
@@ -2118,7 +2117,10 @@ body.wpp-mission-control-open .wpp-tab-switcher-floating-hint {
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-grid-hint {
-    flex: 0 0 auto;
+    position: fixed;
+    transform: translateX(-50%);
+    z-index: 1002;
+    max-width: min(90vw, var(--wpp-mc-panel-max-width));
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-hint.is-hidden {
@@ -2162,10 +2164,6 @@ body.wpp-mission-control-open .wpp-tab-switcher-toolbar-hint.is-below-nav {
         + var(--wpp-mc-toolbar-height)
         + var(--wpp-mc-hint-gap)
     );
-}
-
-body.wpp-mission-control-open .wpp-tab-switcher-toolbar-hint.is-top-only {
-    top: var(--wpp-mc-toolbar-top);
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-split-btn {

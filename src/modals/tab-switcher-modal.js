@@ -840,9 +840,16 @@ var TabSwitcherModal = /** @class */ (function () {
         });
         this.gridWrapEl = this.panelEl.createDiv({ cls: 'wpp-tab-switcher-grid-wrap' });
         this.gridEl = this.gridWrapEl.createDiv({ cls: 'wpp-tab-switcher-grid' });
-        this.gridHintEl = this.gridWrapEl.createDiv({ cls: 'wpp-tab-switcher-hint wpp-tab-switcher-grid-hint' });
+        // Fixed overlay tip (not in grid flex flow) — avoids squeezing the grid on hover
+        this.gridHintEl = doc.body.createDiv({
+            cls: 'wpp-tab-switcher-hint wpp-tab-switcher-grid-hint is-hidden',
+        });
+
+        this._hintHoverNav = false;
+        this._hintHoverGrid = false;
 
         this.mountSplitToolbar(doc);
+        this.bindHintHover();
         this.updateHints();
 
         this.cardEls = [];
@@ -857,28 +864,72 @@ var TabSwitcherModal = /** @class */ (function () {
         this.updateFocus(true);
     };
 
+    TabSwitcherModal.prototype.bindHintHover = function () {
+        var self = this;
+
+        if (this.toolbarEl && !this.toolbarEl._wppHintHoverBound) {
+            this.toolbarEl._wppHintHoverBound = true;
+            this.toolbarEl.addEventListener('mouseenter', function () {
+                self._hintHoverNav = true;
+                self.updateHints();
+            });
+            this.toolbarEl.addEventListener('mouseleave', function () {
+                self._hintHoverNav = false;
+                self.updateHints();
+            });
+        }
+
+        if (this.gridEl && !this.gridEl._wppHintHoverBound) {
+            this.gridEl._wppHintHoverBound = true;
+            this.gridEl.addEventListener('mouseenter', function () {
+                self._hintHoverGrid = true;
+                self.updateHints();
+            });
+            this.gridEl.addEventListener('mouseleave', function () {
+                self._hintHoverGrid = false;
+                self.updateHints();
+            });
+        }
+    };
+
     TabSwitcherModal.prototype.updateHints = function () {
         var L = i18n.L;
         var multiSplit = !!(this.groups && this.groups.length > 1);
-        var showHints = !(this.plugin && typeof this.plugin.isTaskViewHintsEnabled === 'function')
+        var hintsEnabled = !(this.plugin && typeof this.plugin.isTaskViewHintsEnabled === 'function')
             || this.plugin.isTaskViewHintsEnabled();
 
         if (this.gridHintEl) {
-            // Below grid: split-switching tips (mask wheel / number keys)
-            var gridText = showHints ? (L.tabSwitcherHintGrid || '') : '';
+            // Below grid: card / grid interaction tips (fixed — does not reflow grid)
+            var gridText = hintsEnabled ? (L.tabSwitcherHintGrid || '') : '';
+            var showGrid = hintsEnabled && !!this._hintHoverGrid && !!gridText;
             this.gridHintEl.setText(gridText);
-            this.gridHintEl.classList.toggle('is-hidden', !showHints || !multiSplit || !gridText);
-            this.gridHintEl.style.display = (showHints && multiSplit && gridText) ? '' : 'none';
+            this.gridHintEl.classList.toggle('is-hidden', !showGrid);
+            this.gridHintEl.style.display = showGrid ? '' : 'none';
+            if (showGrid && this.gridEl) {
+                var rect = this.gridEl.getBoundingClientRect();
+                var gap = 18;
+                try {
+                    var body = this.gridEl.ownerDocument && this.gridEl.ownerDocument.body;
+                    if (body) {
+                        var raw = getComputedStyle(body).getPropertyValue('--wpp-mc-hint-gap');
+                        var parsed = parseFloat(raw);
+                        if (isFinite(parsed) && parsed > 0) gap = parsed;
+                    }
+                } catch (err) { /* ignore */ }
+                this.gridHintEl.style.top = (rect.bottom + gap) + 'px';
+                this.gridHintEl.style.left = (rect.left + rect.width / 2) + 'px';
+            }
         }
 
         if (this.toolbarHintEl) {
-            // Separate element below split nav (not inside the toolbar container)
-            var navText = showHints ? (L.tabSwitcherHintNav || L.tabSwitcherHint || '') : '';
+            // Below split nav: split-switching tips (only when nav exists)
+            var navText = hintsEnabled ? (L.tabSwitcherHintNav || '') : '';
+            var showNav = hintsEnabled && multiSplit && !!this._hintHoverNav && !!navText;
             this.toolbarHintEl.setText(navText);
-            this.toolbarHintEl.classList.toggle('is-hidden', !showHints || !navText);
-            this.toolbarHintEl.style.display = (showHints && navText) ? '' : 'none';
+            this.toolbarHintEl.classList.toggle('is-hidden', !showNav);
+            this.toolbarHintEl.style.display = showNav ? '' : 'none';
             this.toolbarHintEl.classList.toggle('is-below-nav', multiSplit);
-            this.toolbarHintEl.classList.toggle('is-top-only', !multiSplit);
+            this.toolbarHintEl.classList.remove('is-top-only');
         }
     };
 
@@ -924,7 +975,7 @@ var TabSwitcherModal = /** @class */ (function () {
 
         // Own container — visually below the split nav, not nested in it
         this.toolbarHintEl = doc.body.createDiv({
-            cls: 'wpp-tab-switcher-hint wpp-tab-switcher-toolbar-hint',
+            cls: 'wpp-tab-switcher-hint wpp-tab-switcher-toolbar-hint is-hidden',
         });
     };
 
@@ -1764,12 +1815,26 @@ var TabSwitcherModal = /** @class */ (function () {
     };
 
     /**
-     * Wheel anywhere in task view → cycle split preview.
+     * Wheel on mask/toolbar (outside the card grid) → cycle split preview.
+     * Scrolling inside the grid is left alone so the panel can scroll normally.
      */
     TabSwitcherModal.prototype._onWheel = function (e) {
         var doc = this._overlayDoc || getDoc(this.activeLeaf);
         if (!doc || !doc.body || !doc.body.classList.contains('wpp-mission-control-open')) return;
         if (!this.groups || this.groups.length <= 1) return;
+
+        var dragging = doc.body.classList.contains('wpp-tab-switcher-dragging');
+        var target = e.target;
+
+        if (!dragging) {
+            if (!target || typeof target.closest !== 'function') return;
+            // Grid: do not hijack wheel (keep normal panel/grid scrolling)
+            if (target.closest('.wpp-tab-switcher-grid')) return;
+            var onMask = target.closest(
+                '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-hint, .wpp-tab-switcher-grid-wrap'
+            );
+            if (!onMask) return;
+        }
 
         e.preventDefault();
         e.stopPropagation();
@@ -1932,6 +1997,8 @@ var TabSwitcherModal = /** @class */ (function () {
 
         this._wheelAcc = 0;
         this._wheelLastAt = 0;
+        this._hintHoverNav = false;
+        this._hintHoverGrid = false;
 
         if (this.panelEl) {
             this.panelEl.removeEventListener('click', this._onPanelClick);
@@ -1941,7 +2008,10 @@ var TabSwitcherModal = /** @class */ (function () {
         }
         this.gridWrapEl = null;
         this.gridEl = null;
-        this.gridHintEl = null;
+        if (this.gridHintEl) {
+            this.gridHintEl.remove();
+            this.gridHintEl = null;
+        }
         this.cardEls = [];
 
         if (this.backdropEl) {

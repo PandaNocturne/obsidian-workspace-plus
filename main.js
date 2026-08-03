@@ -10237,9 +10237,9 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "Switch tab",
         tabSwitcherEmpty: "No open tabs to switch.",
         tabSwitcherHint: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
-        tabSwitcherHintNav: "Click preview to switch \xB7 Drag header to reorder \xB7 Double-click page for focus \xB7 Click outside to cancel",
-        tabSwitcherHintGrid: "Scroll to switch split \xB7 Number keys to switch split",
-        tabSwitcherHintSplit: "Scroll / 1\u20139 to switch split",
+        tabSwitcherHintNav: "Scroll mask to switch split \xB7 Number keys to switch split \xB7 Double-click page for focus",
+        tabSwitcherHintGrid: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
+        tabSwitcherHintSplit: "Scroll mask / 1\u20139 to switch split",
         tabSwitcherPrevSplit: "Previous split",
         tabSwitcherNextSplit: "Next split",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10254,16 +10254,16 @@ var require_i18n = __commonJS({
         settingsTaskViewContentZoomDesc: "Zoom of preview content inside task view cards (10%\u2013100%).",
         settingsTaskViewContentZoomReset: "Reset to {value}",
         settingsShowTaskViewHints: "Show task view hints",
-        settingsShowTaskViewHintsDesc: "Show usage tips under the split nav and below the card grid."
+        settingsShowTaskViewHintsDesc: "Show usage tips when hovering the split nav or the card grid."
       },
       zh: {
         cmdTabSwitcher: "\u5207\u6362\u6807\u7B7E\u9875\uFF08\u4EFB\u52A1\u89C6\u56FE\uFF09",
         tabSwitcherTitle: "\u5207\u6362\u6807\u7B7E\u9875",
         tabSwitcherEmpty: "\u6CA1\u6709\u53EF\u5207\u6362\u7684\u6807\u7B7E\u9875\u3002",
         tabSwitcherHint: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintNav: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u53CC\u51FB\u9875\u7801\u8FDB\u5165\u4E13\u6CE8 \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintGrid: "\u6EDA\u8F6E\u5207\u6362\u5206\u680F \xB7 \u6570\u5B57\u952E\u5207\u6362\u5206\u680F",
-        tabSwitcherHintSplit: "\u6EDA\u8F6E / \u6570\u5B57\u952E\u5207\u6362\u5206\u680F",
+        tabSwitcherHintNav: "\u8499\u7248\u6EDA\u8F6E\u5207\u5206\u680F \xB7 \u6570\u5B57\u952E\u5207\u6362\u5206\u680F \xB7 \u53CC\u51FB\u9875\u7801\u8FDB\u5165\u4E13\u6CE8",
+        tabSwitcherHintGrid: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintSplit: "\u8499\u7248\u6EDA\u8F6E / \u6570\u5B57\u952E\u5207\u6362\u5206\u680F",
         tabSwitcherPrevSplit: "\u4E0A\u4E00\u4E2A\u5206\u680F",
         tabSwitcherNextSplit: "\u4E0B\u4E00\u4E2A\u5206\u680F",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10278,16 +10278,16 @@ var require_i18n = __commonJS({
         settingsTaskViewContentZoomDesc: "\u8C03\u6574\u4EFB\u52A1\u89C6\u56FE\u9884\u89C8\u5361\u7247\u5185\u6B63\u6587\u7684 zoom \u6BD4\u4F8B\uFF0810%\u2013100%\uFF09\u3002",
         settingsTaskViewContentZoomReset: "\u91CD\u7F6E\u4E3A {value}",
         settingsShowTaskViewHints: "\u663E\u793A\u4EFB\u52A1\u89C6\u56FE\u63D0\u793A",
-        settingsShowTaskViewHintsDesc: "\u5728\u5206\u680F\u5BFC\u822A\u4E0E\u7F51\u683C\u4E0B\u65B9\u663E\u793A\u64CD\u4F5C\u63D0\u793A\u3002"
+        settingsShowTaskViewHintsDesc: "\u9F20\u6807\u60AC\u505C\u5206\u680F\u5BFC\u822A\u6216\u7F51\u683C\u65F6\u663E\u793A\u64CD\u4F5C\u63D0\u793A\u3002"
       },
       "zh-TW": {
         cmdTabSwitcher: "\u5207\u63DB\u5206\u9801\uFF08\u4EFB\u52D9\u6AA2\u8996\uFF09",
         tabSwitcherTitle: "\u5207\u63DB\u5206\u9801",
         tabSwitcherEmpty: "\u6C92\u6709\u53EF\u5207\u63DB\u7684\u5206\u9801\u3002",
         tabSwitcherHint: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintNav: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u96D9\u64CA\u9801\u78BC\u9032\u5165\u5C08\u6CE8 \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintGrid: "\u6EFE\u8F2A\u5207\u63DB\u5206\u6B04 \xB7 \u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04",
-        tabSwitcherHintSplit: "\u6EFE\u8F2A / \u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04",
+        tabSwitcherHintNav: "\u8499\u7248\u6EFE\u8F2A\u5207\u5206\u6B04 \xB7 \u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04 \xB7 \u96D9\u64CA\u9801\u78BC\u9032\u5165\u5C08\u6CE8",
+        tabSwitcherHintGrid: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintSplit: "\u8499\u7248\u6EFE\u8F2A / \u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04",
         tabSwitcherPrevSplit: "\u4E0A\u4E00\u500B\u5206\u6B04",
         tabSwitcherNextSplit: "\u4E0B\u4E00\u500B\u5206\u6B04",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10302,15 +10302,15 @@ var require_i18n = __commonJS({
         settingsTaskViewContentZoomDesc: "\u8ABF\u6574\u4EFB\u52D9\u6AA2\u8996\u9810\u89BD\u5361\u7247\u5167\u6B63\u6587\u7684 zoom \u6BD4\u4F8B\uFF0810%\u2013100%\uFF09\u3002",
         settingsTaskViewContentZoomReset: "\u91CD\u8A2D\u70BA {value}",
         settingsShowTaskViewHints: "\u986F\u793A\u4EFB\u52D9\u6AA2\u8996\u63D0\u793A",
-        settingsShowTaskViewHintsDesc: "\u5728\u5206\u6B04\u5C0E\u822A\u8207\u7DB2\u683C\u4E0B\u65B9\u986F\u793A\u64CD\u4F5C\u63D0\u793A\u3002"
+        settingsShowTaskViewHintsDesc: "\u6ED1\u9F20\u61F8\u505C\u5206\u6B04\u5C0E\u822A\u6216\u7DB2\u683C\u6642\u986F\u793A\u64CD\u4F5C\u63D0\u793A\u3002"
       },
       ja: {
         cmdTabSwitcher: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048\uFF08\u30DF\u30C3\u30B7\u30E7\u30F3\u30B3\u30F3\u30C8\u30ED\u30FC\u30EB\uFF09",
         tabSwitcherTitle: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048",
         tabSwitcherEmpty: "\u5207\u308A\u66FF\u3048\u53EF\u80FD\u306A\u30BF\u30D6\u304C\u3042\u308A\u307E\u305B\u3093\u3002",
         tabSwitcherHint: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
-        tabSwitcherHintNav: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u30DA\u30FC\u30B8\u3092\u30C0\u30D6\u30EB\u30AF\u30EA\u30C3\u30AF\u3067\u30D5\u30A9\u30FC\u30AB\u30B9 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
-        tabSwitcherHintGrid: "\u30B9\u30AF\u30ED\u30FC\u30EB\u3067\u30DA\u30A4\u30F3\u5207\u66FF \xB7 \u6570\u5B57\u30AD\u30FC\u3067\u30DA\u30A4\u30F3\u5207\u66FF",
+        tabSwitcherHintNav: "\u30DE\u30B9\u30AF\u3092\u30B9\u30AF\u30ED\u30FC\u30EB\u3067\u30DA\u30A4\u30F3\u5207\u66FF \xB7 \u6570\u5B57\u30AD\u30FC\u3067\u30DA\u30A4\u30F3\u5207\u66FF \xB7 \u30DA\u30FC\u30B8\u3092\u30C0\u30D6\u30EB\u30AF\u30EA\u30C3\u30AF\u3067\u30D5\u30A9\u30FC\u30AB\u30B9",
+        tabSwitcherHintGrid: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
         tabSwitcherHintSplit: "\u30B9\u30AF\u30ED\u30FC\u30EB / \u6570\u5B57\u3067\u30DA\u30A4\u30F3\u5207\u66FF",
         tabSwitcherPrevSplit: "\u524D\u306E\u30DA\u30A4\u30F3",
         tabSwitcherNextSplit: "\u6B21\u306E\u30DA\u30A4\u30F3",
@@ -10326,16 +10326,16 @@ var require_i18n = __commonJS({
         settingsTaskViewContentZoomDesc: "\u30D7\u30EC\u30D3\u30E5\u30FC\u30AB\u30FC\u30C9\u5185\u30B3\u30F3\u30C6\u30F3\u30C4\u306E zoom\uFF0810%\uFF5E100%\uFF09\u3002",
         settingsTaskViewContentZoomReset: "{value} \u306B\u30EA\u30BB\u30C3\u30C8",
         settingsShowTaskViewHints: "\u30BF\u30B9\u30AF\u30D3\u30E5\u30FC\u306E\u30D2\u30F3\u30C8\u3092\u8868\u793A",
-        settingsShowTaskViewHintsDesc: "\u30DA\u30A4\u30F3\u30CA\u30D3\u3068\u30B0\u30EA\u30C3\u30C9\u4E0B\u306B\u64CD\u4F5C\u30D2\u30F3\u30C8\u3092\u8868\u793A\u3057\u307E\u3059\u3002"
+        settingsShowTaskViewHintsDesc: "\u30DA\u30A4\u30F3\u30CA\u30D3\u307E\u305F\u306F\u30B0\u30EA\u30C3\u30C9\u306B\u30DB\u30D0\u30FC\u3057\u305F\u3068\u304D\u64CD\u4F5C\u30D2\u30F3\u30C8\u3092\u8868\u793A\u3057\u307E\u3059\u3002"
       },
       ko: {
         cmdTabSwitcher: "\uD0ED \uC804\uD658 (\uBBF8\uC158 \uCEE8\uD2B8\uB864)",
         tabSwitcherTitle: "\uD0ED \uC804\uD658",
         tabSwitcherEmpty: "\uC804\uD658\uD560 \uD0ED\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
         tabSwitcherHint: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
-        tabSwitcherHintNav: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uD398\uC774\uC9C0 \uB354\uBE14\uD074\uB9AD\uC73C\uB85C \uC9D1\uC911 \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
-        tabSwitcherHintGrid: "\uC2A4\uD06C\uB864\uB85C \uBD84\uD560 \uC804\uD658 \xB7 \uC22B\uC790 \uD0A4\uB85C \uBD84\uD560 \uC804\uD658",
-        tabSwitcherHintSplit: "\uC2A4\uD06C\uB864 / \uC22B\uC790\uB85C \uBD84\uD560 \uC804\uD658",
+        tabSwitcherHintNav: "\uB9C8\uC2A4\uD06C \uC2A4\uD06C\uB864\uB85C \uBD84\uD560 \uC804\uD658 \xB7 \uC22B\uC790 \uD0A4\uB85C \uBD84\uD560 \uC804\uD658 \xB7 \uD398\uC774\uC9C0 \uB354\uBE14\uD074\uB9AD\uC73C\uB85C \uC9D1\uC911",
+        tabSwitcherHintGrid: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
+        tabSwitcherHintSplit: "\uB9C8\uC2A4\uD06C \uC2A4\uD06C\uB864 / \uC22B\uC790\uB85C \uBD84\uD560 \uC804\uD658",
         tabSwitcherPrevSplit: "\uC774\uC804 \uBD84\uD560",
         tabSwitcherNextSplit: "\uB2E4\uC74C \uBD84\uD560",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10350,7 +10350,7 @@ var require_i18n = __commonJS({
         settingsTaskViewContentZoomDesc: "\uBBF8\uB9AC\uBCF4\uAE30 \uCE74\uB4DC \uC548 \uBCF8\uBB38\uC758 zoom \uBE44\uC728(10%\u2013100%).",
         settingsTaskViewContentZoomReset: "{value}(\uC73C)\uB85C \uCD08\uAE30\uD654",
         settingsShowTaskViewHints: "\uC791\uC5C5 \uBCF4\uAE30 \uD78C\uD2B8 \uD45C\uC2DC",
-        settingsShowTaskViewHintsDesc: "\uBD84\uD560 \uD0D0\uC0C9\uACFC \uADF8\uB9AC\uB4DC \uC544\uB798\uC5D0 \uC0AC\uC6A9 \uD78C\uD2B8\uB97C \uD45C\uC2DC\uD569\uB2C8\uB2E4."
+        settingsShowTaskViewHintsDesc: "\uBD84\uD560 \uD0D0\uC0C9 \uB610\uB294 \uADF8\uB9AC\uB4DC\uC5D0 \uB9C8\uC6B0\uC2A4\uB97C \uC62C\uB9AC\uBA74 \uC0AC\uC6A9 \uD78C\uD2B8\uB97C \uD45C\uC2DC\uD569\uB2C8\uB2E4."
       }
     };
     var tabSwitcherLangs = Object.keys(STRINGS);
@@ -14454,8 +14454,13 @@ var require_tab_switcher_modal = __commonJS({
           });
           this.gridWrapEl = this.panelEl.createDiv({ cls: "wpp-tab-switcher-grid-wrap" });
           this.gridEl = this.gridWrapEl.createDiv({ cls: "wpp-tab-switcher-grid" });
-          this.gridHintEl = this.gridWrapEl.createDiv({ cls: "wpp-tab-switcher-hint wpp-tab-switcher-grid-hint" });
+          this.gridHintEl = doc.body.createDiv({
+            cls: "wpp-tab-switcher-hint wpp-tab-switcher-grid-hint is-hidden"
+          });
+          this._hintHoverNav = false;
+          this._hintHoverGrid = false;
           this.mountSplitToolbar(doc);
+          this.bindHintHover();
           this.updateHints();
           this.cardEls = [];
           this.renderCards();
@@ -14466,23 +14471,65 @@ var require_tab_switcher_modal = __commonJS({
           doc.addEventListener("wheel", this._onWheel, { capture: true, passive: false });
           this.updateFocus(true);
         };
+        TabSwitcherModal2.prototype.bindHintHover = function() {
+          var self = this;
+          if (this.toolbarEl && !this.toolbarEl._wppHintHoverBound) {
+            this.toolbarEl._wppHintHoverBound = true;
+            this.toolbarEl.addEventListener("mouseenter", function() {
+              self._hintHoverNav = true;
+              self.updateHints();
+            });
+            this.toolbarEl.addEventListener("mouseleave", function() {
+              self._hintHoverNav = false;
+              self.updateHints();
+            });
+          }
+          if (this.gridEl && !this.gridEl._wppHintHoverBound) {
+            this.gridEl._wppHintHoverBound = true;
+            this.gridEl.addEventListener("mouseenter", function() {
+              self._hintHoverGrid = true;
+              self.updateHints();
+            });
+            this.gridEl.addEventListener("mouseleave", function() {
+              self._hintHoverGrid = false;
+              self.updateHints();
+            });
+          }
+        };
         TabSwitcherModal2.prototype.updateHints = function() {
           var L = i18n2.L;
           var multiSplit = !!(this.groups && this.groups.length > 1);
-          var showHints = !(this.plugin && typeof this.plugin.isTaskViewHintsEnabled === "function") || this.plugin.isTaskViewHintsEnabled();
+          var hintsEnabled = !(this.plugin && typeof this.plugin.isTaskViewHintsEnabled === "function") || this.plugin.isTaskViewHintsEnabled();
           if (this.gridHintEl) {
-            var gridText = showHints ? L.tabSwitcherHintGrid || "" : "";
+            var gridText = hintsEnabled ? L.tabSwitcherHintGrid || "" : "";
+            var showGrid = hintsEnabled && !!this._hintHoverGrid && !!gridText;
             this.gridHintEl.setText(gridText);
-            this.gridHintEl.classList.toggle("is-hidden", !showHints || !multiSplit || !gridText);
-            this.gridHintEl.style.display = showHints && multiSplit && gridText ? "" : "none";
+            this.gridHintEl.classList.toggle("is-hidden", !showGrid);
+            this.gridHintEl.style.display = showGrid ? "" : "none";
+            if (showGrid && this.gridEl) {
+              var rect = this.gridEl.getBoundingClientRect();
+              var gap = 18;
+              try {
+                var body = this.gridEl.ownerDocument && this.gridEl.ownerDocument.body;
+                if (body) {
+                  var raw = getComputedStyle(body).getPropertyValue("--wpp-mc-hint-gap");
+                  var parsed = parseFloat(raw);
+                  if (isFinite(parsed) && parsed > 0) gap = parsed;
+                }
+              } catch (err) {
+              }
+              this.gridHintEl.style.top = rect.bottom + gap + "px";
+              this.gridHintEl.style.left = rect.left + rect.width / 2 + "px";
+            }
           }
           if (this.toolbarHintEl) {
-            var navText = showHints ? L.tabSwitcherHintNav || L.tabSwitcherHint || "" : "";
+            var navText = hintsEnabled ? L.tabSwitcherHintNav || "" : "";
+            var showNav = hintsEnabled && multiSplit && !!this._hintHoverNav && !!navText;
             this.toolbarHintEl.setText(navText);
-            this.toolbarHintEl.classList.toggle("is-hidden", !showHints || !navText);
-            this.toolbarHintEl.style.display = showHints && navText ? "" : "none";
+            this.toolbarHintEl.classList.toggle("is-hidden", !showNav);
+            this.toolbarHintEl.style.display = showNav ? "" : "none";
             this.toolbarHintEl.classList.toggle("is-below-nav", multiSplit);
-            this.toolbarHintEl.classList.toggle("is-top-only", !multiSplit);
+            this.toolbarHintEl.classList.remove("is-top-only");
           }
         };
         TabSwitcherModal2.prototype.mountSplitToolbar = function(doc) {
@@ -14522,7 +14569,7 @@ var require_tab_switcher_modal = __commonJS({
             self.shiftSplitGroup(1);
           });
           this.toolbarHintEl = doc.body.createDiv({
-            cls: "wpp-tab-switcher-hint wpp-tab-switcher-toolbar-hint"
+            cls: "wpp-tab-switcher-hint wpp-tab-switcher-toolbar-hint is-hidden"
           });
         };
         TabSwitcherModal2.prototype.updateSplitToolbar = function() {
@@ -15212,6 +15259,16 @@ var require_tab_switcher_modal = __commonJS({
           var doc = this._overlayDoc || getDoc(this.activeLeaf);
           if (!doc || !doc.body || !doc.body.classList.contains("wpp-mission-control-open")) return;
           if (!this.groups || this.groups.length <= 1) return;
+          var dragging = doc.body.classList.contains("wpp-tab-switcher-dragging");
+          var target = e.target;
+          if (!dragging) {
+            if (!target || typeof target.closest !== "function") return;
+            if (target.closest(".wpp-tab-switcher-grid")) return;
+            var onMask = target.closest(
+              ".wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-hint, .wpp-tab-switcher-grid-wrap"
+            );
+            if (!onMask) return;
+          }
           e.preventDefault();
           e.stopPropagation();
           var delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
@@ -15356,6 +15413,8 @@ var require_tab_switcher_modal = __commonJS({
           }
           this._wheelAcc = 0;
           this._wheelLastAt = 0;
+          this._hintHoverNav = false;
+          this._hintHoverGrid = false;
           if (this.panelEl) {
             this.panelEl.removeEventListener("click", this._onPanelClick);
             this.panelEl.removeEventListener("mousemove", this._onPanelMove);
@@ -15364,7 +15423,10 @@ var require_tab_switcher_modal = __commonJS({
           }
           this.gridWrapEl = null;
           this.gridEl = null;
-          this.gridHintEl = null;
+          if (this.gridHintEl) {
+            this.gridHintEl.remove();
+            this.gridHintEl = null;
+          }
           this.cardEls = [];
           if (this.backdropEl) {
             this.backdropEl.removeEventListener("click", this._onBackdropClick);
@@ -17854,6 +17916,7 @@ var require_persistence = __commonJS({
       "restoreSidebars",
       "taskViewThumbnailRatio",
       "taskViewContentZoom",
+      "showTaskViewHints",
       "zenHideInactiveTabs",
       "showStatusBarWorkspace",
       "showStatusBarZenMode"
