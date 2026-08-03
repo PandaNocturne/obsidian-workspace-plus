@@ -16,6 +16,10 @@ function isMissionControlOpen(app) {
     return !!(body && body.classList.contains('wpp-mission-control-open'));
 }
 
+function isConnectedEl(el) {
+    return !!(el && el.isConnected);
+}
+
 function clearZenActiveFlags(body, exceptEl) {
     if (!body) return;
     var marked = body.querySelectorAll('.wpp-zen-active');
@@ -23,6 +27,37 @@ function clearZenActiveFlags(body, exceptEl) {
         if (exceptEl && marked[i] === exceptEl) continue;
         marked[i].classList.remove('wpp-zen-active');
     }
+}
+
+function getConnectedZenActiveTabs(body) {
+    if (!body) return null;
+    try {
+        var existing = body.querySelector(
+            '.workspace-split.mod-root .workspace-tabs.wpp-zen-active'
+        );
+        return isConnectedEl(existing) ? existing : null;
+    } catch (err) {
+        return null;
+    }
+}
+
+/** Ignore Excalidraw/React content churn; only workspace chrome matters for zen pin. */
+function isZenChromeMutation(mutation) {
+    var target = mutation && mutation.target;
+    if (!target) return false;
+
+    if (mutation.type === 'attributes') {
+        if (!target.classList) return false;
+        return target.classList.contains('workspace-tabs')
+            || target.classList.contains('workspace-split')
+            || target.classList.contains('workspace-leaf');
+    }
+
+    // childList: skip deep view-content updates (Excalidraw first mount)
+    if (typeof target.closest === 'function' && target.closest('.view-content')) {
+        return false;
+    }
+    return true;
 }
 
 function isLeafInRootSplit(app, leaf) {
@@ -66,7 +101,7 @@ function getLeafTabsContainerEl(leaf) {
     var depth = 0;
     while (node && depth < 8) {
         var el = node.containerEl;
-        if (el && el.classList) {
+        if (isConnectedEl(el) && el.classList) {
             if (el.classList.contains('workspace-tabs')) return el;
             if (typeof node.selectTab === 'function'
                 || typeof node.selectTabIndex === 'function'
@@ -81,23 +116,26 @@ function getLeafTabsContainerEl(leaf) {
     try {
         var leafEl = (leaf && leaf.containerEl)
             || (leaf && leaf.view && leaf.view.containerEl);
-        if (leafEl && typeof leafEl.closest === 'function') {
+        if (isConnectedEl(leafEl) && typeof leafEl.closest === 'function') {
             var fromDom = leafEl.closest('.workspace-tabs');
-            if (fromDom) return fromDom;
+            if (isConnectedEl(fromDom)) return fromDom;
         }
     } catch (err) { /* ignore */ }
 
-    return (leaf && leaf.parent && leaf.parent.containerEl) || null;
+    var fallback = leaf && leaf.parent && leaf.parent.containerEl;
+    return isConnectedEl(fallback) ? fallback : null;
 }
 
 function findZenTabsEl(app, body) {
     var leaf = getZenFocusLeaf(app);
     var tabsEl = leaf ? getLeafTabsContainerEl(leaf) : null;
+    if (!isConnectedEl(tabsEl)) tabsEl = null;
 
     if (!tabsEl) {
         try {
             tabsEl = body.querySelector('.workspace-split.mod-root .workspace-tabs.mod-active');
         } catch (err) { /* ignore */ }
+        if (!isConnectedEl(tabsEl)) tabsEl = null;
     }
 
     if (!tabsEl) {
@@ -105,23 +143,23 @@ function findZenTabsEl(app, body) {
             var activeLeafEl = body.querySelector(
                 '.workspace-split.mod-root .workspace-leaf.mod-active'
             );
-            if (activeLeafEl && typeof activeLeafEl.closest === 'function') {
+            if (isConnectedEl(activeLeafEl) && typeof activeLeafEl.closest === 'function') {
                 tabsEl = activeLeafEl.closest('.workspace-tabs');
             }
         } catch (err2) { /* ignore */ }
+        if (!isConnectedEl(tabsEl)) tabsEl = null;
     }
 
+    // Remount gap: keep the live pin instead of chasing a detached node
     if (!tabsEl) {
-        var existing = body.querySelector(
-            '.workspace-split.mod-root .workspace-tabs.wpp-zen-active'
-        );
-        if (existing && existing.isConnected) return existing;
+        tabsEl = getConnectedZenActiveTabs(body);
     }
 
     if (!tabsEl) {
         try {
             tabsEl = body.querySelector('.workspace-split.mod-root .workspace-tabs');
         } catch (err3) { /* ignore */ }
+        if (!isConnectedEl(tabsEl)) tabsEl = null;
     }
 
     return tabsEl || null;
@@ -129,14 +167,20 @@ function findZenTabsEl(app, body) {
 
 /**
  * Pin zen to the tab group only. Zero DOM writes when already correct —
- * avoids load-start / load-end double flicker from class thrashing.
+ * never clear a live pin when the only candidate is a detached remount ghost.
  */
 function lockZenFocus(app) {
     var body = getWorkspaceBody(app);
     if (!body) return false;
 
+    var existing = getConnectedZenActiveTabs(body);
     var tabsEl = findZenTabsEl(app, body);
-    if (!tabsEl) return false;
+
+    // Excalidraw first load can briefly expose detached containerEls — do not
+    // clear live flags into the CSS ":has() miss → all panes visible" state.
+    if (!isConnectedEl(tabsEl)) {
+        return !!existing;
+    }
 
     var marked = body.querySelectorAll('.workspace-split.mod-root .workspace-tabs.wpp-zen-active');
     if (tabsEl.classList.contains('wpp-zen-active') && marked.length === 1 && marked[0] === tabsEl) {
@@ -215,11 +259,16 @@ function attachZenModeMethods(WorkspacePlusPlus) {
         var el = root && root.containerEl;
         if (!el || typeof MutationObserver === 'undefined') return;
 
-        this._zenDomObserver = new MutationObserver(function () {
+        this._zenDomObserver = new MutationObserver(function (records) {
             if (!self.isZenModeEnabled()) return;
             if (isMissionControlOpen(self.app)) return;
-            // Sync — must run before paint so zen never "drops" during Excalidraw remount
-            lockZenFocus(self.app);
+            var i;
+            for (i = 0; i < records.length; i++) {
+                if (!isZenChromeMutation(records[i])) continue;
+                // Microtask before paint — re-pin without waiting for layout-change
+                lockZenFocus(self.app);
+                return;
+            }
         });
 
         try {

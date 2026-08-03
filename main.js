@@ -21747,6 +21747,9 @@ var require_zen_mode = __commonJS({
       var body = getWorkspaceBody(app);
       return !!(body && body.classList.contains("wpp-mission-control-open"));
     }
+    function isConnectedEl(el) {
+      return !!(el && el.isConnected);
+    }
     function clearZenActiveFlags(body, exceptEl) {
       if (!body) return;
       var marked = body.querySelectorAll(".wpp-zen-active");
@@ -21754,6 +21757,29 @@ var require_zen_mode = __commonJS({
         if (exceptEl && marked[i] === exceptEl) continue;
         marked[i].classList.remove("wpp-zen-active");
       }
+    }
+    function getConnectedZenActiveTabs(body) {
+      if (!body) return null;
+      try {
+        var existing = body.querySelector(
+          ".workspace-split.mod-root .workspace-tabs.wpp-zen-active"
+        );
+        return isConnectedEl(existing) ? existing : null;
+      } catch (err) {
+        return null;
+      }
+    }
+    function isZenChromeMutation(mutation) {
+      var target = mutation && mutation.target;
+      if (!target) return false;
+      if (mutation.type === "attributes") {
+        if (!target.classList) return false;
+        return target.classList.contains("workspace-tabs") || target.classList.contains("workspace-split") || target.classList.contains("workspace-leaf");
+      }
+      if (typeof target.closest === "function" && target.closest(".view-content")) {
+        return false;
+      }
+      return true;
     }
     function isLeafInRootSplit(app, leaf) {
       if (!app || !app.workspace || !leaf || typeof leaf.getRoot !== "function") return false;
@@ -21793,7 +21819,7 @@ var require_zen_mode = __commonJS({
       var depth = 0;
       while (node && depth < 8) {
         var el = node.containerEl;
-        if (el && el.classList) {
+        if (isConnectedEl(el) && el.classList) {
           if (el.classList.contains("workspace-tabs")) return el;
           if (typeof node.selectTab === "function" || typeof node.selectTabIndex === "function" || node.type === "tabs") {
             return el;
@@ -21804,53 +21830,58 @@ var require_zen_mode = __commonJS({
       }
       try {
         var leafEl = leaf && leaf.containerEl || leaf && leaf.view && leaf.view.containerEl;
-        if (leafEl && typeof leafEl.closest === "function") {
+        if (isConnectedEl(leafEl) && typeof leafEl.closest === "function") {
           var fromDom = leafEl.closest(".workspace-tabs");
-          if (fromDom) return fromDom;
+          if (isConnectedEl(fromDom)) return fromDom;
         }
       } catch (err) {
       }
-      return leaf && leaf.parent && leaf.parent.containerEl || null;
+      var fallback = leaf && leaf.parent && leaf.parent.containerEl;
+      return isConnectedEl(fallback) ? fallback : null;
     }
     function findZenTabsEl(app, body) {
       var leaf = getZenFocusLeaf(app);
       var tabsEl = leaf ? getLeafTabsContainerEl(leaf) : null;
+      if (!isConnectedEl(tabsEl)) tabsEl = null;
       if (!tabsEl) {
         try {
           tabsEl = body.querySelector(".workspace-split.mod-root .workspace-tabs.mod-active");
         } catch (err) {
         }
+        if (!isConnectedEl(tabsEl)) tabsEl = null;
       }
       if (!tabsEl) {
         try {
           var activeLeafEl = body.querySelector(
             ".workspace-split.mod-root .workspace-leaf.mod-active"
           );
-          if (activeLeafEl && typeof activeLeafEl.closest === "function") {
+          if (isConnectedEl(activeLeafEl) && typeof activeLeafEl.closest === "function") {
             tabsEl = activeLeafEl.closest(".workspace-tabs");
           }
         } catch (err2) {
         }
+        if (!isConnectedEl(tabsEl)) tabsEl = null;
       }
       if (!tabsEl) {
-        var existing = body.querySelector(
-          ".workspace-split.mod-root .workspace-tabs.wpp-zen-active"
-        );
-        if (existing && existing.isConnected) return existing;
+        tabsEl = getConnectedZenActiveTabs(body);
       }
       if (!tabsEl) {
         try {
           tabsEl = body.querySelector(".workspace-split.mod-root .workspace-tabs");
         } catch (err3) {
         }
+        if (!isConnectedEl(tabsEl)) tabsEl = null;
       }
       return tabsEl || null;
     }
     function lockZenFocus(app) {
       var body = getWorkspaceBody(app);
       if (!body) return false;
+      var existing = getConnectedZenActiveTabs(body);
       var tabsEl = findZenTabsEl(app, body);
-      if (!tabsEl) return false;
+      if (!isConnectedEl(tabsEl)) {
+        return !!existing;
+      }
       var marked = body.querySelectorAll(".workspace-split.mod-root .workspace-tabs.wpp-zen-active");
       if (tabsEl.classList.contains("wpp-zen-active") && marked.length === 1 && marked[0] === tabsEl) {
         return true;
@@ -21914,10 +21945,15 @@ var require_zen_mode = __commonJS({
         var root = this.app && this.app.workspace && this.app.workspace.rootSplit;
         var el = root && root.containerEl;
         if (!el || typeof MutationObserver === "undefined") return;
-        this._zenDomObserver = new MutationObserver(function() {
+        this._zenDomObserver = new MutationObserver(function(records) {
           if (!self.isZenModeEnabled()) return;
           if (isMissionControlOpen(self.app)) return;
-          lockZenFocus(self.app);
+          var i;
+          for (i = 0; i < records.length; i++) {
+            if (!isZenChromeMutation(records[i])) continue;
+            lockZenFocus(self.app);
+            return;
+          }
         });
         try {
           this._zenDomObserver.observe(el, {
