@@ -14030,7 +14030,7 @@ var require_tab_switcher_modal = __commonJS({
           }
           var activeIndex = this.leaves.indexOf(this.activeLeaf);
           if (activeIndex < 0) activeIndex = 0;
-          this.focusedIndex = this.leaves.length <= 1 ? 0 : (activeIndex + 1) % this.leaves.length;
+          this.focusedIndex = activeIndex;
           doc.body.addClass("wpp-mission-control-open");
           this.backdropEl = doc.body.createDiv({ cls: "wpp-tab-switcher-backdrop" });
           this.backdropEl.addEventListener("click", this._onBackdropClick);

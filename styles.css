@@ -1614,9 +1614,10 @@ body.wpp-mission-control-open .wpp-tab-switcher-card {
     contain: layout paint;
 }
 
-/* Current workspace leaf — simple accent border */
+/* Current workspace leaf — thicker accent border */
 body.wpp-mission-control-open .wpp-tab-switcher-card.is-active-tab {
     border-color: var(--interactive-accent);
+    border-width: 4px;
 }
 
 /* Keyboard / hover focus — selection ring (what Enter will activate) */

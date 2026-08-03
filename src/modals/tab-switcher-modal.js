@@ -567,9 +567,7 @@ var TabSwitcherModal = /** @class */ (function () {
 
         var activeIndex = this.leaves.indexOf(this.activeLeaf);
         if (activeIndex < 0) activeIndex = 0;
-        this.focusedIndex = this.leaves.length <= 1
-            ? 0
-            : (activeIndex + 1) % this.leaves.length;
+        this.focusedIndex = activeIndex;
 
         doc.body.addClass('wpp-mission-control-open');
 
