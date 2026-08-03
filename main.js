@@ -10236,8 +10236,8 @@ var require_i18n = __commonJS({
         cmdTabSwitcher: "Switch tabs (mission control)",
         tabSwitcherTitle: "Switch tab",
         tabSwitcherEmpty: "No open tabs to switch.",
-        tabSwitcherHint: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
-        tabSwitcherHintSplit: "\u2039 \u203A or 1\u20139 to switch split",
+        tabSwitcherHint: "Click preview to switch \xB7 Drag header to reorder \xB7 Scroll mask for split \xB7 Click outside to cancel",
+        tabSwitcherHintSplit: "\u2039 \u203A or 1\u20139 / scroll mask to switch split",
         tabSwitcherPrevSplit: "Previous split",
         tabSwitcherNextSplit: "Next split",
         tabSwitcherSplitLabel: function(i, n) {
@@ -10256,8 +10256,8 @@ var require_i18n = __commonJS({
         cmdTabSwitcher: "\u5207\u6362\u6807\u7B7E\u9875\uFF08\u4EFB\u52A1\u89C6\u56FE\uFF09",
         tabSwitcherTitle: "\u5207\u6362\u6807\u7B7E\u9875",
         tabSwitcherEmpty: "\u6CA1\u6709\u53EF\u5207\u6362\u7684\u6807\u7B7E\u9875\u3002",
-        tabSwitcherHint: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
-        tabSwitcherHintSplit: "\u2039 \u203A \u6216\u6570\u5B57\u952E\u5207\u6362\u5206\u680F",
+        tabSwitcherHint: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u7F51\u683C\u6EDA\u8F6E\u5207\u6807\u7B7E \xB7 \u8499\u7248\u6EDA\u8F6E\u5207\u5206\u680F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintSplit: "\u2039 \u203A \u6216\u6570\u5B57\u952E / \u8499\u7248\u6EDA\u8F6E\u5207\u6362\u5206\u680F",
         tabSwitcherPrevSplit: "\u4E0A\u4E00\u4E2A\u5206\u680F",
         tabSwitcherNextSplit: "\u4E0B\u4E00\u4E2A\u5206\u680F",
         tabSwitcherSplitLabel: function(i, n) {
@@ -14294,9 +14294,12 @@ var require_tab_switcher_modal = __commonJS({
           this.open = this.open.bind(this);
           this.close = this.close.bind(this);
           this._onKeyDown = this._onKeyDown.bind(this);
+          this._onWheel = this._onWheel.bind(this);
           this._onBackdropClick = this._onBackdropClick.bind(this);
           this._onPanelClick = this._onPanelClick.bind(this);
           this._onPanelMove = this._onPanelMove.bind(this);
+          this._wheelAcc = 0;
+          this._wheelLastAt = 0;
         }
         TabSwitcherModal2.prototype.enqueuePreview = function(task) {
           var self = this;
@@ -14395,6 +14398,7 @@ var require_tab_switcher_modal = __commonJS({
           this.panelEl.addEventListener("click", this._onPanelClick);
           this.panelEl.addEventListener("mousemove", this._onPanelMove);
           doc.addEventListener("keydown", this._onKeyDown, true);
+          doc.addEventListener("wheel", this._onWheel, { capture: true, passive: false });
           this.updateFocus(true);
         };
         TabSwitcherModal2.prototype.getHintText = function() {
@@ -14960,6 +14964,36 @@ var require_tab_switcher_modal = __commonJS({
           this.focusedIndex = index;
           this.updateFocus(false);
         };
+        TabSwitcherModal2.prototype._onWheel = function(e) {
+          var doc = this._overlayDoc || getDoc(this.activeLeaf);
+          if (!doc || !doc.body || !doc.body.classList.contains("wpp-mission-control-open")) return;
+          if (doc.body.classList.contains("wpp-tab-switcher-dragging")) return;
+          if (!this.groups || this.groups.length <= 1) return;
+          var target = e.target;
+          if (!target || typeof target.closest !== "function") return;
+          if (target.closest(".wpp-tab-switcher-grid")) return;
+          var onMask = target.closest(
+            ".wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint"
+          );
+          if (!onMask) return;
+          e.preventDefault();
+          e.stopPropagation();
+          var delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
+          if (!delta) return;
+          if (e.deltaMode === 1) delta *= 16;
+          else if (e.deltaMode === 2) delta *= 48;
+          var now = Date.now();
+          if (now - (this._wheelLastAt || 0) < 90) {
+            this._wheelAcc = (this._wheelAcc || 0) + delta;
+          } else {
+            this._wheelAcc = delta;
+          }
+          if (Math.abs(this._wheelAcc) < 28) return;
+          var dir = this._wheelAcc > 0 ? 1 : -1;
+          this._wheelAcc = 0;
+          this._wheelLastAt = now;
+          this.shiftSplitGroup(dir);
+        };
         TabSwitcherModal2.prototype._onKeyDown = function(e) {
           if (e.isComposing) return;
           var key = e.key;
@@ -15045,6 +15079,13 @@ var require_tab_switcher_modal = __commonJS({
             doc.removeEventListener("keydown", this._onKeyDown, true);
           } catch (err) {
           }
+          try {
+            doc.removeEventListener("wheel", this._onWheel, { capture: true });
+            doc.removeEventListener("wheel", this._onWheel, true);
+          } catch (err2) {
+          }
+          this._wheelAcc = 0;
+          this._wheelLastAt = 0;
           if (this.panelEl) {
             this.panelEl.removeEventListener("click", this._onPanelClick);
             this.panelEl.removeEventListener("mousemove", this._onPanelMove);

@@ -680,9 +680,12 @@ var TabSwitcherModal = /** @class */ (function () {
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
         this._onKeyDown = this._onKeyDown.bind(this);
+        this._onWheel = this._onWheel.bind(this);
         this._onBackdropClick = this._onBackdropClick.bind(this);
         this._onPanelClick = this._onPanelClick.bind(this);
         this._onPanelMove = this._onPanelMove.bind(this);
+        this._wheelAcc = 0;
+        this._wheelLastAt = 0;
     }
 
     TabSwitcherModal.prototype.enqueuePreview = function (task) {
@@ -799,6 +802,7 @@ var TabSwitcherModal = /** @class */ (function () {
         this.panelEl.addEventListener('click', this._onPanelClick);
         this.panelEl.addEventListener('mousemove', this._onPanelMove);
         doc.addEventListener('keydown', this._onKeyDown, true);
+        doc.addEventListener('wheel', this._onWheel, { capture: true, passive: false });
 
         this.updateFocus(true);
     };
@@ -1484,6 +1488,50 @@ var TabSwitcherModal = /** @class */ (function () {
         this.updateFocus(false);
     };
 
+    /**
+     * Wheel on mask/toolbar (outside the card grid) → cycle split preview.
+     * Scrolling inside the grid is left alone so the panel can scroll normally.
+     */
+    TabSwitcherModal.prototype._onWheel = function (e) {
+        var doc = this._overlayDoc || getDoc(this.activeLeaf);
+        if (!doc || !doc.body || !doc.body.classList.contains('wpp-mission-control-open')) return;
+        if (doc.body.classList.contains('wpp-tab-switcher-dragging')) return;
+        if (!this.groups || this.groups.length <= 1) return;
+
+        var target = e.target;
+        if (!target || typeof target.closest !== 'function') return;
+
+        // Grid: do not hijack wheel (no tab cycling)
+        if (target.closest('.wpp-tab-switcher-grid')) return;
+
+        var onMask = target.closest(
+            '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint'
+        );
+        if (!onMask) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
+        if (!delta) return;
+        if (e.deltaMode === 1) delta *= 16;
+        else if (e.deltaMode === 2) delta *= 48;
+
+        var now = Date.now();
+        if (now - (this._wheelLastAt || 0) < 90) {
+            this._wheelAcc = (this._wheelAcc || 0) + delta;
+        } else {
+            this._wheelAcc = delta;
+        }
+
+        if (Math.abs(this._wheelAcc) < 28) return;
+
+        var dir = this._wheelAcc > 0 ? 1 : -1;
+        this._wheelAcc = 0;
+        this._wheelLastAt = now;
+        this.shiftSplitGroup(dir);
+    };
+
     TabSwitcherModal.prototype._onKeyDown = function (e) {
         if (e.isComposing) return;
         var key = e.key;
@@ -1577,6 +1625,14 @@ var TabSwitcherModal = /** @class */ (function () {
         try {
             doc.removeEventListener('keydown', this._onKeyDown, true);
         } catch (err) { /* ignore */ }
+        try {
+            doc.removeEventListener('wheel', this._onWheel, { capture: true });
+            // Fallback for browsers that ignore options object identity
+            doc.removeEventListener('wheel', this._onWheel, true);
+        } catch (err2) { /* ignore */ }
+
+        this._wheelAcc = 0;
+        this._wheelLastAt = 0;
 
         if (this.panelEl) {
             this.panelEl.removeEventListener('click', this._onPanelClick);
