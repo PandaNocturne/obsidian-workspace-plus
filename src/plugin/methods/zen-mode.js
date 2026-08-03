@@ -52,6 +52,10 @@ function attachZenModeMethods(WorkspacePlusPlus) {
         return this.data.zenHideInactiveTabs !== false;
     };
 
+    WorkspacePlusPlus.prototype.isStatusBarZenModeEnabled = function () {
+        return this.data.showStatusBarZenMode !== false;
+    };
+
     WorkspacePlusPlus.prototype.applyZenModeClasses = function () {
         var body = getWorkspaceBody(this.app);
         var enabled = this.isZenModeEnabled();
@@ -62,6 +66,7 @@ function attachZenModeMethods(WorkspacePlusPlus) {
         );
         if (enabled) lockZenFocus(this.app);
         else clearZenActiveFlags(body);
+        this.updateZenStatusBar();
     };
 
     WorkspacePlusPlus.prototype.clearZenModeClasses = function () {
@@ -69,6 +74,54 @@ function attachZenModeMethods(WorkspacePlusPlus) {
         body.classList.remove('wpp-zen-mode');
         body.classList.remove('wpp-zen-hide-inactive-tabs');
         clearZenActiveFlags(body);
+        this.updateZenStatusBar();
+    };
+
+    WorkspacePlusPlus.prototype.applyStatusBarZenVisibility = function () {
+        if (!this.zenStatusBarEl) return;
+        var show = this.isStatusBarZenModeEnabled();
+        this.zenStatusBarEl.toggleClass('wpp-zen-status-bar-hidden', !show);
+        this.zenStatusBarEl.style.display = show ? '' : 'none';
+    };
+
+    WorkspacePlusPlus.prototype.setShowStatusBarZenMode = function (enabled, options) {
+        this.data.showStatusBarZenMode = !!enabled;
+        this.applyStatusBarZenVisibility();
+        if (enabled) this.updateZenStatusBar();
+        return persistIfNeeded(this, options);
+    };
+
+    WorkspacePlusPlus.prototype.updateZenStatusBar = function () {
+        var L = i18n.L;
+        if (!this.zenStatusBarEl) return;
+
+        this.applyStatusBarZenVisibility();
+        if (!this.isStatusBarZenModeEnabled()) return;
+
+        var enabled = this.isZenModeEnabled();
+        this.zenStatusBarEl.empty();
+        this.zenStatusBarEl.toggleClass('is-active', enabled);
+        this.zenStatusBarEl.setAttribute(
+            'aria-label',
+            enabled ? L.zenStatusBarDisable : L.zenStatusBarEnable
+        );
+        this.zenStatusBarEl.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+
+        var icon = this.zenStatusBarEl.createSpan({ cls: 'wpp-zen-status-icon' });
+        obsidian.setIcon(icon, 'focus');
+
+        this.zenStatusBarEl.createSpan({
+            text: enabled ? L.zenStatusBarOn : L.zenStatusBarOff,
+            cls: 'wpp-zen-status-label',
+        });
+
+        if (typeof obsidian.setTooltip === 'function') {
+            obsidian.setTooltip(
+                this.zenStatusBarEl,
+                enabled ? L.zenStatusBarDisable : L.zenStatusBarEnable,
+                { delay: 250 }
+            );
+        }
     };
 
     WorkspacePlusPlus.prototype.setZenMode = function (enabled, options) {

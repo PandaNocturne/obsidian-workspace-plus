@@ -10332,7 +10332,15 @@ var require_i18n = __commonJS({
         settingsZenHideInactiveTabs: "Hide inactive tabs in focus mode",
         settingsZenHideInactiveTabsDesc: "When focus mode is on, only show the active tab header in the current group.",
         zenModeEnabled: "Focus tab mode on",
-        zenModeDisabled: "Focus tab mode off"
+        zenModeDisabled: "Focus tab mode off",
+        settingsShowStatusBarWorkspace: "Show workspace status bar",
+        settingsShowStatusBarWorkspaceDesc: "Show the current workspace/session control in the status bar.",
+        settingsShowStatusBarZenMode: "Show focus mode status bar",
+        settingsShowStatusBarZenModeDesc: "Show a status bar control that toggles focus tab mode. It highlights when focus mode is on.",
+        zenStatusBarOn: "Focus",
+        zenStatusBarOff: "Focus",
+        zenStatusBarEnable: "Enable focus tab mode",
+        zenStatusBarDisable: "Disable focus tab mode"
       },
       zh: {
         settingsForkCreditBefore: "\u672C\u63D2\u4EF6\u57FA\u4E8E ",
@@ -10344,7 +10352,15 @@ var require_i18n = __commonJS({
         settingsZenHideInactiveTabs: "\u4E13\u6CE8\u6A21\u5F0F\u4E0B\u9690\u85CF\u975E\u6D3B\u52A8\u6807\u7B7E",
         settingsZenHideInactiveTabsDesc: "\u5F00\u542F\u4E13\u6CE8\u6A21\u5F0F\u65F6\uFF0C\u5F53\u524D\u5206\u7EC4\u4EC5\u663E\u793A\u6D3B\u52A8\u6807\u7B7E\u9875\u6807\u9898\u3002",
         zenModeEnabled: "\u5DF2\u5F00\u542F\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
-        zenModeDisabled: "\u5DF2\u5173\u95ED\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F"
+        zenModeDisabled: "\u5DF2\u5173\u95ED\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
+        settingsShowStatusBarWorkspace: "\u663E\u793A\u72B6\u6001\u680F\u5DE5\u4F5C\u533A\u63A7\u4EF6",
+        settingsShowStatusBarWorkspaceDesc: "\u5728\u72B6\u6001\u680F\u663E\u793A\u5F53\u524D\u5DE5\u4F5C\u533A/\u4F1A\u8BDD\u63A7\u4EF6\u3002",
+        settingsShowStatusBarZenMode: "\u663E\u793A\u72B6\u6001\u680F\u4E13\u6CE8\u6A21\u5F0F\u63A7\u4EF6",
+        settingsShowStatusBarZenModeDesc: "\u5728\u72B6\u6001\u680F\u663E\u793A\u4E13\u6CE8\u6A21\u5F0F\u5F00\u5173\uFF1B\u5F00\u542F\u65F6\u4F1A\u9AD8\u4EAE\u663E\u793A\uFF0C\u70B9\u51FB\u53EF\u5207\u6362\u3002",
+        zenStatusBarOn: "\u4E13\u6CE8",
+        zenStatusBarOff: "\u4E13\u6CE8",
+        zenStatusBarEnable: "\u5F00\u542F\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
+        zenStatusBarDisable: "\u5173\u95ED\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F"
       },
       "zh-TW": {
         settingsForkCreditBefore: "\u672C\u5916\u639B\u57FA\u65BC ",
@@ -10356,7 +10372,15 @@ var require_i18n = __commonJS({
         settingsZenHideInactiveTabs: "\u5C08\u6CE8\u6A21\u5F0F\u4E0B\u96B1\u85CF\u975E\u4F7F\u7528\u4E2D\u5206\u9801",
         settingsZenHideInactiveTabsDesc: "\u958B\u555F\u5C08\u6CE8\u6A21\u5F0F\u6642\uFF0C\u76EE\u524D\u5206\u7D44\u50C5\u986F\u793A\u4F7F\u7528\u4E2D\u5206\u9801\u6A19\u984C\u3002",
         zenModeEnabled: "\u5DF2\u958B\u555F\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F",
-        zenModeDisabled: "\u5DF2\u95DC\u9589\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F"
+        zenModeDisabled: "\u5DF2\u95DC\u9589\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F",
+        settingsShowStatusBarWorkspace: "\u986F\u793A\u72C0\u614B\u5217\u5DE5\u4F5C\u5340\u63A7\u4EF6",
+        settingsShowStatusBarWorkspaceDesc: "\u5728\u72C0\u614B\u5217\u986F\u793A\u76EE\u524D\u5DE5\u4F5C\u5340/\u5DE5\u4F5C\u968E\u6BB5\u63A7\u4EF6\u3002",
+        settingsShowStatusBarZenMode: "\u986F\u793A\u72C0\u614B\u5217\u5C08\u6CE8\u6A21\u5F0F\u63A7\u4EF6",
+        settingsShowStatusBarZenModeDesc: "\u5728\u72C0\u614B\u5217\u986F\u793A\u5C08\u6CE8\u6A21\u5F0F\u958B\u95DC\uFF1B\u958B\u555F\u6642\u6703\u9192\u76EE\u63D0\u793A\uFF0C\u9EDE\u64CA\u53EF\u5207\u63DB\u3002",
+        zenStatusBarOn: "\u5C08\u6CE8",
+        zenStatusBarOff: "\u5C08\u6CE8",
+        zenStatusBarEnable: "\u958B\u555F\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F",
+        zenStatusBarDisable: "\u95DC\u9589\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F"
       },
       ja: {
         settingsForkCreditBefore: "\u672C\u30D7\u30E9\u30B0\u30A4\u30F3\u306F s1m4ne \u6C0F\u306E ",
@@ -10368,7 +10392,15 @@ var require_i18n = __commonJS({
         settingsZenHideInactiveTabs: "\u30D5\u30A9\u30FC\u30AB\u30B9\u6642\u306B\u975E\u30A2\u30AF\u30C6\u30A3\u30D6\u30BF\u30D6\u3092\u96A0\u3059",
         settingsZenHideInactiveTabsDesc: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30E2\u30FC\u30C9\u4E2D\u306F\u3001\u73FE\u5728\u306E\u30B0\u30EB\u30FC\u30D7\u3067\u30A2\u30AF\u30C6\u30A3\u30D6\u306A\u30BF\u30D6\u898B\u51FA\u3057\u306E\u307F\u8868\u793A\u3057\u307E\u3059\u3002",
         zenModeEnabled: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9\u3092\u30AA\u30F3\u306B\u3057\u307E\u3057\u305F",
-        zenModeDisabled: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9\u3092\u30AA\u30D5\u306B\u3057\u307E\u3057\u305F"
+        zenModeDisabled: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9\u3092\u30AA\u30D5\u306B\u3057\u307E\u3057\u305F",
+        settingsShowStatusBarWorkspace: "\u30B9\u30C6\u30FC\u30BF\u30B9\u30D0\u30FC\u306B\u30EF\u30FC\u30AF\u30B9\u30DA\u30FC\u30B9\u3092\u8868\u793A",
+        settingsShowStatusBarWorkspaceDesc: "\u30B9\u30C6\u30FC\u30BF\u30B9\u30D0\u30FC\u306B\u73FE\u5728\u306E\u30EF\u30FC\u30AF\u30B9\u30DA\u30FC\u30B9/\u30BB\u30C3\u30B7\u30E7\u30F3\u64CD\u4F5C\u3092\u8868\u793A\u3057\u307E\u3059\u3002",
+        settingsShowStatusBarZenMode: "\u30B9\u30C6\u30FC\u30BF\u30B9\u30D0\u30FC\u306B\u30D5\u30A9\u30FC\u30AB\u30B9\u5207\u66FF\u3092\u8868\u793A",
+        settingsShowStatusBarZenModeDesc: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9\u3092\u5207\u308A\u66FF\u3048\u308B\u30B9\u30C6\u30FC\u30BF\u30B9\u30D0\u30FC\u9805\u76EE\u3092\u8868\u793A\u3057\u307E\u3059\u3002\u30AA\u30F3\u6642\u306F\u5F37\u8ABF\u8868\u793A\u3055\u308C\u307E\u3059\u3002",
+        zenStatusBarOn: "Focus",
+        zenStatusBarOff: "Focus",
+        zenStatusBarEnable: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9\u3092\u30AA\u30F3",
+        zenStatusBarDisable: "\u30D5\u30A9\u30FC\u30AB\u30B9\u30BF\u30D6\u30E2\u30FC\u30C9\u3092\u30AA\u30D5"
       },
       ko: {
         settingsForkCreditBefore: "\uC774 \uD50C\uB7EC\uADF8\uC778\uC740 s1m4ne\uC758 ",
@@ -10380,7 +10412,15 @@ var require_i18n = __commonJS({
         settingsZenHideInactiveTabs: "\uC9D1\uC911 \uBAA8\uB4DC\uC5D0\uC11C \uBE44\uD65C\uC131 \uD0ED \uC228\uAE30\uAE30",
         settingsZenHideInactiveTabsDesc: "\uC9D1\uC911 \uBAA8\uB4DC\uC5D0\uC11C\uB294 \uD604\uC7AC \uADF8\uB8F9\uC758 \uD65C\uC131 \uD0ED \uD5E4\uB354\uB9CC \uD45C\uC2DC\uD569\uB2C8\uB2E4.",
         zenModeEnabled: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC \uCF1C\uC9D0",
-        zenModeDisabled: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC \uAEBC\uC9D0"
+        zenModeDisabled: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC \uAEBC\uC9D0",
+        settingsShowStatusBarWorkspace: "\uC0C1\uD0DC \uD45C\uC2DC\uC904 \uC6CC\uD06C\uC2A4\uD398\uC774\uC2A4 \uD45C\uC2DC",
+        settingsShowStatusBarWorkspaceDesc: "\uC0C1\uD0DC \uD45C\uC2DC\uC904\uC5D0 \uD604\uC7AC \uC6CC\uD06C\uC2A4\uD398\uC774\uC2A4/\uC138\uC158 \uCEE8\uD2B8\uB864\uC744 \uD45C\uC2DC\uD569\uB2C8\uB2E4.",
+        settingsShowStatusBarZenMode: "\uC0C1\uD0DC \uD45C\uC2DC\uC904 \uC9D1\uC911 \uBAA8\uB4DC \uD45C\uC2DC",
+        settingsShowStatusBarZenModeDesc: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC\uB97C \uC804\uD658\uD558\uB294 \uC0C1\uD0DC \uD45C\uC2DC\uC904 \uD56D\uBAA9\uC744 \uD45C\uC2DC\uD569\uB2C8\uB2E4. \uCF1C\uC838 \uC788\uC744 \uB54C \uAC15\uC870\uB429\uB2C8\uB2E4.",
+        zenStatusBarOn: "\uC9D1\uC911",
+        zenStatusBarOff: "\uC9D1\uC911",
+        zenStatusBarEnable: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC \uCF1C\uAE30",
+        zenStatusBarDisable: "\uC9D1\uC911 \uD0ED \uBAA8\uB4DC \uB044\uAE30"
       }
     };
     var forkCreditLangs = Object.keys(STRINGS);
@@ -14917,6 +14957,22 @@ var require_settings = __commonJS({
                 self.plugin.setRestoreSidebars(value);
               }
             });
+            addToggleSetting(contentEl, {
+              name: L.settingsShowStatusBarWorkspace,
+              desc: L.settingsShowStatusBarWorkspaceDesc,
+              value: self.plugin.isStatusBarWorkspaceEnabled(),
+              onChange: function(value) {
+                self.plugin.setShowStatusBarWorkspace(value);
+              }
+            });
+            addToggleSetting(contentEl, {
+              name: L.settingsShowStatusBarZenMode,
+              desc: L.settingsShowStatusBarZenModeDesc,
+              value: self.plugin.isStatusBarZenModeEnabled(),
+              onChange: function(value) {
+                self.plugin.setShowStatusBarZenMode(value);
+              }
+            });
             new obsidian2.Setting(contentEl).setName(L.settingsTaskViewThumbnailRatio).setDesc(L.settingsTaskViewThumbnailRatioDesc).addDropdown(function(dropdown) {
               dropdown.addOption("16:9", "16:9");
               dropdown.addOption("4:3", "4:3");
@@ -15434,6 +15490,8 @@ var require_default_data = __commonJS({
       taskViewContentZoom: 0.45,
       zenMode: false,
       zenHideInactiveTabs: true,
+      showStatusBarWorkspace: true,
+      showStatusBarZenMode: true,
       statusBarQuickSwitcher: false,
       groupFeatureEnabled: true,
       showFilterInput: false,
@@ -17060,7 +17118,9 @@ var require_persistence = __commonJS({
       "taskViewThumbnailRatio",
       "taskViewContentZoom",
       "zenMode",
-      "zenHideInactiveTabs"
+      "zenHideInactiveTabs",
+      "showStatusBarWorkspace",
+      "showStatusBarZenMode"
     ];
     function joinPath(base, child) {
       return String(base || "").replace(/\/+$/, "") + "/" + child;
@@ -19959,11 +20019,33 @@ var require_session_statusbar = __commonJS({
     "use strict";
     var obsidian2 = require("obsidian");
     var i18n2 = require_i18n();
+    function persistIfNeeded(plugin, options) {
+      options = options || {};
+      if (options.persist === false) return Promise.resolve(true);
+      return plugin.persistData();
+    }
     function attachSessionStatusBarMethods(WorkspacePlusPlus2) {
+      WorkspacePlusPlus2.prototype.isStatusBarWorkspaceEnabled = function() {
+        return this.data.showStatusBarWorkspace !== false;
+      };
+      WorkspacePlusPlus2.prototype.applyStatusBarWorkspaceVisibility = function() {
+        if (!this.statusBarEl) return;
+        var show = this.isStatusBarWorkspaceEnabled();
+        this.statusBarEl.toggleClass("wpp-status-bar-hidden", !show);
+        this.statusBarEl.style.display = show ? "" : "none";
+      };
+      WorkspacePlusPlus2.prototype.setShowStatusBarWorkspace = function(enabled, options) {
+        this.data.showStatusBarWorkspace = !!enabled;
+        this.applyStatusBarWorkspaceVisibility();
+        if (enabled) this.updateStatusBar();
+        return persistIfNeeded(this, options);
+      };
       WorkspacePlusPlus2.prototype.updateStatusBar = function() {
         var L = i18n2.L;
         var session = this.getActiveSession();
         if (!this.statusBarEl) return;
+        this.applyStatusBarWorkspaceVisibility();
+        if (!this.isStatusBarWorkspaceEnabled()) return;
         var showUnsavedHighlight = this.shouldShowUnsavedStatusBarHighlight();
         this.statusBarEl.removeClass("wpp-status-bar-unsaved");
         if (showUnsavedHighlight) {
@@ -21218,6 +21300,9 @@ var require_zen_mode = __commonJS({
       WorkspacePlusPlus2.prototype.isZenHideInactiveTabsEnabled = function() {
         return this.data.zenHideInactiveTabs !== false;
       };
+      WorkspacePlusPlus2.prototype.isStatusBarZenModeEnabled = function() {
+        return this.data.showStatusBarZenMode !== false;
+      };
       WorkspacePlusPlus2.prototype.applyZenModeClasses = function() {
         var body = getWorkspaceBody(this.app);
         var enabled = this.isZenModeEnabled();
@@ -21228,12 +21313,53 @@ var require_zen_mode = __commonJS({
         );
         if (enabled) lockZenFocus(this.app);
         else clearZenActiveFlags(body);
+        this.updateZenStatusBar();
       };
       WorkspacePlusPlus2.prototype.clearZenModeClasses = function() {
         var body = getWorkspaceBody(this.app);
         body.classList.remove("wpp-zen-mode");
         body.classList.remove("wpp-zen-hide-inactive-tabs");
         clearZenActiveFlags(body);
+        this.updateZenStatusBar();
+      };
+      WorkspacePlusPlus2.prototype.applyStatusBarZenVisibility = function() {
+        if (!this.zenStatusBarEl) return;
+        var show = this.isStatusBarZenModeEnabled();
+        this.zenStatusBarEl.toggleClass("wpp-zen-status-bar-hidden", !show);
+        this.zenStatusBarEl.style.display = show ? "" : "none";
+      };
+      WorkspacePlusPlus2.prototype.setShowStatusBarZenMode = function(enabled, options) {
+        this.data.showStatusBarZenMode = !!enabled;
+        this.applyStatusBarZenVisibility();
+        if (enabled) this.updateZenStatusBar();
+        return persistIfNeeded(this, options);
+      };
+      WorkspacePlusPlus2.prototype.updateZenStatusBar = function() {
+        var L = i18n2.L;
+        if (!this.zenStatusBarEl) return;
+        this.applyStatusBarZenVisibility();
+        if (!this.isStatusBarZenModeEnabled()) return;
+        var enabled = this.isZenModeEnabled();
+        this.zenStatusBarEl.empty();
+        this.zenStatusBarEl.toggleClass("is-active", enabled);
+        this.zenStatusBarEl.setAttribute(
+          "aria-label",
+          enabled ? L.zenStatusBarDisable : L.zenStatusBarEnable
+        );
+        this.zenStatusBarEl.setAttribute("aria-pressed", enabled ? "true" : "false");
+        var icon = this.zenStatusBarEl.createSpan({ cls: "wpp-zen-status-icon" });
+        obsidian2.setIcon(icon, "focus");
+        this.zenStatusBarEl.createSpan({
+          text: enabled ? L.zenStatusBarOn : L.zenStatusBarOff,
+          cls: "wpp-zen-status-label"
+        });
+        if (typeof obsidian2.setTooltip === "function") {
+          obsidian2.setTooltip(
+            this.zenStatusBarEl,
+            enabled ? L.zenStatusBarDisable : L.zenStatusBarEnable,
+            { delay: 250 }
+          );
+        }
       };
       WorkspacePlusPlus2.prototype.setZenMode = function(enabled, options) {
         options = options || {};
@@ -21319,11 +21445,24 @@ var require_statusbar_controller = __commonJS({
       plugin.statusBarEl.addClass("wpp-status-bar");
       plugin.statusBarEl.addEventListener("click", function(evt) {
         if (evt.button !== 0) return;
+        if (!plugin.isStatusBarWorkspaceEnabled()) return;
         evt.preventDefault();
         evt.stopPropagation();
         new modals2.SessionManagerModal(plugin.app, plugin).open();
       });
       plugin.updateStatusBar();
+      plugin.zenStatusBarEl = plugin.addStatusBarItem();
+      plugin.zenStatusBarEl.addClass("wpp-zen-status-bar");
+      plugin.zenStatusBarEl.setAttribute("role", "button");
+      plugin.zenStatusBarEl.setAttribute("tabindex", "0");
+      plugin.zenStatusBarEl.addEventListener("click", function(evt) {
+        if (evt.button !== 0) return;
+        if (!plugin.isStatusBarZenModeEnabled()) return;
+        evt.preventDefault();
+        evt.stopPropagation();
+        plugin.toggleZenMode({ notify: false });
+      });
+      plugin.updateZenStatusBar();
       return plugin.statusBarEl;
     }
     module2.exports = {

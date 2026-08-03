@@ -105,6 +105,24 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
                 },
             });
 
+            addToggleSetting(contentEl, {
+                name: L.settingsShowStatusBarWorkspace,
+                desc: L.settingsShowStatusBarWorkspaceDesc,
+                value: self.plugin.isStatusBarWorkspaceEnabled(),
+                onChange: function (value) {
+                    self.plugin.setShowStatusBarWorkspace(value);
+                },
+            });
+
+            addToggleSetting(contentEl, {
+                name: L.settingsShowStatusBarZenMode,
+                desc: L.settingsShowStatusBarZenModeDesc,
+                value: self.plugin.isStatusBarZenModeEnabled(),
+                onChange: function (value) {
+                    self.plugin.setShowStatusBarZenMode(value);
+                },
+            });
+
             new obsidian.Setting(contentEl)
                 .setName(L.settingsTaskViewThumbnailRatio)
                 .setDesc(L.settingsTaskViewThumbnailRatioDesc)

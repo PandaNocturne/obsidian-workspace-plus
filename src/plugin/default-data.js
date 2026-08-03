@@ -18,6 +18,8 @@ module.exports = {
     taskViewContentZoom: 0.45,
     zenMode: false,
     zenHideInactiveTabs: true,
+    showStatusBarWorkspace: true,
+    showStatusBarZenMode: true,
     statusBarQuickSwitcher: false,
     groupFeatureEnabled: true,
     showFilterInput: false,

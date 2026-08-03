@@ -62,6 +62,8 @@ var SETTINGS_KEYS = [
     'taskViewContentZoom',
     'zenMode',
     'zenHideInactiveTabs',
+    'showStatusBarWorkspace',
+    'showStatusBarZenMode',
 ];
 
 function joinPath(base, child) {
