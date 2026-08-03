@@ -25,6 +25,12 @@ function attachSessionStartupMethods(WorkspacePlusPlus) {
             self.startupSettleStartedAt = 0;
             self.startupSettleUntil = 0;
             self.startupSettleTimer = null;
+            // Layout is stable — re-lock zen focus (activeLeaf may have been sidebar earlier)
+            if (typeof self.scheduleZenModeRefresh === 'function') {
+                self.scheduleZenModeRefresh(0);
+            } else if (typeof self.applyZenModeClasses === 'function') {
+                self.applyZenModeClasses();
+            }
         }, nextDeadline - Date.now());
         return this.startupSettleUntil;
     };

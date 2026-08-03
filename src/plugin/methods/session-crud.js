@@ -29,6 +29,7 @@ function attachSessionCrudMethods(WorkspacePlusPlus) {
             name: name,
             modified: typeof options.modified === 'number' ? options.modified : Date.now(),
             layout: layout,
+            zenMode: !!options.zenMode,
         };
         if (options.isDefault) {
             record.isDefault = true;
@@ -42,6 +43,7 @@ function attachSessionCrudMethods(WorkspacePlusPlus) {
 
         this.insertSessionAndActivate(this.createSessionRecord(id, name, layout));
 
+        this.applyZenModeClasses();
         this.updateStatusBar();
         this.syncSessionCommands();
         return this.persistData();
@@ -83,6 +85,8 @@ function attachSessionCrudMethods(WorkspacePlusPlus) {
         var self = this;
         return applyNextLayout
             .then(function () {
+                self.applyZenModeClasses();
+                self.scheduleZenModeRefresh(80);
                 return self.persistData();
             })
             .then(function () { return true; });
@@ -158,6 +162,8 @@ function attachSessionCrudMethods(WorkspacePlusPlus) {
         var self = this;
         return applyNextLayout
             .then(function () {
+                self.applyZenModeClasses();
+                self.scheduleZenModeRefresh(80);
                 return self.persistData();
             })
             .then(function () { return true; });
@@ -357,7 +363,8 @@ function attachSessionCrudMethods(WorkspacePlusPlus) {
         var copy = this.createSessionRecord(
             newId,
             name,
-            layoutUtils.cloneLayout(source.layout)
+            layoutUtils.cloneLayout(source.layout),
+            { zenMode: !!source.zenMode }
         );
         if (source.note) {
             copy.note = source.note;

@@ -19,22 +19,73 @@ function clearZenActiveFlags(body) {
     }
 }
 
+function isLeafInRootSplit(app, leaf) {
+    if (!app || !app.workspace || !leaf || typeof leaf.getRoot !== 'function') return false;
+    try {
+        return leaf.getRoot() === app.workspace.rootSplit;
+    } catch (err) {
+        return false;
+    }
+}
+
+/** Prefer the editor leaf in rootSplit — activeLeaf is often still a sidebar on cold start. */
+function getZenFocusLeaf(app) {
+    var workspace = app && app.workspace;
+    if (!workspace) return null;
+
+    var active = workspace.activeLeaf;
+    if (isLeafInRootSplit(app, active)) return active;
+
+    if (typeof workspace.getMostRecentLeaf === 'function') {
+        try {
+            var recent = workspace.getMostRecentLeaf(workspace.rootSplit);
+            if (isLeafInRootSplit(app, recent)) return recent;
+            // Some builds ignore the root hint — still accept if result is in root
+            recent = workspace.getMostRecentLeaf();
+            if (isLeafInRootSplit(app, recent)) return recent;
+        } catch (err) { /* ignore */ }
+    }
+
+    var found = null;
+    if (typeof workspace.iterateRootLeaves === 'function') {
+        try {
+            workspace.iterateRootLeaves(function (leaf) {
+                if (!found && leaf) found = leaf;
+            });
+        } catch (err2) { /* ignore */ }
+    }
+    return found;
+}
+
+/** Walk up to the WorkspaceTabs container that owns this leaf. */
+function getLeafTabsContainerEl(leaf) {
+    var node = leaf && leaf.parent;
+    var depth = 0;
+    while (node && depth < 8) {
+        var el = node.containerEl;
+        if (el && el.classList) {
+            if (el.classList.contains('workspace-tabs')) return el;
+            if (typeof node.selectTab === 'function'
+                || typeof node.selectTabIndex === 'function'
+                || node.type === 'tabs') {
+                return el;
+            }
+        }
+        node = node.parent;
+        depth += 1;
+    }
+    return (leaf && leaf.parent && leaf.parent.containerEl) || null;
+}
+
 function lockZenFocus(app) {
     var body = getWorkspaceBody(app);
     clearZenActiveFlags(body);
 
-    var leaf = app && app.workspace && app.workspace.activeLeaf;
-    if (!leaf || typeof leaf.getRoot !== 'function') return;
-    try {
-        if (leaf.getRoot() !== app.workspace.rootSplit) return;
-    } catch (err) {
-        return;
-    }
+    var leaf = getZenFocusLeaf(app);
+    if (!leaf) return;
 
-    var parent = leaf.parent;
-    if (parent && parent.containerEl) {
-        parent.containerEl.classList.add('wpp-zen-active');
-    }
+    var tabsEl = getLeafTabsContainerEl(leaf);
+    if (tabsEl) tabsEl.classList.add('wpp-zen-active');
 }
 
 function persistIfNeeded(plugin, options) {
@@ -44,8 +95,49 @@ function persistIfNeeded(plugin, options) {
 }
 
 function attachZenModeMethods(WorkspacePlusPlus) {
+    /** One-time: move legacy global data.zenMode onto the active session. */
+    WorkspacePlusPlus.prototype.migrateZenModeToSessions = function () {
+        var sessions = this.data && this.data.sessions;
+        if (!sessions || typeof sessions !== 'object') return false;
+
+        var ids = Object.keys(sessions);
+        var hadPerSessionFlag = false;
+        for (var i = 0; i < ids.length; i++) {
+            var session = sessions[ids[i]];
+            if (!session || typeof session !== 'object') continue;
+            if (Object.prototype.hasOwnProperty.call(session, 'zenMode')) {
+                hadPerSessionFlag = true;
+                session.zenMode = !!session.zenMode;
+            } else {
+                session.zenMode = false;
+            }
+        }
+
+        var legacyGlobal = !!this.data.zenMode;
+        if (!hadPerSessionFlag && legacyGlobal) {
+            var active = this.getActiveSession && this.getActiveSession();
+            if (active) active.zenMode = true;
+        }
+
+        // Global flag no longer drives UI (kept cleared to avoid resurrecting on load)
+        this.data.zenMode = false;
+        return legacyGlobal || hadPerSessionFlag;
+    };
+
+    WorkspacePlusPlus.prototype.getActiveSessionZenMode = function () {
+        var session = this.getActiveSession && this.getActiveSession();
+        return !!(session && session.zenMode);
+    };
+
+    WorkspacePlusPlus.prototype.setActiveSessionZenMode = function (enabled) {
+        var session = this.getActiveSession && this.getActiveSession();
+        if (session) session.zenMode = !!enabled;
+        this.data.zenMode = !!enabled;
+        return !!enabled;
+    };
+
     WorkspacePlusPlus.prototype.isZenModeEnabled = function () {
-        return !!this.data.zenMode;
+        return this.getActiveSessionZenMode();
     };
 
     WorkspacePlusPlus.prototype.isZenHideInactiveTabsEnabled = function () {
@@ -126,7 +218,7 @@ function attachZenModeMethods(WorkspacePlusPlus) {
 
     WorkspacePlusPlus.prototype.setZenMode = function (enabled, options) {
         options = options || {};
-        this.data.zenMode = !!enabled;
+        this.setActiveSessionZenMode(enabled);
         this.applyZenModeClasses();
         if (options.notify) {
             new obsidian.Notice(
@@ -149,6 +241,31 @@ function attachZenModeMethods(WorkspacePlusPlus) {
     WorkspacePlusPlus.prototype.refreshZenModeFocus = function () {
         if (!this.isZenModeEnabled()) return;
         lockZenFocus(this.app);
+    };
+
+    /** Re-apply after workspace DOM settles (cold start / session restore). */
+    WorkspacePlusPlus.prototype.scheduleZenModeRefresh = function (delayMs) {
+        var self = this;
+        var delay = typeof delayMs === 'number' && delayMs >= 0 ? delayMs : 0;
+        if (!this._zenRefreshTimers) this._zenRefreshTimers = [];
+        var timer = setTimeout(function () {
+            if (self._zenRefreshTimers) {
+                self._zenRefreshTimers = self._zenRefreshTimers.filter(function (t) {
+                    return t !== timer;
+                });
+            }
+            if (!self.isZenModeEnabled()) return;
+            self.applyZenModeClasses();
+        }, delay);
+        this._zenRefreshTimers.push(timer);
+    };
+
+    WorkspacePlusPlus.prototype.clearZenModeRefreshTimers = function () {
+        var timers = this._zenRefreshTimers || [];
+        for (var i = 0; i < timers.length; i++) {
+            clearTimeout(timers[i]);
+        }
+        this._zenRefreshTimers = [];
     };
 }
 

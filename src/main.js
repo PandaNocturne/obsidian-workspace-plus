@@ -31,6 +31,7 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
             if (!self.data.sessionOrder) self.data.sessionOrder = [];
 
             self.normalizeGroupFeatureState();
+            self.migrateZenModeToSessions();
             self.isSwitchingSession = false;
             self.pendingSwitchRequest = null;
             self.switchLockAt = 0;
@@ -85,11 +86,17 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
                 self.registerFrontmatterListeners();
                 self.scheduleStartupSessionStorageChecks();
                 self.applyZenModeClasses();
+                // Cold start: activeLeaf / tab headers often settle a beat later
+                self.scheduleZenModeRefresh(50);
+                self.scheduleZenModeRefresh(400);
             });
         });
     };
 
     WorkspacePlusPlus.prototype.onunload = function () {
+        if (typeof this.clearZenModeRefreshTimers === 'function') {
+            this.clearZenModeRefreshTimers();
+        }
         this.clearZenModeClasses();
         this.stopHistorySnapshotTimer();
         this.hideSwitchOverlay();

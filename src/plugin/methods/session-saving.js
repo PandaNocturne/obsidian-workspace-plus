@@ -251,6 +251,7 @@ function attachSessionSavingMethods(WorkspacePlusPlus) {
 
         this.updateStatusBar();
         this.syncSessionCommands();
+        this.applyZenModeClasses();
 
         return this.persistData().then(function () {
             if (!options.silent) {
@@ -301,8 +302,11 @@ function attachSessionSavingMethods(WorkspacePlusPlus) {
             ? this.applyWorkspaceLayout(session.layout)
             : Promise.resolve();
         var name = session.name;
+        var self = this;
 
         return applyLayout.then(function () {
+            self.applyZenModeClasses();
+            self.scheduleZenModeRefresh(80);
             if (!options.silent) {
                 new obsidian.Notice(L.reloadedSession(name));
             }

@@ -60,7 +60,6 @@ var SETTINGS_KEYS = [
     'restoreSidebars',
     'taskViewThumbnailRatio',
     'taskViewContentZoom',
-    'zenMode',
     'zenHideInactiveTabs',
     'showStatusBarWorkspace',
     'showStatusBarZenMode',

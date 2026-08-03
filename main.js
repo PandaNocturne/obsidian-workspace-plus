@@ -10328,7 +10328,7 @@ var require_i18n = __commonJS({
         settingsForkCreditLink: "Workspace++",
         cmdToggleZenMode: "Toggle focus tab mode",
         settingsZenMode: "Focus tab mode",
-        settingsZenModeDesc: "Hide inactive tab groups and maximize the active split (like Vertical Tabs zen mode).",
+        settingsZenModeDesc: "Per workspace: hide inactive tab groups and maximize the active split (like Vertical Tabs zen mode).",
         settingsZenHideInactiveTabs: "Hide inactive tabs in focus mode",
         settingsZenHideInactiveTabsDesc: "When focus mode is on, only show the active tab header in the current group.",
         zenModeEnabled: "Focus tab mode on",
@@ -10348,7 +10348,7 @@ var require_i18n = __commonJS({
         settingsForkCreditLink: "Workspace++",
         cmdToggleZenMode: "\u5207\u6362\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
         settingsZenMode: "\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
-        settingsZenModeDesc: "\u9690\u85CF\u5176\u4ED6\u5206\u680F\u6807\u7B7E\u7EC4\uFF0C\u653E\u5927\u5F53\u524D\u5206\u680F\uFF08\u53C2\u8003 Vertical Tabs \u7684 Zen mode\uFF09\u3002",
+        settingsZenModeDesc: "\u6309\u5DE5\u4F5C\u533A\u5206\u522B\u8BB0\u5F55\uFF1A\u9690\u85CF\u5176\u4ED6\u5206\u680F\u6807\u7B7E\u7EC4\uFF0C\u653E\u5927\u5F53\u524D\u5206\u680F\uFF08\u53C2\u8003 Vertical Tabs \u7684 Zen mode\uFF09\u3002",
         settingsZenHideInactiveTabs: "\u4E13\u6CE8\u6A21\u5F0F\u4E0B\u9690\u85CF\u975E\u6D3B\u52A8\u6807\u7B7E",
         settingsZenHideInactiveTabsDesc: "\u5F00\u542F\u4E13\u6CE8\u6A21\u5F0F\u65F6\uFF0C\u5F53\u524D\u5206\u7EC4\u4EC5\u663E\u793A\u6D3B\u52A8\u6807\u7B7E\u9875\u6807\u9898\u3002",
         zenModeEnabled: "\u5DF2\u5F00\u542F\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
@@ -15620,6 +15620,7 @@ var require_default_data = __commonJS({
       restoreSidebars: true,
       taskViewThumbnailRatio: "4:3",
       taskViewContentZoom: 0.45,
+      // zenMode is per-session (session.zenMode); kept here only for one-time migration
       zenMode: false,
       zenHideInactiveTabs: true,
       showStatusBarWorkspace: true,
@@ -17249,7 +17250,6 @@ var require_persistence = __commonJS({
       "restoreSidebars",
       "taskViewThumbnailRatio",
       "taskViewContentZoom",
-      "zenMode",
       "zenHideInactiveTabs",
       "showStatusBarWorkspace",
       "showStatusBarZenMode"
@@ -19503,7 +19503,8 @@ var require_session_crud = __commonJS({
           id,
           name,
           modified: typeof options.modified === "number" ? options.modified : Date.now(),
-          layout
+          layout,
+          zenMode: !!options.zenMode
         };
         if (options.isDefault) {
           record.isDefault = true;
@@ -19514,6 +19515,7 @@ var require_session_crud = __commonJS({
         var id = utils.generateId();
         var layout = this.getCurrentWorkspaceLayout();
         this.insertSessionAndActivate(this.createSessionRecord(id, name, layout));
+        this.applyZenModeClasses();
         this.updateStatusBar();
         this.syncSessionCommands();
         return this.persistData();
@@ -19544,6 +19546,8 @@ var require_session_crud = __commonJS({
         this.syncSessionCommands();
         var self = this;
         return applyNextLayout.then(function() {
+          self.applyZenModeClasses();
+          self.scheduleZenModeRefresh(80);
           return self.persistData();
         }).then(function() {
           return true;
@@ -19602,6 +19606,8 @@ var require_session_crud = __commonJS({
         this.syncSessionCommands();
         var self = this;
         return applyNextLayout.then(function() {
+          self.applyZenModeClasses();
+          self.scheduleZenModeRefresh(80);
           return self.persistData();
         }).then(function() {
           return true;
@@ -19781,7 +19787,8 @@ var require_session_crud = __commonJS({
         var copy = this.createSessionRecord(
           newId,
           name,
-          layoutUtils.cloneLayout(source.layout)
+          layoutUtils.cloneLayout(source.layout),
+          { zenMode: !!source.zenMode }
         );
         if (source.note) {
           copy.note = source.note;
@@ -20037,6 +20044,7 @@ var require_session_saving = __commonJS({
         }
         this.updateStatusBar();
         this.syncSessionCommands();
+        this.applyZenModeClasses();
         return this.persistData().then(function() {
           if (!options.silent) {
             new obsidian2.Notice(L.savedAs(sessionName));
@@ -20080,7 +20088,10 @@ var require_session_saving = __commonJS({
         }
         var applyLayout = session.layout ? this.applyWorkspaceLayout(session.layout) : Promise.resolve();
         var name = session.name;
+        var self = this;
         return applyLayout.then(function() {
+          self.applyZenModeClasses();
+          self.scheduleZenModeRefresh(80);
           if (!options.silent) {
             new obsidian2.Notice(L.reloadedSession(name));
           }
@@ -20232,6 +20243,11 @@ var require_session_startup = __commonJS({
           self.startupSettleStartedAt = 0;
           self.startupSettleUntil = 0;
           self.startupSettleTimer = null;
+          if (typeof self.scheduleZenModeRefresh === "function") {
+            self.scheduleZenModeRefresh(0);
+          } else if (typeof self.applyZenModeClasses === "function") {
+            self.applyZenModeClasses();
+          }
         }, nextDeadline - Date.now());
         return this.startupSettleUntil;
       };
@@ -20507,14 +20523,21 @@ var require_session_switching = __commonJS({
         if (target.id === this.data.activeSessionId) return Promise.resolve(false);
         var performSwitch = function(skipCurrentSave) {
           var current = self.getActiveSession();
-          if (current && !skipCurrentSave) {
-            self.pushLayoutToHistory(current);
-            current.layout = self.getCurrentWorkspaceLayout();
-            current.modified = Date.now();
+          if (current) {
+            current.zenMode = self.isZenModeEnabled();
+            if (!skipCurrentSave) {
+              self.pushLayoutToHistory(current);
+              current.layout = self.getCurrentWorkspaceLayout();
+              current.modified = Date.now();
+            }
           }
+          self.clearZenModeClasses();
           self.data.activeSessionId = targetId;
           var applyLayout = target.layout ? self.applyWorkspaceLayout(target.layout) : Promise.resolve();
           return applyLayout.then(function() {
+            self.applyZenModeClasses();
+            self.scheduleZenModeRefresh(50);
+            self.scheduleZenModeRefresh(300);
             self.updateStatusBar();
             return self.persistData();
           }).then(function() {
@@ -20919,6 +20942,10 @@ var require_history = __commonJS({
         var isActive = session.id === this.data.activeSessionId;
         var applyLayout = isActive && session.layout ? this.applyWorkspaceLayout(session.layout) : Promise.resolve();
         return applyLayout.then(function() {
+          if (isActive) {
+            self.applyZenModeClasses();
+            self.scheduleZenModeRefresh(80);
+          }
           self.updateStatusBar();
           return self.persistData();
         }).then(function() {
@@ -21405,20 +21432,62 @@ var require_zen_mode = __commonJS({
         marked[i].classList.remove("wpp-zen-active");
       }
     }
+    function isLeafInRootSplit(app, leaf) {
+      if (!app || !app.workspace || !leaf || typeof leaf.getRoot !== "function") return false;
+      try {
+        return leaf.getRoot() === app.workspace.rootSplit;
+      } catch (err) {
+        return false;
+      }
+    }
+    function getZenFocusLeaf(app) {
+      var workspace = app && app.workspace;
+      if (!workspace) return null;
+      var active = workspace.activeLeaf;
+      if (isLeafInRootSplit(app, active)) return active;
+      if (typeof workspace.getMostRecentLeaf === "function") {
+        try {
+          var recent = workspace.getMostRecentLeaf(workspace.rootSplit);
+          if (isLeafInRootSplit(app, recent)) return recent;
+          recent = workspace.getMostRecentLeaf();
+          if (isLeafInRootSplit(app, recent)) return recent;
+        } catch (err) {
+        }
+      }
+      var found = null;
+      if (typeof workspace.iterateRootLeaves === "function") {
+        try {
+          workspace.iterateRootLeaves(function(leaf) {
+            if (!found && leaf) found = leaf;
+          });
+        } catch (err2) {
+        }
+      }
+      return found;
+    }
+    function getLeafTabsContainerEl(leaf) {
+      var node = leaf && leaf.parent;
+      var depth = 0;
+      while (node && depth < 8) {
+        var el = node.containerEl;
+        if (el && el.classList) {
+          if (el.classList.contains("workspace-tabs")) return el;
+          if (typeof node.selectTab === "function" || typeof node.selectTabIndex === "function" || node.type === "tabs") {
+            return el;
+          }
+        }
+        node = node.parent;
+        depth += 1;
+      }
+      return leaf && leaf.parent && leaf.parent.containerEl || null;
+    }
     function lockZenFocus(app) {
       var body = getWorkspaceBody(app);
       clearZenActiveFlags(body);
-      var leaf = app && app.workspace && app.workspace.activeLeaf;
-      if (!leaf || typeof leaf.getRoot !== "function") return;
-      try {
-        if (leaf.getRoot() !== app.workspace.rootSplit) return;
-      } catch (err) {
-        return;
-      }
-      var parent = leaf.parent;
-      if (parent && parent.containerEl) {
-        parent.containerEl.classList.add("wpp-zen-active");
-      }
+      var leaf = getZenFocusLeaf(app);
+      if (!leaf) return;
+      var tabsEl = getLeafTabsContainerEl(leaf);
+      if (tabsEl) tabsEl.classList.add("wpp-zen-active");
     }
     function persistIfNeeded(plugin, options) {
       options = options || {};
@@ -21426,8 +21495,41 @@ var require_zen_mode = __commonJS({
       return plugin.persistData();
     }
     function attachZenModeMethods(WorkspacePlusPlus2) {
+      WorkspacePlusPlus2.prototype.migrateZenModeToSessions = function() {
+        var sessions = this.data && this.data.sessions;
+        if (!sessions || typeof sessions !== "object") return false;
+        var ids = Object.keys(sessions);
+        var hadPerSessionFlag = false;
+        for (var i = 0; i < ids.length; i++) {
+          var session = sessions[ids[i]];
+          if (!session || typeof session !== "object") continue;
+          if (Object.prototype.hasOwnProperty.call(session, "zenMode")) {
+            hadPerSessionFlag = true;
+            session.zenMode = !!session.zenMode;
+          } else {
+            session.zenMode = false;
+          }
+        }
+        var legacyGlobal = !!this.data.zenMode;
+        if (!hadPerSessionFlag && legacyGlobal) {
+          var active = this.getActiveSession && this.getActiveSession();
+          if (active) active.zenMode = true;
+        }
+        this.data.zenMode = false;
+        return legacyGlobal || hadPerSessionFlag;
+      };
+      WorkspacePlusPlus2.prototype.getActiveSessionZenMode = function() {
+        var session = this.getActiveSession && this.getActiveSession();
+        return !!(session && session.zenMode);
+      };
+      WorkspacePlusPlus2.prototype.setActiveSessionZenMode = function(enabled) {
+        var session = this.getActiveSession && this.getActiveSession();
+        if (session) session.zenMode = !!enabled;
+        this.data.zenMode = !!enabled;
+        return !!enabled;
+      };
       WorkspacePlusPlus2.prototype.isZenModeEnabled = function() {
-        return !!this.data.zenMode;
+        return this.getActiveSessionZenMode();
       };
       WorkspacePlusPlus2.prototype.isZenHideInactiveTabsEnabled = function() {
         return this.data.zenHideInactiveTabs !== false;
@@ -21495,7 +21597,7 @@ var require_zen_mode = __commonJS({
       };
       WorkspacePlusPlus2.prototype.setZenMode = function(enabled, options) {
         options = options || {};
-        this.data.zenMode = !!enabled;
+        this.setActiveSessionZenMode(enabled);
         this.applyZenModeClasses();
         if (options.notify) {
           new obsidian2.Notice(
@@ -21515,6 +21617,28 @@ var require_zen_mode = __commonJS({
       WorkspacePlusPlus2.prototype.refreshZenModeFocus = function() {
         if (!this.isZenModeEnabled()) return;
         lockZenFocus(this.app);
+      };
+      WorkspacePlusPlus2.prototype.scheduleZenModeRefresh = function(delayMs) {
+        var self = this;
+        var delay = typeof delayMs === "number" && delayMs >= 0 ? delayMs : 0;
+        if (!this._zenRefreshTimers) this._zenRefreshTimers = [];
+        var timer = setTimeout(function() {
+          if (self._zenRefreshTimers) {
+            self._zenRefreshTimers = self._zenRefreshTimers.filter(function(t) {
+              return t !== timer;
+            });
+          }
+          if (!self.isZenModeEnabled()) return;
+          self.applyZenModeClasses();
+        }, delay);
+        this._zenRefreshTimers.push(timer);
+      };
+      WorkspacePlusPlus2.prototype.clearZenModeRefreshTimers = function() {
+        var timers = this._zenRefreshTimers || [];
+        for (var i = 0; i < timers.length; i++) {
+          clearTimeout(timers[i]);
+        }
+        this._zenRefreshTimers = [];
       };
     }
     module2.exports = attachZenModeMethods;
@@ -21628,6 +21752,7 @@ var WorkspacePlusPlus = (
         if (!self.data.sessions) self.data.sessions = {};
         if (!self.data.sessionOrder) self.data.sessionOrder = [];
         self.normalizeGroupFeatureState();
+        self.migrateZenModeToSessions();
         self.isSwitchingSession = false;
         self.pendingSwitchRequest = null;
         self.switchLockAt = 0;
@@ -21672,10 +21797,15 @@ var WorkspacePlusPlus = (
           self.registerFrontmatterListeners();
           self.scheduleStartupSessionStorageChecks();
           self.applyZenModeClasses();
+          self.scheduleZenModeRefresh(50);
+          self.scheduleZenModeRefresh(400);
         });
       });
     };
     WorkspacePlusPlus2.prototype.onunload = function() {
+      if (typeof this.clearZenModeRefreshTimers === "function") {
+        this.clearZenModeRefreshTimers();
+      }
       this.clearZenModeClasses();
       this.stopHistorySnapshotTimer();
       this.hideSwitchOverlay();

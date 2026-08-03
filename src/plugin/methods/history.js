@@ -405,6 +405,10 @@ function attachHistoryMethods(WorkspacePlusPlus) {
             : Promise.resolve();
 
         return applyLayout.then(function () {
+            if (isActive) {
+                self.applyZenModeClasses();
+                self.scheduleZenModeRefresh(80);
+            }
             self.updateStatusBar();
             return self.persistData();
         }).then(function () {

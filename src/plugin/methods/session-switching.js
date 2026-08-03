@@ -257,23 +257,33 @@ function attachSessionSwitchingMethods(WorkspacePlusPlus) {
         if (target.id === this.data.activeSessionId) return Promise.resolve(false);
 
         var performSwitch = function (skipCurrentSave) {
-            // 1. Save current session state
+            // 1. Save current session state (layout + per-session zen)
             var current = self.getActiveSession();
-            if (current && !skipCurrentSave) {
-                self.pushLayoutToHistory(current);
-                current.layout = self.getCurrentWorkspaceLayout();
-                current.modified = Date.now();
+            if (current) {
+                current.zenMode = self.isZenModeEnabled();
+                if (!skipCurrentSave) {
+                    self.pushLayoutToHistory(current);
+                    current.layout = self.getCurrentWorkspaceLayout();
+                    current.modified = Date.now();
+                }
             }
+
+            // Clear zen UI before layout swap — avoids blank page when target has zen off
+            // or when focus flags from the previous layout no longer match.
+            self.clearZenModeClasses();
 
             // 2. Update active
             self.data.activeSessionId = targetId;
 
-            // 3. Apply target layout
+            // 3. Apply target layout, then restore that session's zen state
             var applyLayout = target.layout
                 ? self.applyWorkspaceLayout(target.layout)
                 : Promise.resolve();
 
             return applyLayout.then(function () {
+                self.applyZenModeClasses();
+                self.scheduleZenModeRefresh(50);
+                self.scheduleZenModeRefresh(300);
                 self.updateStatusBar();
                 return self.persistData();
             }).then(function () {
