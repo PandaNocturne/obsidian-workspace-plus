@@ -543,6 +543,54 @@ function collectGroupLeaves(app) {
     return { group: group, leaves: leaves, active: active };
 }
 
+function isTabGroupNode(node) {
+    return !!(node
+        && Array.isArray(node.children)
+        && (typeof node.selectTab === 'function'
+            || typeof node.selectTabIndex === 'function'
+            || node.type === 'tabs'));
+}
+
+/** All editor tab groups under rootSplit (left-to-right / tree order). */
+function collectRootTabGroups(app) {
+    var groups = [];
+    var root = app && app.workspace && app.workspace.rootSplit;
+    if (!root) return groups;
+
+    function walk(node) {
+        if (!node) return;
+        if (isTabGroupNode(node)) {
+            groups.push(node);
+            return;
+        }
+        if (!Array.isArray(node.children)) return;
+        for (var i = 0; i < node.children.length; i++) {
+            walk(node.children[i]);
+        }
+    }
+
+    walk(root);
+    return groups;
+}
+
+function pickLeafInGroup(app, group, preferred) {
+    var leaves = collectLeavesFromGroup(group);
+    if (!leaves.length) return null;
+    if (preferred && leaves.indexOf(preferred) >= 0) return preferred;
+
+    var active = getActiveLeaf(app);
+    if (active && leaves.indexOf(active) >= 0) return active;
+
+    try {
+        if (group && typeof group.currentTab === 'number' && group.children) {
+            var cur = group.children[group.currentTab];
+            if (isWorkspaceLeaf(cur)) return cur;
+        }
+    } catch (err) { /* ignore */ }
+
+    return leaves[0] || null;
+}
+
 function isLeafPinned(leaf) {
     if (!leaf) return false;
     if (typeof leaf.pinned === 'boolean') return leaf.pinned;
@@ -596,7 +644,7 @@ function moveLeafInParent(parent, fromIndex, toIndex) {
 function removeOverlayDom(doc) {
     if (!doc || !doc.body) return;
     var nodes = doc.body.querySelectorAll(
-        '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-drag-clone'
+        '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-drag-clone'
     );
     for (var i = 0; i < nodes.length; i++) {
         try { nodes[i].remove(); } catch (err) { /* ignore */ }
@@ -620,6 +668,8 @@ var TabSwitcherModal = /** @class */ (function () {
         this.plugin = plugin;
         this.leaves = [];
         this.group = null;
+        this.groups = [];
+        this.groupIndex = 0;
         this.cardEls = [];
         this.focusedIndex = 0;
         // Stagger heavy embeds (Canvas) so opening task view does not mount them all at once
@@ -685,9 +735,17 @@ var TabSwitcherModal = /** @class */ (function () {
             return;
         }
 
-        this.group = collected.group;
-        this.leaves = collected.leaves.slice();
-        this.activeLeaf = collected.active;
+        this.groups = collectRootTabGroups(this.app);
+        if (!this.groups.length && collected.group) {
+            this.groups = [collected.group];
+        }
+        this.groupIndex = collected.group ? this.groups.indexOf(collected.group) : 0;
+        if (this.groupIndex < 0) this.groupIndex = 0;
+
+        this.group = this.groups[this.groupIndex] || collected.group;
+        this.leaves = collectLeavesFromGroup(this.group);
+        if (!this.leaves.length) this.leaves = collected.leaves.slice();
+        this.activeLeaf = pickLeafInGroup(this.app, this.group, collected.active) || collected.active;
         this._overlayDoc = doc;
 
         if (this.leaves.length === 0) {
@@ -729,17 +787,201 @@ var TabSwitcherModal = /** @class */ (function () {
         });
         this.gridEl = this.panelEl.createDiv({ cls: 'wpp-tab-switcher-grid' });
 
+        this.mountSplitToolbar(doc);
+
         this.hintEl = doc.body.createDiv({ cls: 'wpp-tab-switcher-floating-hint' });
-        this.hintEl.setText(i18n.L.tabSwitcherHint);
+        this.hintEl.setText(this.getHintText());
 
         this.cardEls = [];
         this.renderCards();
+        this.updateSplitToolbar();
 
         this.panelEl.addEventListener('click', this._onPanelClick);
         this.panelEl.addEventListener('mousemove', this._onPanelMove);
         doc.addEventListener('keydown', this._onKeyDown, true);
 
         this.updateFocus(true);
+    };
+
+    TabSwitcherModal.prototype.getHintText = function () {
+        var base = i18n.L.tabSwitcherHint || '';
+        if (this.groups && this.groups.length > 1 && i18n.L.tabSwitcherHintSplit) {
+            return base + ' · ' + i18n.L.tabSwitcherHintSplit;
+        }
+        return base;
+    };
+
+    TabSwitcherModal.prototype.mountSplitToolbar = function (doc) {
+        var self = this;
+        var L = i18n.L;
+        this.toolbarEl = doc.body.createDiv({ cls: 'wpp-tab-switcher-toolbar' });
+
+        this.prevSplitBtn = this.toolbarEl.createDiv({
+            cls: 'wpp-tab-switcher-split-btn',
+            attr: {
+                role: 'button',
+                tabindex: '-1',
+                'aria-label': L.tabSwitcherPrevSplit || 'Previous split',
+            },
+        });
+        this.prevSplitBtn.setText('‹');
+        this.prevSplitBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.shiftSplitGroup(-1);
+        });
+
+        this.splitPagesEl = this.toolbarEl.createDiv({
+            cls: 'wpp-tab-switcher-split-pages',
+            attr: { role: 'tablist', 'aria-label': L.tabSwitcherTitle || 'Splits' },
+        });
+
+        this.nextSplitBtn = this.toolbarEl.createDiv({
+            cls: 'wpp-tab-switcher-split-btn',
+            attr: {
+                role: 'button',
+                tabindex: '-1',
+                'aria-label': L.tabSwitcherNextSplit || 'Next split',
+            },
+        });
+        this.nextSplitBtn.setText('›');
+        this.nextSplitBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.shiftSplitGroup(1);
+        });
+    };
+
+    TabSwitcherModal.prototype.updateSplitToolbar = function () {
+        if (!this.toolbarEl) return;
+        var self = this;
+        var count = this.groups ? this.groups.length : 0;
+        var show = count > 1;
+        this.toolbarEl.classList.toggle('is-hidden', !show);
+        this.toolbarEl.style.display = show ? '' : 'none';
+        if (!show) return;
+
+        var previewIndex = this.groupIndex || 0;
+        var workspaceActive = getActiveLeaf(this.app);
+        var workspaceSplitIndex = -1;
+        if (workspaceActive) {
+            for (var g = 0; g < count; g++) {
+                var groupLeaves = collectLeavesFromGroup(this.groups[g]);
+                if (groupLeaves.indexOf(workspaceActive) >= 0) {
+                    workspaceSplitIndex = g;
+                    break;
+                }
+            }
+        }
+
+        if (this.splitPagesEl) {
+            this.splitPagesEl.empty();
+            for (var i = 0; i < count; i++) {
+                (function (pageIndex) {
+                    var isPreview = pageIndex === previewIndex;
+                    var isWorkspace = pageIndex === workspaceSplitIndex;
+                    var page = self.splitPagesEl.createDiv({
+                        cls: 'wpp-tab-switcher-split-page'
+                            + (isPreview ? ' is-active' : '')
+                            + (isWorkspace ? ' is-workspace-split' : ''),
+                        attr: {
+                            role: 'tab',
+                            tabindex: '-1',
+                            'aria-selected': isPreview ? 'true' : 'false',
+                            'aria-current': isWorkspace ? 'true' : 'false',
+                            'aria-label': typeof i18n.L.tabSwitcherSplitLabel === 'function'
+                                ? i18n.L.tabSwitcherSplitLabel(pageIndex + 1, count)
+                                : String(pageIndex + 1),
+                            'data-split-index': String(pageIndex),
+                        },
+                    });
+                    page.setText(String(pageIndex + 1));
+                    page.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.goToSplitGroup(pageIndex);
+                    });
+                })(i);
+            }
+        }
+
+        if (this.hintEl) this.hintEl.setText(this.getHintText());
+    };
+
+    /**
+     * Jump to a root split by index and show its tabs in task view.
+     * Also focuses that pane so zen mode tracks the selected split.
+     */
+    TabSwitcherModal.prototype.goToSplitGroup = function (index) {
+        this.groups = collectRootTabGroups(this.app);
+        if (!this.groups.length) return;
+
+        var len = this.groups.length;
+        if (len === 1) {
+            this.groupIndex = 0;
+            this.updateSplitToolbar();
+            return;
+        }
+
+        var target = ((index % len) + len) % len;
+        if (target === this.groupIndex
+            && this.group === this.groups[target]
+            && this.leaves
+            && this.leaves.length > 0) {
+            this.updateSplitToolbar();
+            return;
+        }
+
+        var leaves = collectLeavesFromGroup(this.groups[target]);
+        if (leaves.length === 0) {
+            // Prefer nearest non-empty neighbor
+            var dir = target >= (this.groupIndex || 0) ? 1 : -1;
+            var next = target;
+            var attempts = 0;
+            do {
+                next = (next + dir + len) % len;
+                leaves = collectLeavesFromGroup(this.groups[next]);
+                attempts += 1;
+            } while (leaves.length === 0 && attempts < len);
+            if (leaves.length === 0) return;
+            target = next;
+        }
+
+        this.groupIndex = target;
+        this.group = this.groups[target];
+        this.leaves = leaves;
+        // Preview-only: do not change the live workspace active split / zen focus.
+        this.activeLeaf = pickLeafInGroup(this.app, this.group, null);
+
+        var activeIndex = this.leaves.indexOf(this.activeLeaf);
+        this.focusedIndex = activeIndex >= 0 ? activeIndex : 0;
+        this.renderCards();
+        this.updateFocus(true);
+        this.updateSplitToolbar();
+    };
+
+    TabSwitcherModal.prototype.shiftSplitGroup = function (delta) {
+        this.groups = collectRootTabGroups(this.app);
+        if (!this.groups.length) return;
+        var start = this.groupIndex || 0;
+        var len = this.groups.length;
+        if (len <= 1) {
+            this.groupIndex = 0;
+            this.updateSplitToolbar();
+            return;
+        }
+
+        var next = start;
+        var attempts = 0;
+        var leaves = [];
+        do {
+            next = (next + delta + len) % len;
+            leaves = collectLeavesFromGroup(this.groups[next]);
+            attempts += 1;
+        } while (leaves.length === 0 && attempts < len);
+
+        if (leaves.length === 0) return;
+        this.goToSplitGroup(next);
     };
 
     TabSwitcherModal.prototype.renderCards = function () {
@@ -755,7 +997,8 @@ var TabSwitcherModal = /** @class */ (function () {
 
     TabSwitcherModal.prototype.mountCard = function (leaf, index) {
         var self = this;
-        var isActive = leaf === this.activeLeaf;
+        var workspaceActive = getActiveLeaf(this.app);
+        var isActive = leaf === workspaceActive;
         var pinned = isLeafPinned(leaf);
         var L = i18n.L;
 
@@ -1159,10 +1402,30 @@ var TabSwitcherModal = /** @class */ (function () {
     };
 
     TabSwitcherModal.prototype.syncLeavesFromGroup = function () {
-        var collected = collectGroupLeaves(this.app);
-        this.group = collected.group;
-        this.leaves = collected.leaves.slice();
-        this.activeLeaf = collected.active;
+        this.groups = collectRootTabGroups(this.app);
+        if (!this.groups.length) {
+            var collected = collectGroupLeaves(this.app);
+            this.groups = collected.group ? [collected.group] : [];
+            this.group = collected.group;
+            this.groupIndex = 0;
+            this.leaves = collected.leaves.slice();
+            this.activeLeaf = collected.active;
+            this.updateSplitToolbar();
+            return this.leaves;
+        }
+
+        if (this.group) {
+            var kept = this.groups.indexOf(this.group);
+            if (kept >= 0) this.groupIndex = kept;
+        }
+        if (this.groupIndex >= this.groups.length) {
+            this.groupIndex = Math.max(0, this.groups.length - 1);
+        }
+
+        this.group = this.groups[this.groupIndex] || null;
+        this.leaves = collectLeavesFromGroup(this.group);
+        this.activeLeaf = pickLeafInGroup(this.app, this.group, getActiveLeaf(this.app));
+        this.updateSplitToolbar();
         return this.leaves;
     };
 
@@ -1177,6 +1440,11 @@ var TabSwitcherModal = /** @class */ (function () {
 
         this.syncLeavesFromGroup();
         if (this.leaves.length === 0) {
+            // Current split emptied — try another split, else close
+            if (this.groups && this.groups.length > 1) {
+                this.shiftSplitGroup(1);
+                if (this.leaves.length > 0) return;
+            }
             this.close();
             return;
         }
@@ -1219,7 +1487,22 @@ var TabSwitcherModal = /** @class */ (function () {
     TabSwitcherModal.prototype._onKeyDown = function (e) {
         if (e.isComposing) return;
         var key = e.key;
-        if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown') {
+        if ((key === '[' || key === '<' || (key === 'ArrowLeft' && e.altKey))) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.shiftSplitGroup(-1);
+        } else if ((key === ']' || key === '>' || (key === 'ArrowRight' && e.altKey))) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.shiftSplitGroup(1);
+        } else if (/^[1-9]$/.test(key)) {
+            var page = parseInt(key, 10) - 1;
+            if (this.groups && page < this.groups.length) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.goToSplitGroup(page);
+            }
+        } else if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown') {
             e.preventDefault();
             e.stopPropagation();
             this.moveFocus(key);
@@ -1313,12 +1596,21 @@ var TabSwitcherModal = /** @class */ (function () {
             this.hintEl.remove();
             this.hintEl = null;
         }
+        if (this.toolbarEl) {
+            this.toolbarEl.remove();
+            this.toolbarEl = null;
+            this.prevSplitBtn = null;
+            this.nextSplitBtn = null;
+            this.splitPagesEl = null;
+        }
 
         // Ensure no orphaned overlay remains (e.g. from a previous non-singleton instance)
         removeOverlayDom(doc);
 
         this.leaves = [];
         this.group = null;
+        this.groups = [];
+        this.groupIndex = 0;
         this.activeLeaf = null;
         this._overlayDoc = null;
         this.focusedIndex = 0;

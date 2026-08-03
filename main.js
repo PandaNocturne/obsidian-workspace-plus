@@ -10237,6 +10237,12 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "Switch tab",
         tabSwitcherEmpty: "No open tabs to switch.",
         tabSwitcherHint: "Click preview to switch \xB7 Drag header to reorder \xB7 Click outside to cancel",
+        tabSwitcherHintSplit: "\u2039 \u203A or 1\u20139 to switch split",
+        tabSwitcherPrevSplit: "Previous split",
+        tabSwitcherNextSplit: "Next split",
+        tabSwitcherSplitLabel: function(i, n) {
+          return "Split " + i + " / " + n;
+        },
         tabSwitcherCloseTab: "Close tab",
         tabSwitcherPinTab: "Pin tab",
         tabSwitcherUnpinTab: "Unpin tab",
@@ -10251,6 +10257,12 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\u5207\u6362\u6807\u7B7E\u9875",
         tabSwitcherEmpty: "\u6CA1\u6709\u53EF\u5207\u6362\u7684\u6807\u7B7E\u9875\u3002",
         tabSwitcherHint: "\u70B9\u51FB\u9884\u89C8\u5207\u6362 \xB7 \u62D6\u52A8\u5934\u90E8\u6392\u5E8F \xB7 \u70B9\u51FB\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintSplit: "\u2039 \u203A \u6216\u6570\u5B57\u952E\u5207\u6362\u5206\u680F",
+        tabSwitcherPrevSplit: "\u4E0A\u4E00\u4E2A\u5206\u680F",
+        tabSwitcherNextSplit: "\u4E0B\u4E00\u4E2A\u5206\u680F",
+        tabSwitcherSplitLabel: function(i, n) {
+          return "\u5206\u680F " + i + " / " + n;
+        },
         tabSwitcherCloseTab: "\u5173\u95ED\u6807\u7B7E\u9875",
         tabSwitcherPinTab: "\u56FA\u5B9A\u6807\u7B7E\u9875",
         tabSwitcherUnpinTab: "\u53D6\u6D88\u56FA\u5B9A",
@@ -10265,6 +10277,12 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\u5207\u63DB\u5206\u9801",
         tabSwitcherEmpty: "\u6C92\u6709\u53EF\u5207\u63DB\u7684\u5206\u9801\u3002",
         tabSwitcherHint: "\u9EDE\u64CA\u9810\u89BD\u5207\u63DB \xB7 \u62D6\u66F3\u6A19\u984C\u5217\u6392\u5E8F \xB7 \u9EDE\u64CA\u5916\u90E8\u53D6\u6D88",
+        tabSwitcherHintSplit: "\u2039 \u203A \u6216\u6578\u5B57\u9375\u5207\u63DB\u5206\u6B04",
+        tabSwitcherPrevSplit: "\u4E0A\u4E00\u500B\u5206\u6B04",
+        tabSwitcherNextSplit: "\u4E0B\u4E00\u500B\u5206\u6B04",
+        tabSwitcherSplitLabel: function(i, n) {
+          return "\u5206\u6B04 " + i + " / " + n;
+        },
         tabSwitcherCloseTab: "\u95DC\u9589\u5206\u9801",
         tabSwitcherPinTab: "\u91D8\u9078\u5206\u9801",
         tabSwitcherUnpinTab: "\u53D6\u6D88\u91D8\u9078",
@@ -10279,6 +10297,12 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\u30BF\u30D6\u3092\u5207\u308A\u66FF\u3048",
         tabSwitcherEmpty: "\u5207\u308A\u66FF\u3048\u53EF\u80FD\u306A\u30BF\u30D6\u304C\u3042\u308A\u307E\u305B\u3093\u3002",
         tabSwitcherHint: "\u30D7\u30EC\u30D3\u30E5\u30FC\u3092\u30AF\u30EA\u30C3\u30AF\u3067\u5207\u308A\u66FF\u3048 \xB7 \u30D8\u30C3\u30C0\u30FC\u3092\u30C9\u30E9\u30C3\u30B0\u3067\u4E26\u3079\u66FF\u3048 \xB7 \u5916\u5074\u30AF\u30EA\u30C3\u30AF\u3067\u53D6\u6D88",
+        tabSwitcherHintSplit: "\u2039 \u203A \u307E\u305F\u306F\u6570\u5B57\u3067\u30DA\u30A4\u30F3\u5207\u66FF",
+        tabSwitcherPrevSplit: "\u524D\u306E\u30DA\u30A4\u30F3",
+        tabSwitcherNextSplit: "\u6B21\u306E\u30DA\u30A4\u30F3",
+        tabSwitcherSplitLabel: function(i, n) {
+          return "\u30DA\u30A4\u30F3 " + i + " / " + n;
+        },
         tabSwitcherCloseTab: "\u30BF\u30D6\u3092\u9589\u3058\u308B",
         tabSwitcherPinTab: "\u30BF\u30D6\u3092\u30D4\u30F3\u7559\u3081",
         tabSwitcherUnpinTab: "\u30D4\u30F3\u7559\u3081\u3092\u89E3\u9664",
@@ -10293,6 +10317,12 @@ var require_i18n = __commonJS({
         tabSwitcherTitle: "\uD0ED \uC804\uD658",
         tabSwitcherEmpty: "\uC804\uD658\uD560 \uD0ED\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
         tabSwitcherHint: "\uBBF8\uB9AC\uBCF4\uAE30 \uD074\uB9AD\uC73C\uB85C \uC804\uD658 \xB7 \uD5E4\uB354 \uB4DC\uB798\uADF8\uB85C \uC815\uB82C \xB7 \uBC14\uAE65 \uD074\uB9AD\uC73C\uB85C \uCDE8\uC18C",
+        tabSwitcherHintSplit: "\u2039 \u203A \uB610\uB294 \uC22B\uC790\uB85C \uBD84\uD560 \uC804\uD658",
+        tabSwitcherPrevSplit: "\uC774\uC804 \uBD84\uD560",
+        tabSwitcherNextSplit: "\uB2E4\uC74C \uBD84\uD560",
+        tabSwitcherSplitLabel: function(i, n) {
+          return "\uBD84\uD560 " + i + " / " + n;
+        },
         tabSwitcherCloseTab: "\uD0ED \uB2EB\uAE30",
         tabSwitcherPinTab: "\uD0ED \uACE0\uC815",
         tabSwitcherUnpinTab: "\uACE0\uC815 \uD574\uC81C",
@@ -14143,6 +14173,42 @@ var require_tab_switcher_modal = __commonJS({
       }
       return { group, leaves, active };
     }
+    function isTabGroupNode(node) {
+      return !!(node && Array.isArray(node.children) && (typeof node.selectTab === "function" || typeof node.selectTabIndex === "function" || node.type === "tabs"));
+    }
+    function collectRootTabGroups(app) {
+      var groups = [];
+      var root = app && app.workspace && app.workspace.rootSplit;
+      if (!root) return groups;
+      function walk(node) {
+        if (!node) return;
+        if (isTabGroupNode(node)) {
+          groups.push(node);
+          return;
+        }
+        if (!Array.isArray(node.children)) return;
+        for (var i = 0; i < node.children.length; i++) {
+          walk(node.children[i]);
+        }
+      }
+      walk(root);
+      return groups;
+    }
+    function pickLeafInGroup(app, group, preferred) {
+      var leaves = collectLeavesFromGroup(group);
+      if (!leaves.length) return null;
+      if (preferred && leaves.indexOf(preferred) >= 0) return preferred;
+      var active = getActiveLeaf(app);
+      if (active && leaves.indexOf(active) >= 0) return active;
+      try {
+        if (group && typeof group.currentTab === "number" && group.children) {
+          var cur = group.children[group.currentTab];
+          if (isWorkspaceLeaf(cur)) return cur;
+        }
+      } catch (err) {
+      }
+      return leaves[0] || null;
+    }
     function isLeafPinned(leaf) {
       if (!leaf) return false;
       if (typeof leaf.pinned === "boolean") return leaf.pinned;
@@ -14191,7 +14257,7 @@ var require_tab_switcher_modal = __commonJS({
     function removeOverlayDom(doc) {
       if (!doc || !doc.body) return;
       var nodes = doc.body.querySelectorAll(
-        ".wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-drag-clone"
+        ".wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-drag-clone"
       );
       for (var i = 0; i < nodes.length; i++) {
         try {
@@ -14217,6 +14283,8 @@ var require_tab_switcher_modal = __commonJS({
           this.plugin = plugin;
           this.leaves = [];
           this.group = null;
+          this.groups = [];
+          this.groupIndex = 0;
           this.cardEls = [];
           this.focusedIndex = 0;
           this._previewQueue = [];
@@ -14272,9 +14340,16 @@ var require_tab_switcher_modal = __commonJS({
             this.close();
             return;
           }
-          this.group = collected.group;
-          this.leaves = collected.leaves.slice();
-          this.activeLeaf = collected.active;
+          this.groups = collectRootTabGroups(this.app);
+          if (!this.groups.length && collected.group) {
+            this.groups = [collected.group];
+          }
+          this.groupIndex = collected.group ? this.groups.indexOf(collected.group) : 0;
+          if (this.groupIndex < 0) this.groupIndex = 0;
+          this.group = this.groups[this.groupIndex] || collected.group;
+          this.leaves = collectLeavesFromGroup(this.group);
+          if (!this.leaves.length) this.leaves = collected.leaves.slice();
+          this.activeLeaf = pickLeafInGroup(this.app, this.group, collected.active) || collected.active;
           this._overlayDoc = doc;
           if (this.leaves.length === 0) {
             new obsidian2.Notice(i18n2.L.tabSwitcherEmpty);
@@ -14311,14 +14386,166 @@ var require_tab_switcher_modal = __commonJS({
             }
           });
           this.gridEl = this.panelEl.createDiv({ cls: "wpp-tab-switcher-grid" });
+          this.mountSplitToolbar(doc);
           this.hintEl = doc.body.createDiv({ cls: "wpp-tab-switcher-floating-hint" });
-          this.hintEl.setText(i18n2.L.tabSwitcherHint);
+          this.hintEl.setText(this.getHintText());
           this.cardEls = [];
           this.renderCards();
+          this.updateSplitToolbar();
           this.panelEl.addEventListener("click", this._onPanelClick);
           this.panelEl.addEventListener("mousemove", this._onPanelMove);
           doc.addEventListener("keydown", this._onKeyDown, true);
           this.updateFocus(true);
+        };
+        TabSwitcherModal2.prototype.getHintText = function() {
+          var base = i18n2.L.tabSwitcherHint || "";
+          if (this.groups && this.groups.length > 1 && i18n2.L.tabSwitcherHintSplit) {
+            return base + " \xB7 " + i18n2.L.tabSwitcherHintSplit;
+          }
+          return base;
+        };
+        TabSwitcherModal2.prototype.mountSplitToolbar = function(doc) {
+          var self = this;
+          var L = i18n2.L;
+          this.toolbarEl = doc.body.createDiv({ cls: "wpp-tab-switcher-toolbar" });
+          this.prevSplitBtn = this.toolbarEl.createDiv({
+            cls: "wpp-tab-switcher-split-btn",
+            attr: {
+              role: "button",
+              tabindex: "-1",
+              "aria-label": L.tabSwitcherPrevSplit || "Previous split"
+            }
+          });
+          this.prevSplitBtn.setText("\u2039");
+          this.prevSplitBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.shiftSplitGroup(-1);
+          });
+          this.splitPagesEl = this.toolbarEl.createDiv({
+            cls: "wpp-tab-switcher-split-pages",
+            attr: { role: "tablist", "aria-label": L.tabSwitcherTitle || "Splits" }
+          });
+          this.nextSplitBtn = this.toolbarEl.createDiv({
+            cls: "wpp-tab-switcher-split-btn",
+            attr: {
+              role: "button",
+              tabindex: "-1",
+              "aria-label": L.tabSwitcherNextSplit || "Next split"
+            }
+          });
+          this.nextSplitBtn.setText("\u203A");
+          this.nextSplitBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.shiftSplitGroup(1);
+          });
+        };
+        TabSwitcherModal2.prototype.updateSplitToolbar = function() {
+          if (!this.toolbarEl) return;
+          var self = this;
+          var count = this.groups ? this.groups.length : 0;
+          var show = count > 1;
+          this.toolbarEl.classList.toggle("is-hidden", !show);
+          this.toolbarEl.style.display = show ? "" : "none";
+          if (!show) return;
+          var previewIndex = this.groupIndex || 0;
+          var workspaceActive = getActiveLeaf(this.app);
+          var workspaceSplitIndex = -1;
+          if (workspaceActive) {
+            for (var g = 0; g < count; g++) {
+              var groupLeaves = collectLeavesFromGroup(this.groups[g]);
+              if (groupLeaves.indexOf(workspaceActive) >= 0) {
+                workspaceSplitIndex = g;
+                break;
+              }
+            }
+          }
+          if (this.splitPagesEl) {
+            this.splitPagesEl.empty();
+            for (var i = 0; i < count; i++) {
+              (function(pageIndex) {
+                var isPreview = pageIndex === previewIndex;
+                var isWorkspace = pageIndex === workspaceSplitIndex;
+                var page = self.splitPagesEl.createDiv({
+                  cls: "wpp-tab-switcher-split-page" + (isPreview ? " is-active" : "") + (isWorkspace ? " is-workspace-split" : ""),
+                  attr: {
+                    role: "tab",
+                    tabindex: "-1",
+                    "aria-selected": isPreview ? "true" : "false",
+                    "aria-current": isWorkspace ? "true" : "false",
+                    "aria-label": typeof i18n2.L.tabSwitcherSplitLabel === "function" ? i18n2.L.tabSwitcherSplitLabel(pageIndex + 1, count) : String(pageIndex + 1),
+                    "data-split-index": String(pageIndex)
+                  }
+                });
+                page.setText(String(pageIndex + 1));
+                page.addEventListener("click", function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  self.goToSplitGroup(pageIndex);
+                });
+              })(i);
+            }
+          }
+          if (this.hintEl) this.hintEl.setText(this.getHintText());
+        };
+        TabSwitcherModal2.prototype.goToSplitGroup = function(index) {
+          this.groups = collectRootTabGroups(this.app);
+          if (!this.groups.length) return;
+          var len = this.groups.length;
+          if (len === 1) {
+            this.groupIndex = 0;
+            this.updateSplitToolbar();
+            return;
+          }
+          var target = (index % len + len) % len;
+          if (target === this.groupIndex && this.group === this.groups[target] && this.leaves && this.leaves.length > 0) {
+            this.updateSplitToolbar();
+            return;
+          }
+          var leaves = collectLeavesFromGroup(this.groups[target]);
+          if (leaves.length === 0) {
+            var dir = target >= (this.groupIndex || 0) ? 1 : -1;
+            var next = target;
+            var attempts = 0;
+            do {
+              next = (next + dir + len) % len;
+              leaves = collectLeavesFromGroup(this.groups[next]);
+              attempts += 1;
+            } while (leaves.length === 0 && attempts < len);
+            if (leaves.length === 0) return;
+            target = next;
+          }
+          this.groupIndex = target;
+          this.group = this.groups[target];
+          this.leaves = leaves;
+          this.activeLeaf = pickLeafInGroup(this.app, this.group, null);
+          var activeIndex = this.leaves.indexOf(this.activeLeaf);
+          this.focusedIndex = activeIndex >= 0 ? activeIndex : 0;
+          this.renderCards();
+          this.updateFocus(true);
+          this.updateSplitToolbar();
+        };
+        TabSwitcherModal2.prototype.shiftSplitGroup = function(delta) {
+          this.groups = collectRootTabGroups(this.app);
+          if (!this.groups.length) return;
+          var start = this.groupIndex || 0;
+          var len = this.groups.length;
+          if (len <= 1) {
+            this.groupIndex = 0;
+            this.updateSplitToolbar();
+            return;
+          }
+          var next = start;
+          var attempts = 0;
+          var leaves = [];
+          do {
+            next = (next + delta + len) % len;
+            leaves = collectLeavesFromGroup(this.groups[next]);
+            attempts += 1;
+          } while (leaves.length === 0 && attempts < len);
+          if (leaves.length === 0) return;
+          this.goToSplitGroup(next);
         };
         TabSwitcherModal2.prototype.renderCards = function() {
           if (!this.gridEl) return;
@@ -14331,7 +14558,8 @@ var require_tab_switcher_modal = __commonJS({
         };
         TabSwitcherModal2.prototype.mountCard = function(leaf, index) {
           var self = this;
-          var isActive = leaf === this.activeLeaf;
+          var workspaceActive = getActiveLeaf(this.app);
+          var isActive = leaf === workspaceActive;
           var pinned = isLeafPinned(leaf);
           var L = i18n2.L;
           var card = this.gridEl.createDiv({
@@ -14662,10 +14890,28 @@ var require_tab_switcher_modal = __commonJS({
           });
         };
         TabSwitcherModal2.prototype.syncLeavesFromGroup = function() {
-          var collected = collectGroupLeaves(this.app);
-          this.group = collected.group;
-          this.leaves = collected.leaves.slice();
-          this.activeLeaf = collected.active;
+          this.groups = collectRootTabGroups(this.app);
+          if (!this.groups.length) {
+            var collected = collectGroupLeaves(this.app);
+            this.groups = collected.group ? [collected.group] : [];
+            this.group = collected.group;
+            this.groupIndex = 0;
+            this.leaves = collected.leaves.slice();
+            this.activeLeaf = collected.active;
+            this.updateSplitToolbar();
+            return this.leaves;
+          }
+          if (this.group) {
+            var kept = this.groups.indexOf(this.group);
+            if (kept >= 0) this.groupIndex = kept;
+          }
+          if (this.groupIndex >= this.groups.length) {
+            this.groupIndex = Math.max(0, this.groups.length - 1);
+          }
+          this.group = this.groups[this.groupIndex] || null;
+          this.leaves = collectLeavesFromGroup(this.group);
+          this.activeLeaf = pickLeafInGroup(this.app, this.group, getActiveLeaf(this.app));
+          this.updateSplitToolbar();
           return this.leaves;
         };
         TabSwitcherModal2.prototype.closeLeafAt = function(index) {
@@ -14677,6 +14923,10 @@ var require_tab_switcher_modal = __commonJS({
           }
           this.syncLeavesFromGroup();
           if (this.leaves.length === 0) {
+            if (this.groups && this.groups.length > 1) {
+              this.shiftSplitGroup(1);
+              if (this.leaves.length > 0) return;
+            }
             this.close();
             return;
           }
@@ -14713,7 +14963,22 @@ var require_tab_switcher_modal = __commonJS({
         TabSwitcherModal2.prototype._onKeyDown = function(e) {
           if (e.isComposing) return;
           var key = e.key;
-          if (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown") {
+          if (key === "[" || key === "<" || key === "ArrowLeft" && e.altKey) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.shiftSplitGroup(-1);
+          } else if (key === "]" || key === ">" || key === "ArrowRight" && e.altKey) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.shiftSplitGroup(1);
+          } else if (/^[1-9]$/.test(key)) {
+            var page = parseInt(key, 10) - 1;
+            if (this.groups && page < this.groups.length) {
+              e.preventDefault();
+              e.stopPropagation();
+              this.goToSplitGroup(page);
+            }
+          } else if (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown") {
             e.preventDefault();
             e.stopPropagation();
             this.moveFocus(key);
@@ -14797,9 +15062,18 @@ var require_tab_switcher_modal = __commonJS({
             this.hintEl.remove();
             this.hintEl = null;
           }
+          if (this.toolbarEl) {
+            this.toolbarEl.remove();
+            this.toolbarEl = null;
+            this.prevSplitBtn = null;
+            this.nextSplitBtn = null;
+            this.splitPagesEl = null;
+          }
           removeOverlayDom(doc);
           this.leaves = [];
           this.group = null;
+          this.groups = [];
+          this.groupIndex = 0;
           this.activeLeaf = null;
           this._overlayDoc = null;
           this.focusedIndex = 0;

@@ -2080,3 +2080,89 @@ body.wpp-mission-control-open .wpp-tab-switcher-floating-hint {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* Top controls: cycle which split's tabs are shown */
+body.wpp-mission-control-open .wpp-tab-switcher-toolbar {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1003;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 6px;
+    border-radius: var(--radius-m);
+    background: rgba(0, 0, 0, 0.45);
+    color: var(--text-on-accent, #fff);
+    pointer-events: auto;
+    user-select: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-toolbar.is-hidden {
+    display: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-s);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    opacity: 1;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-pages {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border: 2px solid transparent;
+    border-radius: var(--radius-s);
+    font-size: var(--font-ui-small);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-page:hover {
+    background: rgba(255, 255, 255, 0.16);
+    opacity: 1;
+}
+
+/* Selected / previewed split in task view — original accent fill */
+body.wpp-mission-control-open .wpp-tab-switcher-split-page.is-active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent, #fff);
+    opacity: 1;
+    font-weight: var(--font-semibold, 600);
+}
+
+/* Live workspace page's split — border only */
+body.wpp-mission-control-open .wpp-tab-switcher-split-page.is-workspace-split {
+    border-color: var(--interactive-accent);
+}
+
+/* Selected + current: keep accent fill, use light border so it stays visible */
+body.wpp-mission-control-open .wpp-tab-switcher-split-page.is-active.is-workspace-split {
+    border-color: var(--text-on-accent, #fff);
+}
