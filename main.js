@@ -12989,6 +12989,16 @@ var require_session_manager_modal = __commonJS({
             });
           }
         };
+        SessionManagerModal2.prototype.getSessionItemIndexAtPoint = function(x, y) {
+          var items = this.listEl.querySelectorAll(".wpp-session-item");
+          for (var i = 0; i < items.length; i++) {
+            var rect = items[i].getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+              return i;
+            }
+          }
+          return -1;
+        };
         SessionManagerModal2.prototype.setupDragAndDrop = function() {
           var self = this;
           if ((this.filterQuery || "").trim()) return;
@@ -13005,6 +13015,14 @@ var require_session_manager_modal = __commonJS({
               var dragStarted = false;
               var draggedEl = item;
               var cloneEl = null;
+              var items = Array.prototype.slice.call(self.listEl.querySelectorAll(".wpp-session-item"));
+              var fromIndex = items.indexOf(item);
+              if (fromIndex < 0) return;
+              function clearSessionDropTargets() {
+                items.forEach(function(el) {
+                  el.classList.remove("is-drop-target");
+                });
+              }
               function startDrag(ev) {
                 dragStarted = true;
                 document.body.classList.add("wpp-session-list-dragging");
@@ -13012,17 +13030,19 @@ var require_session_manager_modal = __commonJS({
                 var offsetX = startX - rect.left;
                 var offsetY = startY - rect.top;
                 cloneEl = item.cloneNode(true);
+                cloneEl.classList.remove("is-dragging", "is-drop-target", "wpp-just-moved");
                 cloneEl.classList.add("wpp-drag-clone");
                 cloneEl.style.position = "fixed";
                 cloneEl.style.width = rect.width + "px";
+                cloneEl.style.height = rect.height + "px";
                 cloneEl.style.top = ev.clientY - offsetY + "px";
                 cloneEl.style.left = ev.clientX - offsetX + "px";
-                cloneEl.style.zIndex = "10000";
+                cloneEl.style.zIndex = "10050";
                 cloneEl.style.pointerEvents = "none";
                 document.body.appendChild(cloneEl);
-                item.classList.add("is-dragging");
                 cloneEl._offsetX = offsetX;
                 cloneEl._offsetY = offsetY;
+                item.classList.add("is-dragging");
               }
               function updateGroupDropTarget(ev) {
                 var tabs = self.groupTabsRow.querySelectorAll(".wpp-group-tab");
@@ -13047,40 +13067,35 @@ var require_session_manager_modal = __commonJS({
               }
               function onMouseMove(ev) {
                 if (!dragStarted) {
-                  var dx = ev.clientX - startX;
-                  var dy = ev.clientY - startY;
-                  if (Math.abs(dx) + Math.abs(dy) < 5) return;
+                  if (Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY) < 5) return;
                   startDrag(ev);
                 }
+                if (!cloneEl) return;
                 cloneEl.style.top = ev.clientY - cloneEl._offsetY + "px";
                 cloneEl.style.left = ev.clientX - cloneEl._offsetX + "px";
                 var hoverTab = updateGroupDropTarget(ev);
-                if (hoverTab) return;
-                var siblings = self.listEl.querySelectorAll(".wpp-session-item");
-                var placed = false;
-                for (var i = 0; i < siblings.length; i++) {
-                  var el = siblings[i];
-                  if (el === draggedEl) continue;
-                  var r = el.getBoundingClientRect();
-                  if (ev.clientY < r.top + r.height / 2) {
-                    self.listEl.insertBefore(draggedEl, el);
-                    placed = true;
-                    break;
-                  }
+                if (hoverTab) {
+                  clearSessionDropTargets();
+                  return;
                 }
-                if (!placed) {
-                  self.listEl.appendChild(draggedEl);
-                }
+                var overIndex = self.getSessionItemIndexAtPoint(ev.clientX, ev.clientY);
+                items.forEach(function(el, i) {
+                  el.classList.toggle("is-drop-target", overIndex === i && i !== fromIndex);
+                });
               }
               function onMouseUp(ev) {
                 document.removeEventListener("mousemove", onMouseMove);
                 document.removeEventListener("mouseup", onMouseUp);
                 document.body.classList.remove("wpp-session-list-dragging");
-                if (!dragStarted) return;
-                cloneEl.remove();
-                draggedEl.classList.remove("is-dragging");
-                var dropTab = updateGroupDropTarget(ev);
+                var dropTab = dragStarted ? updateGroupDropTarget(ev) : null;
                 clearGroupDropTargets();
+                clearSessionDropTargets();
+                if (cloneEl) {
+                  cloneEl.remove();
+                  cloneEl = null;
+                }
+                draggedEl.classList.remove("is-dragging");
+                if (!dragStarted) return;
                 if (dropTab && dropTab.dataset.groupId === "__ungrouped__") {
                   var ungroupSessionId = draggedEl.dataset.sessionId;
                   var ungroupSessionName = (self.plugin.data.sessions[ungroupSessionId] || {}).name || "";
@@ -13121,21 +13136,27 @@ var require_session_manager_modal = __commonJS({
                     return;
                   }
                 }
-                var newVisibleOrder = [];
-                var items = self.listEl.querySelectorAll(".wpp-session-item");
-                items.forEach(function(el) {
-                  newVisibleOrder.push(el.dataset.sessionId);
+                var toIndex = self.getSessionItemIndexAtPoint(ev.clientX, ev.clientY);
+                if (toIndex < 0 || toIndex === fromIndex) return;
+                var orderItems = Array.prototype.slice.call(self.listEl.querySelectorAll(".wpp-session-item"));
+                var moved = orderItems[fromIndex];
+                if (!moved) return;
+                orderItems.splice(fromIndex, 1);
+                orderItems.splice(toIndex, 0, moved);
+                orderItems.forEach(function(el) {
+                  self.listEl.appendChild(el);
                 });
-                items.forEach(function(el, i) {
+                var newVisibleOrder = [];
+                orderItems.forEach(function(el, i) {
+                  newVisibleOrder.push(el.dataset.sessionId);
                   var indexEl = el.querySelector(".wpp-session-index");
                   if (indexEl) {
                     indexEl.textContent = String(i + 1);
                   }
                 });
-                draggedEl.classList.add("wpp-just-moved");
-                var movedRef = draggedEl;
+                moved.classList.add("wpp-just-moved");
                 setTimeout(function() {
-                  movedRef.classList.remove("wpp-just-moved");
+                  moved.classList.remove("wpp-just-moved");
                 }, 600);
                 self.plugin.setSessionOrderFromVisible(newVisibleOrder, { syncCommands: false });
               }

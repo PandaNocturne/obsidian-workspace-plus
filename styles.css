@@ -575,19 +575,28 @@
 }
 
 .wpp-session-item.is-dragging {
-    visibility: hidden;
+    opacity: 0.35;
+}
+
+.wpp-session-item.is-drop-target {
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 3px var(--interactive-accent);
 }
 
 body.wpp-session-list-dragging,
 body.wpp-session-list-dragging * {
-    cursor: grabbing;
+    cursor: grabbing !important;
+    user-select: none !important;
 }
 
 .wpp-drag-clone {
-    opacity: 0.85;
+    border-radius: var(--radius-m, 8px);
+    border: 2px solid var(--interactive-accent);
     box-shadow: var(--shadow-l);
+    opacity: 0.92;
+    overflow: hidden;
     background: var(--background-primary);
-    border-radius: 6px;
+    pointer-events: none;
 }
 
 /* Preserve search overlay row layout when clone is moved to document.body */

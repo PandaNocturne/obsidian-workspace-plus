@@ -961,6 +961,17 @@ var SessionManagerModal = /** @class */ (function (_super) {
         }
     };
 
+    SessionManagerModal.prototype.getSessionItemIndexAtPoint = function (x, y) {
+        var items = this.listEl.querySelectorAll('.wpp-session-item');
+        for (var i = 0; i < items.length; i++) {
+            var rect = items[i].getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                return i;
+            }
+        }
+        return -1;
+    };
+
     SessionManagerModal.prototype.setupDragAndDrop = function () {
         var self = this;
         if ((this.filterQuery || '').trim()) return;
@@ -980,6 +991,15 @@ var SessionManagerModal = /** @class */ (function (_super) {
                 var dragStarted = false;
                 var draggedEl = item;
                 var cloneEl = null;
+                var items = Array.prototype.slice.call(self.listEl.querySelectorAll('.wpp-session-item'));
+                var fromIndex = items.indexOf(item);
+                if (fromIndex < 0) return;
+
+                function clearSessionDropTargets() {
+                    items.forEach(function (el) {
+                        el.classList.remove('is-drop-target');
+                    });
+                }
 
                 function startDrag(ev) {
                     dragStarted = true;
@@ -989,20 +1009,20 @@ var SessionManagerModal = /** @class */ (function (_super) {
                     var offsetY = startY - rect.top;
 
                     cloneEl = item.cloneNode(true);
+                    cloneEl.classList.remove('is-dragging', 'is-drop-target', 'wpp-just-moved');
                     cloneEl.classList.add('wpp-drag-clone');
                     cloneEl.style.position = 'fixed';
                     cloneEl.style.width = rect.width + 'px';
+                    cloneEl.style.height = rect.height + 'px';
                     cloneEl.style.top = (ev.clientY - offsetY) + 'px';
                     cloneEl.style.left = (ev.clientX - offsetX) + 'px';
-                    cloneEl.style.zIndex = '10000';
+                    cloneEl.style.zIndex = '10050';
                     cloneEl.style.pointerEvents = 'none';
                     document.body.appendChild(cloneEl);
-
-                    item.classList.add('is-dragging');
-
-                    // Store offset for move handler
                     cloneEl._offsetX = offsetX;
                     cloneEl._offsetY = offsetY;
+
+                    item.classList.add('is-dragging');
                 }
 
                 function updateGroupDropTarget(ev) {
@@ -1031,34 +1051,24 @@ var SessionManagerModal = /** @class */ (function (_super) {
 
                 function onMouseMove(ev) {
                     if (!dragStarted) {
-                        var dx = ev.clientX - startX;
-                        var dy = ev.clientY - startY;
-                        if (Math.abs(dx) + Math.abs(dy) < 5) return;
+                        if (Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY) < 5) return;
                         startDrag(ev);
                     }
+                    if (!cloneEl) return;
 
                     cloneEl.style.top = (ev.clientY - cloneEl._offsetY) + 'px';
                     cloneEl.style.left = (ev.clientX - cloneEl._offsetX) + 'px';
 
-                    // Check if hovering over a group tab
                     var hoverTab = updateGroupDropTarget(ev);
-                    if (hoverTab) return; // Don't reorder while over group tabs
+                    if (hoverTab) {
+                        clearSessionDropTargets();
+                        return;
+                    }
 
-                    var siblings = self.listEl.querySelectorAll('.wpp-session-item');
-                    var placed = false;
-                    for (var i = 0; i < siblings.length; i++) {
-                        var el = siblings[i];
-                        if (el === draggedEl) continue;
-                        var r = el.getBoundingClientRect();
-                        if (ev.clientY < r.top + r.height / 2) {
-                            self.listEl.insertBefore(draggedEl, el);
-                            placed = true;
-                            break;
-                        }
-                    }
-                    if (!placed) {
-                        self.listEl.appendChild(draggedEl);
-                    }
+                    var overIndex = self.getSessionItemIndexAtPoint(ev.clientX, ev.clientY);
+                    items.forEach(function (el, i) {
+                        el.classList.toggle('is-drop-target', overIndex === i && i !== fromIndex);
+                    });
                 }
 
                 function onMouseUp(ev) {
@@ -1066,14 +1076,16 @@ var SessionManagerModal = /** @class */ (function (_super) {
                     document.removeEventListener('mouseup', onMouseUp);
                     document.body.classList.remove('wpp-session-list-dragging');
 
-                    if (!dragStarted) return;
-
-                    cloneEl.remove();
+                    var dropTab = dragStarted ? updateGroupDropTarget(ev) : null;
+                    clearGroupDropTargets();
+                    clearSessionDropTargets();
+                    if (cloneEl) {
+                        cloneEl.remove();
+                        cloneEl = null;
+                    }
                     draggedEl.classList.remove('is-dragging');
 
-                    // Check if dropped on a group tab
-                    var dropTab = updateGroupDropTarget(ev);
-                    clearGroupDropTargets();
+                    if (!dragStarted) return;
 
                     if (dropTab && dropTab.dataset.groupId === '__ungrouped__') {
                         var ungroupSessionId = draggedEl.dataset.sessionId;
@@ -1110,7 +1122,7 @@ var SessionManagerModal = /** @class */ (function (_super) {
                         if (dropTab && dropTab.dataset.groupId === '__all__'
                             && currentGroupId
                             && currentGroupId !== '__ungrouped__') {
-                        // Drop on "All" tab while viewing a group → remove from group
+                            // Drop on "All" tab while viewing a group → remove from group
                             var rmSessionId = draggedEl.dataset.sessionId;
                             var rmGroupId = currentGroupId;
                             var rmSessionName = (self.plugin.data.sessions[rmSessionId] || {}).name || '';
@@ -1124,26 +1136,31 @@ var SessionManagerModal = /** @class */ (function (_super) {
                         }
                     }
 
-                    // Read order from DOM
-                    var newVisibleOrder = [];
-                    var items = self.listEl.querySelectorAll('.wpp-session-item');
-                    items.forEach(function (el) {
-                        newVisibleOrder.push(el.dataset.sessionId);
+                    var toIndex = self.getSessionItemIndexAtPoint(ev.clientX, ev.clientY);
+                    if (toIndex < 0 || toIndex === fromIndex) return;
+
+                    var orderItems = Array.prototype.slice.call(self.listEl.querySelectorAll('.wpp-session-item'));
+                    var moved = orderItems[fromIndex];
+                    if (!moved) return;
+                    orderItems.splice(fromIndex, 1);
+                    orderItems.splice(toIndex, 0, moved);
+
+                    orderItems.forEach(function (el) {
+                        self.listEl.appendChild(el);
                     });
 
-                    // Update index labels in-place
-                    items.forEach(function (el, i) {
+                    var newVisibleOrder = [];
+                    orderItems.forEach(function (el, i) {
+                        newVisibleOrder.push(el.dataset.sessionId);
                         var indexEl = el.querySelector('.wpp-session-index');
                         if (indexEl) {
                             indexEl.textContent = String(i + 1);
                         }
                     });
 
-                    // Highlight moved item
-                    draggedEl.classList.add('wpp-just-moved');
-                    var movedRef = draggedEl;
+                    moved.classList.add('wpp-just-moved');
                     setTimeout(function () {
-                        movedRef.classList.remove('wpp-just-moved');
+                        moved.classList.remove('wpp-just-moved');
                     }, 600);
 
                     self.plugin.setSessionOrderFromVisible(newVisibleOrder, { syncCommands: false });
