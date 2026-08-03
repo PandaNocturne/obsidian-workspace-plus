@@ -1706,26 +1706,12 @@ var TabSwitcherModal = /** @class */ (function () {
     };
 
     /**
-     * Wheel on mask/toolbar (outside the card grid) → cycle split preview.
-     * Scrolling inside the grid is left alone so the panel can scroll normally.
+     * Wheel anywhere in task view → cycle split preview.
      */
     TabSwitcherModal.prototype._onWheel = function (e) {
         var doc = this._overlayDoc || getDoc(this.activeLeaf);
         if (!doc || !doc.body || !doc.body.classList.contains('wpp-mission-control-open')) return;
         if (!this.groups || this.groups.length <= 1) return;
-
-        var dragging = doc.body.classList.contains('wpp-tab-switcher-dragging');
-        var target = e.target;
-
-        if (!dragging) {
-            if (!target || typeof target.closest !== 'function') return;
-            // Grid: do not hijack wheel (no tab cycling)
-            if (target.closest('.wpp-tab-switcher-grid')) return;
-            var onMask = target.closest(
-                '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-hint, .wpp-tab-switcher-grid-wrap'
-            );
-            if (!onMask) return;
-        }
 
         e.preventDefault();
         e.stopPropagation();
