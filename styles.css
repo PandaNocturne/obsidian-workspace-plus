@@ -1377,7 +1377,14 @@ body.wpp-session-list-dragging * {
    Zen / focus tab mode (inspired by Vertical Tabs)
    ============================================================ */
 
-body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-tabs:not(.mod-active):not(.wpp-zen-active) {
+/*
+ * Lock the TAB GROUP only (.workspace-tabs), never view content.
+ * JS MutationObserver re-pins .wpp-zen-active synchronously on DOM remount
+ * so Excalidraw load cannot briefly drop zen (no load-start / load-end flash).
+ */
+body.wpp-zen-mode:not(.is-popout-window)
+    .workspace-split.mod-root:has(.workspace-tabs.wpp-zen-active, .workspace-tabs.mod-active)
+    .workspace-tabs:not(.mod-active):not(.wpp-zen-active) {
     display: none;
     flex-basis: unset;
 }
@@ -1391,6 +1398,16 @@ body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-ta
 body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-split:has(.workspace-tabs.mod-active),
 body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-split:has(.workspace-tabs.wpp-zen-active) {
     flex-basis: 100%;
+}
+
+body.wpp-mission-control-open.wpp-zen-mode:not(.is-popout-window)
+    .workspace-split.mod-root
+    .workspace-tabs.wpp-zen-active,
+body.wpp-mission-control-open.wpp-zen-mode:not(.is-popout-window)
+    .workspace-split.mod-root
+    .workspace-tabs.mod-active {
+    display: flex !important;
+    flex-basis: 100% !important;
 }
 
 body.wpp-zen-mode.wpp-zen-hide-inactive-tabs:not(.is-popout-window)

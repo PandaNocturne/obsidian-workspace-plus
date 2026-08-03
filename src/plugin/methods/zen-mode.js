@@ -11,10 +11,16 @@ function getWorkspaceBody(app) {
     return document.body;
 }
 
-function clearZenActiveFlags(body) {
+function isMissionControlOpen(app) {
+    var body = getWorkspaceBody(app);
+    return !!(body && body.classList.contains('wpp-mission-control-open'));
+}
+
+function clearZenActiveFlags(body, exceptEl) {
     if (!body) return;
     var marked = body.querySelectorAll('.wpp-zen-active');
     for (var i = 0; i < marked.length; i++) {
+        if (exceptEl && marked[i] === exceptEl) continue;
         marked[i].classList.remove('wpp-zen-active');
     }
 }
@@ -28,7 +34,6 @@ function isLeafInRootSplit(app, leaf) {
     }
 }
 
-/** Prefer the editor leaf in rootSplit — activeLeaf is often still a sidebar on cold start. */
 function getZenFocusLeaf(app) {
     var workspace = app && app.workspace;
     if (!workspace) return null;
@@ -40,7 +45,6 @@ function getZenFocusLeaf(app) {
         try {
             var recent = workspace.getMostRecentLeaf(workspace.rootSplit);
             if (isLeafInRootSplit(app, recent)) return recent;
-            // Some builds ignore the root hint — still accept if result is in root
             recent = workspace.getMostRecentLeaf();
             if (isLeafInRootSplit(app, recent)) return recent;
         } catch (err) { /* ignore */ }
@@ -57,7 +61,6 @@ function getZenFocusLeaf(app) {
     return found;
 }
 
-/** Walk up to the WorkspaceTabs container that owns this leaf. */
 function getLeafTabsContainerEl(leaf) {
     var node = leaf && leaf.parent;
     var depth = 0;
@@ -74,18 +77,75 @@ function getLeafTabsContainerEl(leaf) {
         node = node.parent;
         depth += 1;
     }
+
+    try {
+        var leafEl = (leaf && leaf.containerEl)
+            || (leaf && leaf.view && leaf.view.containerEl);
+        if (leafEl && typeof leafEl.closest === 'function') {
+            var fromDom = leafEl.closest('.workspace-tabs');
+            if (fromDom) return fromDom;
+        }
+    } catch (err) { /* ignore */ }
+
     return (leaf && leaf.parent && leaf.parent.containerEl) || null;
 }
 
+function findZenTabsEl(app, body) {
+    var leaf = getZenFocusLeaf(app);
+    var tabsEl = leaf ? getLeafTabsContainerEl(leaf) : null;
+
+    if (!tabsEl) {
+        try {
+            tabsEl = body.querySelector('.workspace-split.mod-root .workspace-tabs.mod-active');
+        } catch (err) { /* ignore */ }
+    }
+
+    if (!tabsEl) {
+        try {
+            var activeLeafEl = body.querySelector(
+                '.workspace-split.mod-root .workspace-leaf.mod-active'
+            );
+            if (activeLeafEl && typeof activeLeafEl.closest === 'function') {
+                tabsEl = activeLeafEl.closest('.workspace-tabs');
+            }
+        } catch (err2) { /* ignore */ }
+    }
+
+    if (!tabsEl) {
+        var existing = body.querySelector(
+            '.workspace-split.mod-root .workspace-tabs.wpp-zen-active'
+        );
+        if (existing && existing.isConnected) return existing;
+    }
+
+    if (!tabsEl) {
+        try {
+            tabsEl = body.querySelector('.workspace-split.mod-root .workspace-tabs');
+        } catch (err3) { /* ignore */ }
+    }
+
+    return tabsEl || null;
+}
+
+/**
+ * Pin zen to the tab group only. Zero DOM writes when already correct —
+ * avoids load-start / load-end double flicker from class thrashing.
+ */
 function lockZenFocus(app) {
     var body = getWorkspaceBody(app);
-    clearZenActiveFlags(body);
+    if (!body) return false;
 
-    var leaf = getZenFocusLeaf(app);
-    if (!leaf) return;
+    var tabsEl = findZenTabsEl(app, body);
+    if (!tabsEl) return false;
 
-    var tabsEl = getLeafTabsContainerEl(leaf);
-    if (tabsEl) tabsEl.classList.add('wpp-zen-active');
+    var marked = body.querySelectorAll('.workspace-split.mod-root .workspace-tabs.wpp-zen-active');
+    if (tabsEl.classList.contains('wpp-zen-active') && marked.length === 1 && marked[0] === tabsEl) {
+        return true;
+    }
+
+    clearZenActiveFlags(body, tabsEl);
+    tabsEl.classList.add('wpp-zen-active');
+    return true;
 }
 
 function persistIfNeeded(plugin, options) {
@@ -95,7 +155,6 @@ function persistIfNeeded(plugin, options) {
 }
 
 function attachZenModeMethods(WorkspacePlusPlus) {
-    /** One-time: move legacy global data.zenMode onto the active session. */
     WorkspacePlusPlus.prototype.migrateZenModeToSessions = function () {
         var sessions = this.data && this.data.sessions;
         if (!sessions || typeof sessions !== 'object') return false;
@@ -119,7 +178,6 @@ function attachZenModeMethods(WorkspacePlusPlus) {
             if (active) active.zenMode = true;
         }
 
-        // Global flag no longer drives UI (kept cleared to avoid resurrecting on load)
         this.data.zenMode = false;
         return legacyGlobal || hadPerSessionFlag;
     };
@@ -148,6 +206,41 @@ function attachZenModeMethods(WorkspacePlusPlus) {
         return this.data.showStatusBarZenMode !== false;
     };
 
+    WorkspacePlusPlus.prototype.startZenDomGuard = function () {
+        var self = this;
+        this.stopZenDomGuard();
+        if (!this.isZenModeEnabled()) return;
+
+        var root = this.app && this.app.workspace && this.app.workspace.rootSplit;
+        var el = root && root.containerEl;
+        if (!el || typeof MutationObserver === 'undefined') return;
+
+        this._zenDomObserver = new MutationObserver(function () {
+            if (!self.isZenModeEnabled()) return;
+            if (isMissionControlOpen(self.app)) return;
+            // Sync — must run before paint so zen never "drops" during Excalidraw remount
+            lockZenFocus(self.app);
+        });
+
+        try {
+            this._zenDomObserver.observe(el, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class'],
+            });
+        } catch (err) {
+            this._zenDomObserver = null;
+        }
+    };
+
+    WorkspacePlusPlus.prototype.stopZenDomGuard = function () {
+        if (this._zenDomObserver) {
+            try { this._zenDomObserver.disconnect(); } catch (err) { /* ignore */ }
+            this._zenDomObserver = null;
+        }
+    };
+
     WorkspacePlusPlus.prototype.applyZenModeClasses = function () {
         var body = getWorkspaceBody(this.app);
         var enabled = this.isZenModeEnabled();
@@ -156,13 +249,19 @@ function attachZenModeMethods(WorkspacePlusPlus) {
             'wpp-zen-hide-inactive-tabs',
             enabled && this.isZenHideInactiveTabsEnabled()
         );
-        if (enabled) lockZenFocus(this.app);
-        else clearZenActiveFlags(body);
+        if (enabled) {
+            lockZenFocus(this.app);
+            this.startZenDomGuard();
+        } else {
+            this.stopZenDomGuard();
+            clearZenActiveFlags(body);
+        }
         this.updateZenStatusBar();
     };
 
     WorkspacePlusPlus.prototype.clearZenModeClasses = function () {
         var body = getWorkspaceBody(this.app);
+        this.stopZenDomGuard();
         body.classList.remove('wpp-zen-mode');
         body.classList.remove('wpp-zen-hide-inactive-tabs');
         clearZenActiveFlags(body);
@@ -238,12 +337,13 @@ function attachZenModeMethods(WorkspacePlusPlus) {
         return persistIfNeeded(this, options);
     };
 
+    /** Sync re-pin only — no debounce (debounce caused load-start/load-end double exit). */
     WorkspacePlusPlus.prototype.refreshZenModeFocus = function () {
         if (!this.isZenModeEnabled()) return;
+        if (isMissionControlOpen(this.app)) return;
         lockZenFocus(this.app);
     };
 
-    /** Re-apply after workspace DOM settles (cold start / session restore). */
     WorkspacePlusPlus.prototype.scheduleZenModeRefresh = function (delayMs) {
         var self = this;
         var delay = typeof delayMs === 'number' && delayMs >= 0 ? delayMs : 0;
@@ -255,7 +355,8 @@ function attachZenModeMethods(WorkspacePlusPlus) {
                 });
             }
             if (!self.isZenModeEnabled()) return;
-            self.applyZenModeClasses();
+            if (isMissionControlOpen(self.app)) return;
+            lockZenFocus(self.app);
         }, delay);
         this._zenRefreshTimers.push(timer);
     };
@@ -266,6 +367,7 @@ function attachZenModeMethods(WorkspacePlusPlus) {
             clearTimeout(timers[i]);
         }
         this._zenRefreshTimers = [];
+        this.stopZenDomGuard();
     };
 }
 

@@ -1670,6 +1670,11 @@ var TabSwitcherModal = /** @class */ (function () {
         this.activeLeaf = null;
         this._overlayDoc = null;
         this.focusedIndex = 0;
+
+        // Re-pin zen after task view closes (refresh was paused while overlay was open)
+        if (this.plugin && typeof this.plugin.refreshZenModeFocus === 'function') {
+            this.plugin.refreshZenModeFocus();
+        }
     };
 
     return TabSwitcherModal;
