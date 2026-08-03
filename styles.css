@@ -2183,3 +2183,20 @@ body.wpp-mission-control-open .wpp-tab-switcher-split-page.is-workspace-split {
 body.wpp-mission-control-open .wpp-tab-switcher-split-page.is-active.is-workspace-split {
     border-color: var(--text-on-accent, #fff);
 }
+
+/* Drop target while dragging a tab header onto another split page (preview switch) */
+body.wpp-mission-control-open.wpp-tab-switcher-dragging .wpp-tab-switcher-split-page.is-drop-target {
+    background: color-mix(in srgb, var(--interactive-accent) 55%, transparent);
+    border-color: var(--interactive-accent);
+    color: var(--text-on-accent, #fff);
+    opacity: 1;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 45%, transparent);
+    transform: scale(1.08);
+}
+
+/* Empty grid area as append drop zone when moving across splits */
+body.wpp-mission-control-open.wpp-tab-switcher-dragging .wpp-tab-switcher-grid.is-drop-target {
+    outline: 2px dashed color-mix(in srgb, var(--interactive-accent) 70%, transparent);
+    outline-offset: 6px;
+    border-radius: var(--radius-m);
+}

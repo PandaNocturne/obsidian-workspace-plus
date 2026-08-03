@@ -641,6 +641,56 @@ function moveLeafInParent(parent, fromIndex, toIndex) {
     }
 }
 
+/** Move a leaf into another WorkspaceTabs group (append or insert). */
+function moveLeafToGroup(leaf, targetGroup, toIndex) {
+    if (!leaf || !targetGroup || !Array.isArray(targetGroup.children)) return false;
+
+    var sourceParent = leaf.parent;
+    if (!sourceParent || sourceParent === targetGroup) return false;
+
+    var insertAt = typeof toIndex === 'number' ? toIndex : targetGroup.children.length;
+    if (insertAt < 0) insertAt = 0;
+    if (insertAt > targetGroup.children.length) insertAt = targetGroup.children.length;
+
+    try {
+        if (typeof sourceParent.removeChild === 'function'
+            && typeof targetGroup.insertChild === 'function') {
+            sourceParent.removeChild(leaf);
+            targetGroup.insertChild(insertAt, leaf);
+        } else {
+            var fromIndex = sourceParent.children.indexOf(leaf);
+            if (fromIndex < 0) return false;
+            sourceParent.children.splice(fromIndex, 1);
+            targetGroup.children.splice(insertAt, 0, leaf);
+            if (typeof leaf.setParent === 'function') leaf.setParent(targetGroup);
+            if (typeof sourceParent.recomputeChildrenDimensions === 'function') {
+                sourceParent.recomputeChildrenDimensions();
+            }
+            if (typeof targetGroup.recomputeChildrenDimensions === 'function') {
+                targetGroup.recomputeChildrenDimensions();
+            }
+        }
+        if (typeof targetGroup.selectTab === 'function') targetGroup.selectTab(leaf);
+        else if (typeof targetGroup.selectTabIndex === 'function') {
+            targetGroup.selectTabIndex(insertAt);
+        }
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
+function requestWorkspaceLayoutPersist(app) {
+    try {
+        if (app && app.workspace && typeof app.workspace.requestSaveLayout === 'function') {
+            app.workspace.requestSaveLayout();
+        }
+        if (app && app.workspace && typeof app.workspace.requestResize === 'function') {
+            app.workspace.requestResize();
+        }
+    } catch (err) { /* ignore */ }
+}
+
 function removeOverlayDom(doc) {
     if (!doc || !doc.body) return;
     var nodes = doc.body.querySelectorAll(
@@ -1131,12 +1181,58 @@ var TabSwitcherModal = /** @class */ (function () {
         var cloneEl = null;
         var fromIndex = this.cardEls.indexOf(card);
         if (fromIndex < 0) return;
+        var dragLeaf = this.leaves[fromIndex];
+        if (!dragLeaf) return;
 
         e.preventDefault();
         e.stopPropagation();
 
+        function clearDropHighlights() {
+            self.cardEls.forEach(function (el) {
+                el.classList.remove('is-drop-target');
+            });
+            self.clearSplitDropTargets();
+            if (self.gridEl) self.gridEl.classList.remove('is-drop-target');
+        }
+
+        function updateDropHighlights(clientX, clientY) {
+            clearDropHighlights();
+
+            // Hover split page → preview that split (move only happens on grid drop)
+            var splitIndex = self.getSplitIndexAtPoint(clientX, clientY);
+            if (splitIndex >= 0) {
+                if (splitIndex !== self.groupIndex) {
+                    self.goToSplitGroup(splitIndex);
+                }
+                self.setSplitDropTarget(splitIndex);
+                return;
+            }
+
+            if (!self.isPointInGrid(clientX, clientY)) return;
+
+            var overIndex = self.getCardIndexAtPoint(clientX, clientY);
+            var crossSplit = dragLeaf.parent !== self.group;
+
+            if (overIndex >= 0) {
+                self.cardEls.forEach(function (el, i) {
+                    var leaf = self.leaves[i];
+                    el.classList.toggle(
+                        'is-drop-target',
+                        i === overIndex && leaf !== dragLeaf
+                    );
+                });
+                return;
+            }
+
+            // Empty area of another split's grid → append target
+            if (crossSplit && self.gridEl) {
+                self.gridEl.classList.add('is-drop-target');
+            }
+        }
+
         function startDrag(ev) {
             dragStarted = true;
+            self._cardDragLeaf = dragLeaf;
             doc.body.classList.add('wpp-tab-switcher-dragging');
             var rect = card.getBoundingClientRect();
             var offsetX = startX - rect.left;
@@ -1165,21 +1261,19 @@ var TabSwitcherModal = /** @class */ (function () {
             if (!cloneEl) return;
             cloneEl.style.top = (ev.clientY - cloneEl._offsetY) + 'px';
             cloneEl.style.left = (ev.clientX - cloneEl._offsetX) + 'px';
-
-            var overIndex = self.getCardIndexAtPoint(ev.clientX, ev.clientY);
-            self.cardEls.forEach(function (el, i) {
-                el.classList.toggle('is-drop-target', overIndex === i && i !== fromIndex);
-            });
+            updateDropHighlights(ev.clientX, ev.clientY);
         }
 
         function onMouseUp(ev) {
             doc.removeEventListener('mousemove', onMouseMove, true);
             doc.removeEventListener('mouseup', onMouseUp, true);
             doc.body.classList.remove('wpp-tab-switcher-dragging');
+            self._cardDragLeaf = null;
 
+            var inGrid = self.isPointInGrid(ev.clientX, ev.clientY);
             var toIndex = self.getCardIndexAtPoint(ev.clientX, ev.clientY);
+            clearDropHighlights();
             self.cardEls.forEach(function (el) {
-                el.classList.remove('is-drop-target');
                 el.classList.remove('is-dragging');
             });
             if (cloneEl) {
@@ -1189,13 +1283,34 @@ var TabSwitcherModal = /** @class */ (function () {
 
             if (!dragStarted) {
                 // Treat as focus select on header (do not switch)
-                self.focusedIndex = fromIndex;
+                var stillIdx = self.leaves.indexOf(dragLeaf);
+                self.focusedIndex = stillIdx >= 0 ? stillIdx : fromIndex;
                 self.updateFocus(false);
                 return;
             }
 
-            if (toIndex < 0 || toIndex === fromIndex) return;
-            self.reorderLeaves(fromIndex, toIndex);
+            // Must drop on the card grid; toolbar / mask / outside → no move
+            if (!inGrid) return;
+
+            var targetGroup = self.group;
+            if (!targetGroup) return;
+
+            if (dragLeaf.parent === targetGroup) {
+                if (toIndex < 0) return;
+                var fromNow = self.leaves.indexOf(dragLeaf);
+                if (fromNow < 0 || fromNow === toIndex) return;
+                self.reorderLeaves(fromNow, toIndex);
+                return;
+            }
+
+            var insertAt;
+            if (toIndex >= 0 && self.leaves[toIndex]) {
+                insertAt = targetGroup.children.indexOf(self.leaves[toIndex]);
+                if (insertAt < 0) insertAt = targetGroup.children.length;
+            } else {
+                insertAt = targetGroup.children ? targetGroup.children.length : 0;
+            }
+            self.moveLeafIntoGroup(dragLeaf, targetGroup, insertAt);
         }
 
         doc.addEventListener('mousemove', onMouseMove, true);
@@ -1212,6 +1327,44 @@ var TabSwitcherModal = /** @class */ (function () {
         return -1;
     };
 
+    TabSwitcherModal.prototype.isPointInGrid = function (x, y) {
+        if (!this.gridEl) return false;
+        var rect = this.gridEl.getBoundingClientRect();
+        return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    };
+
+    TabSwitcherModal.prototype.getSplitIndexAtPoint = function (x, y) {
+        if (!this.splitPagesEl || !this.groups || this.groups.length <= 1) return -1;
+        if (this.toolbarEl && this.toolbarEl.classList.contains('is-hidden')) return -1;
+
+        var pages = this.splitPagesEl.querySelectorAll('.wpp-tab-switcher-split-page');
+        for (var i = 0; i < pages.length; i++) {
+            var rect = pages[i].getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                var idx = parseInt(pages[i].getAttribute('data-split-index'), 10);
+                return isNaN(idx) ? i : idx;
+            }
+        }
+        return -1;
+    };
+
+    TabSwitcherModal.prototype.clearSplitDropTargets = function () {
+        if (!this.splitPagesEl) return;
+        var pages = this.splitPagesEl.querySelectorAll('.wpp-tab-switcher-split-page.is-drop-target');
+        for (var i = 0; i < pages.length; i++) {
+            pages[i].classList.remove('is-drop-target');
+        }
+    };
+
+    TabSwitcherModal.prototype.setSplitDropTarget = function (index) {
+        this.clearSplitDropTargets();
+        if (!this.splitPagesEl || index < 0) return;
+        var page = this.splitPagesEl.querySelector(
+            '.wpp-tab-switcher-split-page[data-split-index="' + index + '"]'
+        );
+        if (page) page.classList.add('is-drop-target');
+    };
+
     TabSwitcherModal.prototype.reorderLeaves = function (fromIndex, toIndex) {
         var moved = this.leaves[fromIndex];
         var target = this.leaves[toIndex];
@@ -1224,20 +1377,58 @@ var TabSwitcherModal = /** @class */ (function () {
 
         if (!moveLeafInParent(parent, realFrom, realTo)) return;
 
-        try {
-            if (typeof this.app.workspace.requestSaveLayout === 'function') {
-                this.app.workspace.requestSaveLayout();
-            }
-            if (typeof this.app.workspace.requestResize === 'function') {
-                this.app.workspace.requestResize();
-            }
-        } catch (err) { /* ignore */ }
+        requestWorkspaceLayoutPersist(this.app);
 
         this.syncLeavesFromGroup();
         var newIndex = this.leaves.indexOf(moved);
         this.focusedIndex = newIndex >= 0 ? newIndex : Math.min(toIndex, this.leaves.length - 1);
         this.renderCards();
         this.updateFocus(false);
+    };
+
+    /** Move leaf into a tab group at insertAt, then show that group. */
+    TabSwitcherModal.prototype.moveLeafIntoGroup = function (moved, targetGroup, insertAt) {
+        if (!moved || !targetGroup) return;
+        if (moved.parent === targetGroup) return;
+
+        if (typeof insertAt !== 'number' || insertAt < 0) {
+            insertAt = targetGroup.children ? targetGroup.children.length : 0;
+        }
+        if (!moveLeafToGroup(moved, targetGroup, insertAt)) return;
+
+        requestWorkspaceLayoutPersist(this.app);
+
+        this.groups = collectRootTabGroups(this.app);
+        var newTargetIndex = this.groups.indexOf(targetGroup);
+        if (newTargetIndex < 0) {
+            for (var i = 0; i < this.groups.length; i++) {
+                if (collectLeavesFromGroup(this.groups[i]).indexOf(moved) >= 0) {
+                    newTargetIndex = i;
+                    break;
+                }
+            }
+        }
+        if (newTargetIndex < 0) {
+            this.syncLeavesFromGroup();
+            if (this.leaves.length === 0 && this.groups && this.groups.length > 1) {
+                this.shiftSplitGroup(1);
+            } else {
+                this.renderCards();
+                this.updateFocus(false);
+            }
+            return;
+        }
+
+        this.groupIndex = newTargetIndex;
+        this.group = this.groups[newTargetIndex];
+        this.leaves = collectLeavesFromGroup(this.group);
+        this.activeLeaf = pickLeafInGroup(this.app, this.group, moved);
+        this.focusedIndex = this.leaves.indexOf(moved);
+        if (this.focusedIndex < 0) this.focusedIndex = 0;
+
+        this.renderCards();
+        this.updateFocus(false);
+        this.updateSplitToolbar();
     };
 
     TabSwitcherModal.prototype.fillCardPreview = function (leaf, scaleEl) {
@@ -1495,19 +1686,20 @@ var TabSwitcherModal = /** @class */ (function () {
     TabSwitcherModal.prototype._onWheel = function (e) {
         var doc = this._overlayDoc || getDoc(this.activeLeaf);
         if (!doc || !doc.body || !doc.body.classList.contains('wpp-mission-control-open')) return;
-        if (doc.body.classList.contains('wpp-tab-switcher-dragging')) return;
         if (!this.groups || this.groups.length <= 1) return;
 
+        var dragging = doc.body.classList.contains('wpp-tab-switcher-dragging');
         var target = e.target;
-        if (!target || typeof target.closest !== 'function') return;
 
-        // Grid: do not hijack wheel (no tab cycling)
-        if (target.closest('.wpp-tab-switcher-grid')) return;
-
-        var onMask = target.closest(
-            '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint'
-        );
-        if (!onMask) return;
+        if (!dragging) {
+            if (!target || typeof target.closest !== 'function') return;
+            // Grid: do not hijack wheel (no tab cycling)
+            if (target.closest('.wpp-tab-switcher-grid')) return;
+            var onMask = target.closest(
+                '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-toolbar, .wpp-tab-switcher-floating-hint'
+            );
+            if (!onMask) return;
+        }
 
         e.preventDefault();
         e.stopPropagation();
@@ -1535,6 +1727,43 @@ var TabSwitcherModal = /** @class */ (function () {
     TabSwitcherModal.prototype._onKeyDown = function (e) {
         if (e.isComposing) return;
         var key = e.key;
+        var doc = this._overlayDoc || getDoc(this.activeLeaf);
+        var dragging = !!(doc && doc.body && doc.body.classList.contains('wpp-tab-switcher-dragging'));
+
+        // While dragging: only split preview keys (+ Esc) — drop must land on the grid
+        if (dragging) {
+            if ((key === '[' || key === '<' || (key === 'ArrowLeft' && e.altKey))) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.shiftSplitGroup(-1);
+                return;
+            }
+            if ((key === ']' || key === '>' || (key === 'ArrowRight' && e.altKey))) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.shiftSplitGroup(1);
+                return;
+            }
+            if (/^[1-9]$/.test(key)) {
+                var dragPage = parseInt(key, 10) - 1;
+                if (this.groups && dragPage < this.groups.length) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.goToSplitGroup(dragPage);
+                }
+                return;
+            }
+            if (key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.close();
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
         if ((key === '[' || key === '<' || (key === 'ArrowLeft' && e.altKey))) {
             e.preventDefault();
             e.stopPropagation();
@@ -1669,6 +1898,7 @@ var TabSwitcherModal = /** @class */ (function () {
         this.groupIndex = 0;
         this.activeLeaf = null;
         this._overlayDoc = null;
+        this._cardDragLeaf = null;
         this.focusedIndex = 0;
 
         // Re-pin zen after task view closes (refresh was paused while overlay was open)
