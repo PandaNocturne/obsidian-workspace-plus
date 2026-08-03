@@ -24,7 +24,10 @@ function registerCommands(plugin) {
     });
 
     addSimpleCommand('switch-tabs', L.cmdTabSwitcher, function () {
-        new modals.TabSwitcherModal(plugin.app, plugin).open();
+        if (!plugin.tabSwitcherModal) {
+            plugin.tabSwitcherModal = new modals.TabSwitcherModal(plugin.app, plugin);
+        }
+        plugin.tabSwitcherModal.open();
     });
 
     addSimpleCommand('save-current-session', L.cmdSaveCurrent, function () {

@@ -1555,22 +1555,25 @@ body.wpp-mission-control-open .wpp-tab-switcher-backdrop {
 
 body.wpp-mission-control-open .wpp-tab-switcher-panel {
     position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    inset: 0;
     z-index: 1001;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    width: max-content;
-    max-width: var(--wpp-mc-panel-max-width);
-    max-height: var(--wpp-mc-panel-max-height);
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    margin: 0;
     overflow: auto;
     padding: 30px;
-    border-radius: 12px;
-    background: var(--modal-background, var(--background-primary));
-    border: 1px solid var(--background-modifier-border);
-    box-shadow: var(--shadow-l);
+    border-radius: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    /* Avoid transform here — nested scale() on cards breaks overflow clipping */
+    pointer-events: none;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-grid {
@@ -1580,8 +1583,18 @@ body.wpp-mission-control-open .wpp-tab-switcher-grid {
     justify-content: center;
     align-content: flex-start;
     align-items: flex-start;
-    width: 100%;
+    box-sizing: border-box;
+    width: max-content;
+    max-width: var(--wpp-mc-panel-max-width);
+    max-height: var(--wpp-mc-panel-max-height);
     min-height: 0;
+    overflow: auto;
+    padding: 30px;
+    border-radius: 12px;
+    background: var(--modal-background, var(--background-primary));
+    border: 1px solid var(--background-modifier-border);
+    box-shadow: var(--shadow-l);
+    pointer-events: auto;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-card {
@@ -1591,12 +1604,14 @@ body.wpp-mission-control-open .wpp-tab-switcher-card {
     flex: 0 0 auto;
     width: var(--wpp-mc-leaf-width);
     max-width: 100%;
+    min-width: 0;
     overflow: hidden;
     border-radius: 10px;
     border: 2px solid var(--background-modifier-border);
     background: var(--background-primary);
     box-shadow: var(--shadow-s);
     cursor: default;
+    contain: layout paint;
 }
 
 /* Current workspace leaf — simple accent border */
@@ -1721,6 +1736,7 @@ body.wpp-mission-control-open .wpp-tab-switcher-viewport {
     background: var(--background-primary);
     cursor: pointer;
     box-shadow: none;
+    contain: paint;
 }
 
 body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-tab-switcher-viewport {
@@ -1736,6 +1752,9 @@ body.wpp-mission-control-open .wpp-tab-switcher-scale {
     pointer-events: none;
     overflow: hidden;
     background: var(--background-primary);
+    /* Collapse unused layout space after visual scale so cards do not overlap */
+    margin-right: calc(var(--wpp-mc-source-width) * (var(--wpp-mc-zoom) - 1));
+    margin-bottom: calc(var(--wpp-mc-source-height) * (var(--wpp-mc-zoom) - 1));
 }
 
 body.wpp-tab-switcher-dragging {

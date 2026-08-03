@@ -13540,16 +13540,52 @@ var require_tab_switcher_modal = __commonJS({
     function isWorkspaceLeaf(node) {
       return !!(node && typeof node.getViewState === "function" && node.view);
     }
-    function isRootLeaf(app, leaf) {
-      if (!leaf || typeof leaf.getRoot !== "function") return false;
-      return leaf.getRoot() === app.workspace.rootSplit;
-    }
     function getActiveLeaf(app) {
       var active = app.workspace.activeLeaf;
       if (!active && typeof app.workspace.getMostRecentLeaf === "function") {
         active = app.workspace.getMostRecentLeaf();
       }
       return active || null;
+    }
+    function getLeafDocument(leaf) {
+      try {
+        var el = leaf && leaf.containerEl || leaf && leaf.view && leaf.view.containerEl;
+        if (el && el.ownerDocument) return el.ownerDocument;
+      } catch (err) {
+      }
+      return typeof activeDocument !== "undefined" && activeDocument || document;
+    }
+    function getDoc(leaf) {
+      if (leaf) return getLeafDocument(leaf);
+      return typeof activeDocument !== "undefined" && activeDocument || document;
+    }
+    function getTabGroup(leaf) {
+      var node = leaf && leaf.parent;
+      var depth = 0;
+      while (node && depth < 6) {
+        if (Array.isArray(node.children) && (typeof node.selectTab === "function" || typeof node.selectTabIndex === "function" || node.type === "tabs")) {
+          return node;
+        }
+        if (Array.isArray(node.children) && node.children.length > 0) {
+          var leafCount = 0;
+          for (var i = 0; i < node.children.length; i++) {
+            if (isWorkspaceLeaf(node.children[i])) leafCount += 1;
+          }
+          if (leafCount > 0 && leafCount === node.children.length) return node;
+        }
+        node = node.parent;
+        depth += 1;
+      }
+      return leaf && leaf.parent || null;
+    }
+    function collectLeavesFromGroup(group) {
+      var leaves = [];
+      if (!group || !Array.isArray(group.children)) return leaves;
+      for (var i = 0; i < group.children.length; i++) {
+        var child = group.children[i];
+        if (isWorkspaceLeaf(child)) leaves.push(child);
+      }
+      return leaves;
     }
     function getLeafTitle(leaf) {
       if (!leaf) return "";
@@ -13596,6 +13632,17 @@ var require_tab_switcher_modal = __commonJS({
       if (!clone) return clone;
       try {
         clone.removeAttribute("id");
+        if (clone.style) {
+          clone.style.removeProperty("position");
+          clone.style.removeProperty("top");
+          clone.style.removeProperty("left");
+          clone.style.removeProperty("right");
+          clone.style.removeProperty("bottom");
+          clone.style.removeProperty("width");
+          clone.style.removeProperty("height");
+          clone.style.removeProperty("inset");
+          clone.style.removeProperty("transform");
+        }
         var withIds = clone.querySelectorAll("[id]");
         for (var i = 0; i < withIds.length; i++) {
           withIds[i].removeAttribute("id");
@@ -13879,30 +13926,16 @@ var require_tab_switcher_modal = __commonJS({
       });
     }
     function collectGroupLeaves(app) {
-      var leaves = [];
       var active = getActiveLeaf(app);
-      var parent = active && active.parent;
-      if (parent && Array.isArray(parent.children) && isRootLeaf(app, active)) {
-        for (var i = 0; i < parent.children.length; i++) {
-          var child = parent.children[i];
-          if (isWorkspaceLeaf(child)) leaves.push(child);
-        }
-        return { group: parent, leaves, active };
+      if (!active) {
+        return { group: null, leaves: [], active: null };
       }
-      if (typeof app.workspace.iterateRootLeaves === "function") {
-        app.workspace.iterateRootLeaves(function(leaf) {
-          if (isWorkspaceLeaf(leaf)) leaves.push(leaf);
-        });
-      } else {
-        app.workspace.iterateAllLeaves(function(leaf) {
-          if (isWorkspaceLeaf(leaf) && isRootLeaf(app, leaf)) leaves.push(leaf);
-        });
+      var group = getTabGroup(active);
+      var leaves = collectLeavesFromGroup(group);
+      if (leaves.length === 0) {
+        leaves = [active];
       }
-      return {
-        group: active && active.parent || null,
-        leaves,
-        active
-      };
+      return { group, leaves, active };
     }
     function isLeafPinned(leaf) {
       if (!leaf) return false;
@@ -13949,8 +13982,19 @@ var require_tab_switcher_modal = __commonJS({
         }
       }
     }
-    function getDoc() {
-      return typeof activeDocument !== "undefined" && activeDocument || document;
+    function removeOverlayDom(doc) {
+      if (!doc || !doc.body) return;
+      var nodes = doc.body.querySelectorAll(
+        ".wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-drag-clone"
+      );
+      for (var i = 0; i < nodes.length; i++) {
+        try {
+          nodes[i].remove();
+        } catch (err) {
+        }
+      }
+      doc.body.removeClass("wpp-mission-control-open");
+      doc.body.classList.remove("wpp-tab-switcher-dragging");
     }
     var TabSwitcherModal = (
       /** @class */
@@ -13970,14 +14014,16 @@ var require_tab_switcher_modal = __commonJS({
           this._onPanelMove = this._onPanelMove.bind(this);
         }
         TabSwitcherModal2.prototype.open = function() {
-          if (getDoc().body.classList.contains("wpp-mission-control-open")) {
+          var collected = collectGroupLeaves(this.app);
+          var doc = getDoc(collected.active);
+          if (doc.body.classList.contains("wpp-mission-control-open") || doc.body.querySelector(".wpp-tab-switcher-backdrop")) {
             this.close();
             return;
           }
-          var collected = collectGroupLeaves(this.app);
           this.group = collected.group;
           this.leaves = collected.leaves.slice();
           this.activeLeaf = collected.active;
+          this._overlayDoc = doc;
           if (this.leaves.length === 0) {
             new obsidian2.Notice(i18n2.L.tabSwitcherEmpty);
             return;
@@ -13985,7 +14031,6 @@ var require_tab_switcher_modal = __commonJS({
           var activeIndex = this.leaves.indexOf(this.activeLeaf);
           if (activeIndex < 0) activeIndex = 0;
           this.focusedIndex = this.leaves.length <= 1 ? 0 : (activeIndex + 1) % this.leaves.length;
-          var doc = getDoc();
           doc.body.addClass("wpp-mission-control-open");
           this.backdropEl = doc.body.createDiv({ cls: "wpp-tab-switcher-backdrop" });
           this.backdropEl.addEventListener("click", this._onBackdropClick);
@@ -14122,6 +14167,7 @@ var require_tab_switcher_modal = __commonJS({
         };
         TabSwitcherModal2.prototype.beginCardDrag = function(e, card) {
           var self = this;
+          var doc = this._overlayDoc || getDoc(this.activeLeaf);
           var startX = e.clientX;
           var startY = e.clientY;
           var dragStarted = false;
@@ -14132,7 +14178,7 @@ var require_tab_switcher_modal = __commonJS({
           e.stopPropagation();
           function startDrag(ev) {
             dragStarted = true;
-            getDoc().body.classList.add("wpp-tab-switcher-dragging");
+            doc.body.classList.add("wpp-tab-switcher-dragging");
             var rect = card.getBoundingClientRect();
             var offsetX = startX - rect.left;
             var offsetY = startY - rect.top;
@@ -14144,7 +14190,7 @@ var require_tab_switcher_modal = __commonJS({
             cloneEl.style.left = ev.clientX - offsetX + "px";
             cloneEl.style.zIndex = "10050";
             cloneEl.style.pointerEvents = "none";
-            getDoc().body.appendChild(cloneEl);
+            doc.body.appendChild(cloneEl);
             cloneEl._offsetX = offsetX;
             cloneEl._offsetY = offsetY;
             card.classList.add("is-dragging");
@@ -14163,9 +14209,9 @@ var require_tab_switcher_modal = __commonJS({
             });
           }
           function onMouseUp(ev) {
-            getDoc().removeEventListener("mousemove", onMouseMove, true);
-            getDoc().removeEventListener("mouseup", onMouseUp, true);
-            getDoc().body.classList.remove("wpp-tab-switcher-dragging");
+            doc.removeEventListener("mousemove", onMouseMove, true);
+            doc.removeEventListener("mouseup", onMouseUp, true);
+            doc.body.classList.remove("wpp-tab-switcher-dragging");
             var toIndex = self.getCardIndexAtPoint(ev.clientX, ev.clientY);
             self.cardEls.forEach(function(el) {
               el.classList.remove("is-drop-target");
@@ -14183,8 +14229,8 @@ var require_tab_switcher_modal = __commonJS({
             if (toIndex < 0 || toIndex === fromIndex) return;
             self.reorderLeaves(fromIndex, toIndex);
           }
-          getDoc().addEventListener("mousemove", onMouseMove, true);
-          getDoc().addEventListener("mouseup", onMouseUp, true);
+          doc.addEventListener("mousemove", onMouseMove, true);
+          doc.addEventListener("mouseup", onMouseUp, true);
         };
         TabSwitcherModal2.prototype.getCardIndexAtPoint = function(x, y) {
           for (var i = 0; i < this.cardEls.length; i++) {
@@ -14344,7 +14390,8 @@ var require_tab_switcher_modal = __commonJS({
           }
         };
         TabSwitcherModal2.prototype._onPanelMove = function(e) {
-          if (getDoc().body.classList.contains("wpp-tab-switcher-dragging")) return;
+          var doc = this._overlayDoc || getDoc(this.activeLeaf);
+          if (doc.body.classList.contains("wpp-tab-switcher-dragging")) return;
           var card = e.target && e.target.closest && e.target.closest(".wpp-tab-switcher-card");
           if (!card) return;
           var index = parseInt(card.getAttribute("data-index"), 10);
@@ -14416,8 +14463,11 @@ var require_tab_switcher_modal = __commonJS({
           }
         };
         TabSwitcherModal2.prototype.close = function() {
-          var doc = getDoc();
-          doc.removeEventListener("keydown", this._onKeyDown, true);
+          var doc = this._overlayDoc || getDoc(this.activeLeaf);
+          try {
+            doc.removeEventListener("keydown", this._onKeyDown, true);
+          } catch (err) {
+          }
           if (this.panelEl) {
             this.panelEl.removeEventListener("click", this._onPanelClick);
             this.panelEl.removeEventListener("mousemove", this._onPanelMove);
@@ -14435,12 +14485,11 @@ var require_tab_switcher_modal = __commonJS({
             this.hintEl.remove();
             this.hintEl = null;
           }
-          doc.body.removeClass("wpp-mission-control-open");
-          doc.body.classList.remove("wpp-tab-switcher-dragging");
-          var clones = doc.body.querySelectorAll(".wpp-tab-switcher-drag-clone");
-          for (var c = 0; c < clones.length; c++) clones[c].remove();
+          removeOverlayDom(doc);
           this.leaves = [];
           this.group = null;
+          this.activeLeaf = null;
+          this._overlayDoc = null;
           this.focusedIndex = 0;
         };
         return TabSwitcherModal2;
@@ -15259,7 +15308,10 @@ var require_register_commands = __commonJS({
         new modals2.SessionManagerModal(plugin.app, plugin).open();
       });
       addSimpleCommand("switch-tabs", L.cmdTabSwitcher, function() {
-        new modals2.TabSwitcherModal(plugin.app, plugin).open();
+        if (!plugin.tabSwitcherModal) {
+          plugin.tabSwitcherModal = new modals2.TabSwitcherModal(plugin.app, plugin);
+        }
+        plugin.tabSwitcherModal.open();
       });
       addSimpleCommand("save-current-session", L.cmdSaveCurrent, function() {
         plugin.saveActiveSession();

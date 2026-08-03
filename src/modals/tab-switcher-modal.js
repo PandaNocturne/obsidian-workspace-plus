@@ -7,17 +7,65 @@ function isWorkspaceLeaf(node) {
     return !!(node && typeof node.getViewState === 'function' && node.view);
 }
 
-function isRootLeaf(app, leaf) {
-    if (!leaf || typeof leaf.getRoot !== 'function') return false;
-    return leaf.getRoot() === app.workspace.rootSplit;
-}
-
 function getActiveLeaf(app) {
     var active = app.workspace.activeLeaf;
     if (!active && typeof app.workspace.getMostRecentLeaf === 'function') {
         active = app.workspace.getMostRecentLeaf();
     }
     return active || null;
+}
+
+/** Prefer the leaf's own document (popout window) over the main app document. */
+function getLeafDocument(leaf) {
+    try {
+        var el = (leaf && leaf.containerEl)
+            || (leaf && leaf.view && leaf.view.containerEl);
+        if (el && el.ownerDocument) return el.ownerDocument;
+    } catch (err) { /* ignore */ }
+    return (typeof activeDocument !== 'undefined' && activeDocument) || document;
+}
+
+function getDoc(leaf) {
+    if (leaf) return getLeafDocument(leaf);
+    return (typeof activeDocument !== 'undefined' && activeDocument) || document;
+}
+
+/**
+ * Resolve the tab group (WorkspaceTabs) that owns this leaf.
+ * Walks up in case the immediate parent is an unexpected wrapper.
+ */
+function getTabGroup(leaf) {
+    var node = leaf && leaf.parent;
+    var depth = 0;
+    while (node && depth < 6) {
+        if (Array.isArray(node.children)
+            && (typeof node.selectTab === 'function'
+                || typeof node.selectTabIndex === 'function'
+                || node.type === 'tabs')) {
+            return node;
+        }
+        // Fallback: parent whose children are mostly workspace leaves
+        if (Array.isArray(node.children) && node.children.length > 0) {
+            var leafCount = 0;
+            for (var i = 0; i < node.children.length; i++) {
+                if (isWorkspaceLeaf(node.children[i])) leafCount += 1;
+            }
+            if (leafCount > 0 && leafCount === node.children.length) return node;
+        }
+        node = node.parent;
+        depth += 1;
+    }
+    return (leaf && leaf.parent) || null;
+}
+
+function collectLeavesFromGroup(group) {
+    var leaves = [];
+    if (!group || !Array.isArray(group.children)) return leaves;
+    for (var i = 0; i < group.children.length; i++) {
+        var child = group.children[i];
+        if (isWorkspaceLeaf(child)) leaves.push(child);
+    }
+    return leaves;
 }
 
 function getLeafTitle(leaf) {
@@ -70,6 +118,18 @@ function sanitizeClone(clone) {
     if (!clone) return clone;
     try {
         clone.removeAttribute('id');
+        // Drop split-pane layout geometry so clones cannot bleed across cards
+        if (clone.style) {
+            clone.style.removeProperty('position');
+            clone.style.removeProperty('top');
+            clone.style.removeProperty('left');
+            clone.style.removeProperty('right');
+            clone.style.removeProperty('bottom');
+            clone.style.removeProperty('width');
+            clone.style.removeProperty('height');
+            clone.style.removeProperty('inset');
+            clone.style.removeProperty('transform');
+        }
         var withIds = clone.querySelectorAll('[id]');
         for (var i = 0; i < withIds.length; i++) {
             withIds[i].removeAttribute('id');
@@ -387,33 +447,20 @@ function renderFileEmbedInto(app, plugin, host, file) {
 }
 
 function collectGroupLeaves(app) {
-    var leaves = [];
     var active = getActiveLeaf(app);
-    var parent = active && active.parent;
-
-    if (parent && Array.isArray(parent.children) && isRootLeaf(app, active)) {
-        for (var i = 0; i < parent.children.length; i++) {
-            var child = parent.children[i];
-            if (isWorkspaceLeaf(child)) leaves.push(child);
-        }
-        return { group: parent, leaves: leaves, active: active };
+    if (!active) {
+        return { group: null, leaves: [], active: null };
     }
 
-    if (typeof app.workspace.iterateRootLeaves === 'function') {
-        app.workspace.iterateRootLeaves(function (leaf) {
-            if (isWorkspaceLeaf(leaf)) leaves.push(leaf);
-        });
-    } else {
-        app.workspace.iterateAllLeaves(function (leaf) {
-            if (isWorkspaceLeaf(leaf) && isRootLeaf(app, leaf)) leaves.push(leaf);
-        });
+    // Always scope to the current pane's tab group — never flatten all split panes.
+    var group = getTabGroup(active);
+    var leaves = collectLeavesFromGroup(group);
+
+    if (leaves.length === 0) {
+        leaves = [active];
     }
 
-    return {
-        group: (active && active.parent) || null,
-        leaves: leaves,
-        active: active,
-    };
+    return { group: group, leaves: leaves, active: active };
 }
 
 function isLeafPinned(leaf) {
@@ -466,8 +513,16 @@ function moveLeafInParent(parent, fromIndex, toIndex) {
     }
 }
 
-function getDoc() {
-    return (typeof activeDocument !== 'undefined' && activeDocument) || document;
+function removeOverlayDom(doc) {
+    if (!doc || !doc.body) return;
+    var nodes = doc.body.querySelectorAll(
+        '.wpp-tab-switcher-backdrop, .wpp-tab-switcher-panel, .wpp-tab-switcher-floating-hint, .wpp-tab-switcher-drag-clone'
+    );
+    for (var i = 0; i < nodes.length; i++) {
+        try { nodes[i].remove(); } catch (err) { /* ignore */ }
+    }
+    doc.body.removeClass('wpp-mission-control-open');
+    doc.body.classList.remove('wpp-tab-switcher-dragging');
 }
 
 // ============================================================
@@ -490,15 +545,20 @@ var TabSwitcherModal = /** @class */ (function () {
     }
 
     TabSwitcherModal.prototype.open = function () {
-        if (getDoc().body.classList.contains('wpp-mission-control-open')) {
+        var collected = collectGroupLeaves(this.app);
+        var doc = getDoc(collected.active);
+
+        // Toggle close / purge any orphaned overlay from a previous instance
+        if (doc.body.classList.contains('wpp-mission-control-open')
+            || doc.body.querySelector('.wpp-tab-switcher-backdrop')) {
             this.close();
             return;
         }
 
-        var collected = collectGroupLeaves(this.app);
         this.group = collected.group;
         this.leaves = collected.leaves.slice();
         this.activeLeaf = collected.active;
+        this._overlayDoc = doc;
 
         if (this.leaves.length === 0) {
             new obsidian.Notice(i18n.L.tabSwitcherEmpty);
@@ -511,7 +571,6 @@ var TabSwitcherModal = /** @class */ (function () {
             ? 0
             : (activeIndex + 1) % this.leaves.length;
 
-        var doc = getDoc();
         doc.body.addClass('wpp-mission-control-open');
 
         this.backdropEl = doc.body.createDiv({ cls: 'wpp-tab-switcher-backdrop' });
@@ -674,6 +733,7 @@ var TabSwitcherModal = /** @class */ (function () {
 
     TabSwitcherModal.prototype.beginCardDrag = function (e, card) {
         var self = this;
+        var doc = this._overlayDoc || getDoc(this.activeLeaf);
         var startX = e.clientX;
         var startY = e.clientY;
         var dragStarted = false;
@@ -686,7 +746,7 @@ var TabSwitcherModal = /** @class */ (function () {
 
         function startDrag(ev) {
             dragStarted = true;
-            getDoc().body.classList.add('wpp-tab-switcher-dragging');
+            doc.body.classList.add('wpp-tab-switcher-dragging');
             var rect = card.getBoundingClientRect();
             var offsetX = startX - rect.left;
             var offsetY = startY - rect.top;
@@ -699,7 +759,7 @@ var TabSwitcherModal = /** @class */ (function () {
             cloneEl.style.left = (ev.clientX - offsetX) + 'px';
             cloneEl.style.zIndex = '10050';
             cloneEl.style.pointerEvents = 'none';
-            getDoc().body.appendChild(cloneEl);
+            doc.body.appendChild(cloneEl);
             cloneEl._offsetX = offsetX;
             cloneEl._offsetY = offsetY;
 
@@ -722,9 +782,9 @@ var TabSwitcherModal = /** @class */ (function () {
         }
 
         function onMouseUp(ev) {
-            getDoc().removeEventListener('mousemove', onMouseMove, true);
-            getDoc().removeEventListener('mouseup', onMouseUp, true);
-            getDoc().body.classList.remove('wpp-tab-switcher-dragging');
+            doc.removeEventListener('mousemove', onMouseMove, true);
+            doc.removeEventListener('mouseup', onMouseUp, true);
+            doc.body.classList.remove('wpp-tab-switcher-dragging');
 
             var toIndex = self.getCardIndexAtPoint(ev.clientX, ev.clientY);
             self.cardEls.forEach(function (el) {
@@ -747,8 +807,8 @@ var TabSwitcherModal = /** @class */ (function () {
             self.reorderLeaves(fromIndex, toIndex);
         }
 
-        getDoc().addEventListener('mousemove', onMouseMove, true);
-        getDoc().addEventListener('mouseup', onMouseUp, true);
+        doc.addEventListener('mousemove', onMouseMove, true);
+        doc.addEventListener('mouseup', onMouseUp, true);
     };
 
     TabSwitcherModal.prototype.getCardIndexAtPoint = function (x, y) {
@@ -948,7 +1008,8 @@ var TabSwitcherModal = /** @class */ (function () {
     };
 
     TabSwitcherModal.prototype._onPanelMove = function (e) {
-        if (getDoc().body.classList.contains('wpp-tab-switcher-dragging')) return;
+        var doc = this._overlayDoc || getDoc(this.activeLeaf);
+        if (doc.body.classList.contains('wpp-tab-switcher-dragging')) return;
         var card = e.target && e.target.closest && e.target.closest('.wpp-tab-switcher-card');
         if (!card) return;
         var index = parseInt(card.getAttribute('data-index'), 10);
@@ -1028,8 +1089,11 @@ var TabSwitcherModal = /** @class */ (function () {
     };
 
     TabSwitcherModal.prototype.close = function () {
-        var doc = getDoc();
-        doc.removeEventListener('keydown', this._onKeyDown, true);
+        var doc = this._overlayDoc || getDoc(this.activeLeaf);
+
+        try {
+            doc.removeEventListener('keydown', this._onKeyDown, true);
+        } catch (err) { /* ignore */ }
 
         if (this.panelEl) {
             this.panelEl.removeEventListener('click', this._onPanelClick);
@@ -1050,12 +1114,13 @@ var TabSwitcherModal = /** @class */ (function () {
             this.hintEl = null;
         }
 
-        doc.body.removeClass('wpp-mission-control-open');
-        doc.body.classList.remove('wpp-tab-switcher-dragging');
-        var clones = doc.body.querySelectorAll('.wpp-tab-switcher-drag-clone');
-        for (var c = 0; c < clones.length; c++) clones[c].remove();
+        // Ensure no orphaned overlay remains (e.g. from a previous non-singleton instance)
+        removeOverlayDom(doc);
+
         this.leaves = [];
         this.group = null;
+        this.activeLeaf = null;
+        this._overlayDoc = null;
         this.focusedIndex = 0;
     };
 
