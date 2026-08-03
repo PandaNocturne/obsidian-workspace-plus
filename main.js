@@ -37,7 +37,7 @@ var require_i18n = __commonJS({
     }
     var STRINGS = {
       en: {
-        modalTitle: "Manage sessions",
+        modalTitle: "Workspace Panel",
         savePlaceholder: "New session name...",
         filterPlaceholder: "Filter sessions...",
         settingsShowFilterInput: "Show session filter",
@@ -494,7 +494,7 @@ var require_i18n = __commonJS({
       zh: {
         settingsStatusBarModScrollSwitch: "\u6309\u4F4F Ctrl/Cmd \u5E76\u6EDA\u52A8\u4EE5\u5207\u6362\u4F1A\u8BDD",
         settingsStatusBarModScrollSwitchDesc: "\u5728\u72B6\u6001\u680F\u9879\u76EE\u4E0A\uFF0C\u6309\u4F4F\u6240\u9009\u4FEE\u9970\u952E\u5E76\u5782\u76F4\u6EDA\u52A8\u5373\u53EF\u5207\u6362\u4F1A\u8BDD\u3002\u4F7F\u7528\u9608\u503C\u548C\u51B7\u5374\u65F6\u95F4\u4EE5\u51CF\u5C11\u89E6\u63A7\u677F\u8BEF\u89E6\u3002",
-        modalTitle: "\u7BA1\u7406\u4F1A\u8BDD",
+        modalTitle: "\u5DE5\u4F5C\u533A\u9762\u677F",
         savePlaceholder: "\u65B0\u4F1A\u8BDD\u540D\u79F0\u2026",
         filterPlaceholder: "\u7B5B\u9009\u4F1A\u8BDD...",
         settingsShowFilterInput: "\u663E\u793A\u4F1A\u8BDD\u7B5B\u9009",
@@ -826,7 +826,7 @@ var require_i18n = __commonJS({
       "zh-TW": {
         settingsStatusBarModScrollSwitch: "\u6309\u4F4F Ctrl/Cmd \u4E26\u6372\u52D5\u4EE5\u5207\u63DB\u5DE5\u4F5C\u968E\u6BB5",
         settingsStatusBarModScrollSwitchDesc: "\u5728\u72C0\u614B\u5217\u9805\u76EE\u4E0A\uFF0C\u6309\u4F4F\u6240\u9078\u4FEE\u98FE\u9375\u4E26\u5782\u76F4\u6372\u52D5\u5373\u53EF\u5207\u63DB\u5DE5\u4F5C\u968E\u6BB5\u3002\u4F7F\u7528\u95BE\u503C\u8207\u51B7\u537B\u6642\u9593\u4EE5\u6E1B\u5C11\u89F8\u63A7\u677F\u8AA4\u89F8\u3002",
-        modalTitle: "\u7BA1\u7406\u5DE5\u4F5C\u968E\u6BB5",
+        modalTitle: "\u5DE5\u4F5C\u5340\u9762\u677F",
         savePlaceholder: "\u65B0\u5DE5\u4F5C\u968E\u6BB5\u540D\u7A31\u2026",
         filterPlaceholder: "\u7BE9\u9078\u5DE5\u4F5C\u968E\u6BB5...",
         settingsShowFilterInput: "\u986F\u793A\u5DE5\u4F5C\u968E\u6BB5\u7BE9\u9078",

@@ -33,6 +33,9 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    /* Keep room so footer archive badge is not clipped by the modal edge */
+    padding-bottom: 4px;
+    box-sizing: border-box;
 }
 
 .wpp-modal {
@@ -47,6 +50,13 @@
     padding: 5px;
     margin: 5px;
     gap: 0;
+}
+
+/* Session manager: consistent side inset aligned with title / chrome */
+.modal.wpp-session-manager-modal .wpp-modal {
+    padding: 4px 16px 10px;
+    margin: 0;
+    overflow: hidden;
 }
 
 /* Save section */
@@ -396,7 +406,9 @@
     min-width: 0;
     margin-top: auto;
     padding-top: 12px;
+    padding-right: 6px;
     border-top: 1px solid var(--background-modifier-border);
+    overflow: visible;
 }
 
 .wpp-modal-footer-left {
@@ -414,6 +426,11 @@
 .wpp-archive-btn-wrap {
     position: relative;
     flex-shrink: 0;
+    overflow: visible;
+    /* Keep badge inside the modal padding box */
+    margin-right: 2px;
+    padding-top: 4px;
+    padding-right: 4px;
 }
 
 /* Footer toolbar icons: no focus outline */
@@ -443,8 +460,8 @@
 
 .wpp-archive-badge {
     position: absolute;
-    top: -6px;
-    right: -6px;
+    top: 0;
+    right: 0;
     min-width: 18px;
     height: 18px;
     padding: 0 5px;
@@ -457,6 +474,7 @@
     color: var(--text-on-accent);
     box-sizing: border-box;
     pointer-events: none;
+    z-index: 2;
 }
 
 .wpp-session-item--archived {
@@ -541,6 +559,20 @@
 
 .wpp-empty-state-group {
     text-align: center;
+}
+
+/* Center empty message in the session list pane (under group tabs) */
+.wpp-session-list--cards:has(> .wpp-empty-state) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+}
+
+.wpp-session-list--cards > .wpp-empty-state {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
 }
 
 /* Keyboard focus */
@@ -1202,8 +1234,10 @@ body.wpp-session-list-dragging * {
     gap: 12px;
     width: 100%;
     min-width: 0;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     flex-shrink: 0;
+    padding: 2px 0 8px;
+    border-bottom: 1px solid var(--background-modifier-border);
 }
 
 .wpp-group-tabs-row-inner {
@@ -1278,17 +1312,6 @@ body.wpp-session-list-dragging * {
     outline: 2px solid var(--interactive-accent);
     outline-offset: -2px;
     background: var(--background-modifier-hover);
-}
-
-/* Modal group tabs row */
-.wpp-group-tabs-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-    min-width: 0;
-    overflow: visible;
-    padding: 2px 0;
 }
 
 /* Group add button */

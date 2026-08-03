@@ -42,7 +42,7 @@ function modifiedClickLabel(baseText, macKey, otherKey) {
 
 var STRINGS = {
     en: {
-        modalTitle: 'Manage sessions',
+        modalTitle: 'Workspace Panel',
         savePlaceholder: 'New session name...',
         filterPlaceholder: 'Filter sessions...',
         settingsShowFilterInput: 'Show session filter',
@@ -394,7 +394,7 @@ var STRINGS = {
     zh: {
         settingsStatusBarModScrollSwitch: '按住 Ctrl/Cmd 并滚动以切换会话',
         settingsStatusBarModScrollSwitchDesc: '在状态栏项目上，按住所选修饰键并垂直滚动即可切换会话。使用阈值和冷却时间以减少触控板误触。',
-        modalTitle: '管理会话',
+        modalTitle: '工作区面板',
         savePlaceholder: '新会话名称…',
         filterPlaceholder: '筛选会话...',
         settingsShowFilterInput: '显示会话筛选',
@@ -629,7 +629,7 @@ var STRINGS = {
     'zh-TW': {
         settingsStatusBarModScrollSwitch: '按住 Ctrl/Cmd 並捲動以切換工作階段',
         settingsStatusBarModScrollSwitchDesc: '在狀態列項目上，按住所選修飾鍵並垂直捲動即可切換工作階段。使用閾值與冷卻時間以減少觸控板誤觸。',
-        modalTitle: '管理工作階段',
+        modalTitle: '工作區面板',
         savePlaceholder: '新工作階段名稱\u2026',
         filterPlaceholder: '篩選工作階段...',
         settingsShowFilterInput: '顯示工作階段篩選',
