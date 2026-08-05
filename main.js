@@ -22157,12 +22157,33 @@ var require_zen_mode = __commonJS({
       return true;
     }
     function isLeafInRootSplit(app, leaf) {
-      if (!app || !app.workspace || !leaf || typeof leaf.getRoot !== "function") return false;
+      if (!app || !app.workspace || !leaf) return false;
+      var root = app.workspace.rootSplit;
+      if (!root) return false;
       try {
-        return leaf.getRoot() === app.workspace.rootSplit;
+        if (typeof leaf.getRoot === "function" && leaf.getRoot() !== root) {
+          return false;
+        }
       } catch (err) {
         return false;
       }
+      try {
+        var rootEl = root.containerEl;
+        var leafEl = leaf.containerEl || leaf.view && leaf.view.containerEl;
+        if (rootEl && leafEl) {
+          if (typeof rootEl.contains === "function" && !rootEl.contains(leafEl)) {
+            return false;
+          }
+          if (typeof leafEl.closest === "function" && leafEl.closest(".csn-sticky, .csn-sticky-window-body")) {
+            return false;
+          }
+        } else if (rootEl && !leafEl) {
+          return false;
+        }
+      } catch (err2) {
+        return false;
+      }
+      return true;
     }
     function findLeafById(app, leafId) {
       if (!leafId || !app || !app.workspace) return null;
