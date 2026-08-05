@@ -1,7 +1,7 @@
 {
     "id": "workspace-plus-plus-beta",
     "name": "Workspace++ Beta",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "minAppVersion": "1.11.0",
     "description": "Workspace session manager with a native-feeling UI/UX. Beta fork with card layout, trash, and layout path repair.",
     "author": "PandaNocturne",
