@@ -47,11 +47,20 @@ function attachSessionStatusBarMethods(WorkspacePlusPlus) {
         var icon = this.statusBarEl.createSpan({ cls: 'wpp-status-icon' });
         obsidian.setIcon(icon, 'panels-top-left');
 
-        // Show group name if a group is active
-        var activeGroup = this.getActiveGroup();
-        if (activeGroup) {
+        // Nest as "Group / Session" only when the active session belongs to a real group.
+        // Default / ungrouped sessions show the session name alone (no nesting).
+        var displayGroup = null;
+        if (session && typeof this.chooseSessionGroupForView === 'function') {
+            var preferredGroupId = this.chooseSessionGroupForView(session.id);
+            if (preferredGroupId && this.data && this.data.groups) {
+                displayGroup = this.data.groups[preferredGroupId] || null;
+            }
+        } else {
+            displayGroup = this.getActiveGroup();
+        }
+        if (displayGroup) {
             this.statusBarEl.createSpan({
-                text: activeGroup.name,
+                text: displayGroup.name,
                 cls: 'wpp-status-group',
             });
             this.statusBarEl.createSpan({

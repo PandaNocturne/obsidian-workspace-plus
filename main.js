@@ -19869,6 +19869,24 @@ var require_groups = __commonJS({
         if (!this.data.activeGroupId) return null;
         return (this.data.groups || {})[this.data.activeGroupId] || null;
       };
+      WorkspacePlusPlus2.prototype.chooseSessionGroupForView = function(sessionId) {
+        if (!this.isGroupFeatureEnabled()) return void 0;
+        var data = this.data || {};
+        var groups = data.groups || {};
+        var sessionGroups = data.sessionGroups || {};
+        var groupIds = Array.isArray(sessionGroups[sessionId]) ? sessionGroups[sessionId] : [];
+        var validGroupIds = groupIds.filter(function(groupId) {
+          return !!groups[groupId];
+        });
+        if (validGroupIds.length === 0) return null;
+        if (validGroupIds.indexOf(data.activeGroupId) !== -1) return data.activeGroupId;
+        var ordered = this.getOrderedGroupTabIds();
+        for (var i = 0; i < ordered.length; i++) {
+          if (ordered[i] === "__all__") continue;
+          if (validGroupIds.indexOf(ordered[i]) !== -1) return ordered[i];
+        }
+        return validGroupIds[0];
+      };
       WorkspacePlusPlus2.prototype.createGroup = function(name) {
         var L = i18n2.L;
         var id = utils.generateId();
@@ -20512,30 +20530,6 @@ var require_session_saving = __commonJS({
       }
       return null;
     }
-    function isGroupFeatureEnabled(plugin) {
-      if (typeof plugin.isGroupFeatureEnabled === "function") {
-        return plugin.isGroupFeatureEnabled();
-      }
-      return !plugin.data || plugin.data.groupFeatureEnabled !== false;
-    }
-    function chooseSessionGroupForView(plugin, sessionId) {
-      if (!isGroupFeatureEnabled(plugin)) return void 0;
-      var data = plugin.data || {};
-      var groups = data.groups || {};
-      var sessionGroups = data.sessionGroups || {};
-      var groupIds = Array.isArray(sessionGroups[sessionId]) ? sessionGroups[sessionId] : [];
-      var validGroupIds = groupIds.filter(function(groupId) {
-        return !!groups[groupId];
-      });
-      if (validGroupIds.length === 0) return null;
-      if (validGroupIds.indexOf(data.activeGroupId) !== -1) return data.activeGroupId;
-      var ordered = typeof plugin.getOrderedGroupTabIds === "function" ? plugin.getOrderedGroupTabIds() : Array.isArray(data.groupOrder) ? data.groupOrder : [];
-      for (var i = 0; i < ordered.length; i++) {
-        if (ordered[i] === "__all__") continue;
-        if (validGroupIds.indexOf(ordered[i]) !== -1) return ordered[i];
-      }
-      return validGroupIds[0];
-    }
     function attachSessionSavingMethods(WorkspacePlusPlus2) {
       WorkspacePlusPlus2.prototype.isAutoSaveOnSwitchEnabled = function() {
         return this.data.autoSaveOnSwitch !== false;
@@ -20698,9 +20692,11 @@ var require_session_saving = __commonJS({
           session.layout = currentLayout;
           session.modified = Date.now();
           this.data.activeSessionId = session.id;
-          var preferredGroupId = chooseSessionGroupForView(this, session.id);
-          if (typeof preferredGroupId !== "undefined") {
-            this.data.activeGroupId = preferredGroupId;
+          if (typeof this.chooseSessionGroupForView === "function") {
+            var preferredGroupId = this.chooseSessionGroupForView(session.id);
+            if (typeof preferredGroupId !== "undefined") {
+              this.data.activeGroupId = preferredGroupId;
+            }
           }
           overwritten = true;
         } else {
@@ -20864,10 +20860,18 @@ var require_session_statusbar = __commonJS({
         this.statusBarEl.empty();
         var icon = this.statusBarEl.createSpan({ cls: "wpp-status-icon" });
         obsidian2.setIcon(icon, "panels-top-left");
-        var activeGroup = this.getActiveGroup();
-        if (activeGroup) {
+        var displayGroup = null;
+        if (session && typeof this.chooseSessionGroupForView === "function") {
+          var preferredGroupId = this.chooseSessionGroupForView(session.id);
+          if (preferredGroupId && this.data && this.data.groups) {
+            displayGroup = this.data.groups[preferredGroupId] || null;
+          }
+        } else {
+          displayGroup = this.getActiveGroup();
+        }
+        if (displayGroup) {
           this.statusBarEl.createSpan({
-            text: activeGroup.name,
+            text: displayGroup.name,
             cls: "wpp-status-group"
           });
           this.statusBarEl.createSpan({
@@ -21216,6 +21220,15 @@ var require_session_switching = __commonJS({
           }
           self.clearZenModeClasses();
           self.data.activeSessionId = targetId;
+          if (typeof self.chooseSessionGroupForView === "function") {
+            var preferredGroupId = self.chooseSessionGroupForView(targetId);
+            if (typeof preferredGroupId !== "undefined" && self.data.activeGroupId !== preferredGroupId) {
+              self.data.activeGroupId = preferredGroupId;
+              if (typeof self.syncSessionCommands === "function") {
+                self.syncSessionCommands();
+              }
+            }
+          }
           var applyLayout = target.layout ? self.applyWorkspaceLayout(target.layout) : Promise.resolve();
           return applyLayout.then(function() {
             if (typeof self.restoreZenFocusLeaf === "function") {

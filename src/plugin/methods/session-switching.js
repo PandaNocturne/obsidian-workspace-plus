@@ -275,8 +275,18 @@ function attachSessionSwitchingMethods(WorkspacePlusPlus) {
             // or when focus flags from the previous layout no longer match.
             self.clearZenModeClasses();
 
-            // 2. Update active
+            // 2. Update active session and sync group view for status-bar nesting
             self.data.activeSessionId = targetId;
+            if (typeof self.chooseSessionGroupForView === 'function') {
+                var preferredGroupId = self.chooseSessionGroupForView(targetId);
+                if (typeof preferredGroupId !== 'undefined'
+                    && self.data.activeGroupId !== preferredGroupId) {
+                    self.data.activeGroupId = preferredGroupId;
+                    if (typeof self.syncSessionCommands === 'function') {
+                        self.syncSessionCommands();
+                    }
+                }
+            }
 
             // 3. Apply target layout, then restore that session's zen state
             var applyLayout = target.layout

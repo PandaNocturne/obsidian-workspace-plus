@@ -120,6 +120,32 @@ function attachGroupMethods(WorkspacePlusPlus) {
         return (this.data.groups || {})[this.data.activeGroupId] || null;
     };
 
+    // Pick the group that should drive status-bar nesting / active view for a session.
+    // Returns undefined when groups are disabled, null for Default/ungrouped sessions
+    // (no nesting), or a real group id when the session belongs to one or more groups.
+    WorkspacePlusPlus.prototype.chooseSessionGroupForView = function (sessionId) {
+        if (!this.isGroupFeatureEnabled()) return undefined;
+
+        var data = this.data || {};
+        var groups = data.groups || {};
+        var sessionGroups = data.sessionGroups || {};
+        var groupIds = Array.isArray(sessionGroups[sessionId]) ? sessionGroups[sessionId] : [];
+        var validGroupIds = groupIds.filter(function (groupId) {
+            return !!groups[groupId];
+        });
+
+        // Default / ungrouped: never nest under a real group label
+        if (validGroupIds.length === 0) return null;
+        if (validGroupIds.indexOf(data.activeGroupId) !== -1) return data.activeGroupId;
+
+        var ordered = this.getOrderedGroupTabIds();
+        for (var i = 0; i < ordered.length; i++) {
+            if (ordered[i] === '__all__') continue;
+            if (validGroupIds.indexOf(ordered[i]) !== -1) return ordered[i];
+        }
+        return validGroupIds[0];
+    };
+
     WorkspacePlusPlus.prototype.createGroup = function (name) {
         var L = i18n.L;
         var id = utils.generateId();

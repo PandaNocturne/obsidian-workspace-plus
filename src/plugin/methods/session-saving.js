@@ -16,38 +16,6 @@ function findSessionByName(data, name) {
     return null;
 }
 
-function isGroupFeatureEnabled(plugin) {
-    if (typeof plugin.isGroupFeatureEnabled === 'function') {
-        return plugin.isGroupFeatureEnabled();
-    }
-    return !plugin.data || plugin.data.groupFeatureEnabled !== false;
-}
-
-function chooseSessionGroupForView(plugin, sessionId) {
-    if (!isGroupFeatureEnabled(plugin)) return undefined;
-
-    var data = plugin.data || {};
-    var groups = data.groups || {};
-    var sessionGroups = data.sessionGroups || {};
-    var groupIds = Array.isArray(sessionGroups[sessionId]) ? sessionGroups[sessionId] : [];
-    var validGroupIds = groupIds.filter(function (groupId) {
-        return !!groups[groupId];
-    });
-
-    if (validGroupIds.length === 0) return null;
-    if (validGroupIds.indexOf(data.activeGroupId) !== -1) return data.activeGroupId;
-
-    var ordered = typeof plugin.getOrderedGroupTabIds === 'function'
-        ? plugin.getOrderedGroupTabIds()
-        : (Array.isArray(data.groupOrder) ? data.groupOrder : []);
-
-    for (var i = 0; i < ordered.length; i++) {
-        if (ordered[i] === '__all__') continue;
-        if (validGroupIds.indexOf(ordered[i]) !== -1) return ordered[i];
-    }
-    return validGroupIds[0];
-}
-
 function attachSessionSavingMethods(WorkspacePlusPlus) {
     WorkspacePlusPlus.prototype.isAutoSaveOnSwitchEnabled = function () {
         return this.data.autoSaveOnSwitch !== false;
@@ -237,9 +205,11 @@ function attachSessionSavingMethods(WorkspacePlusPlus) {
             session.layout = currentLayout;
             session.modified = Date.now();
             this.data.activeSessionId = session.id;
-            var preferredGroupId = chooseSessionGroupForView(this, session.id);
-            if (typeof preferredGroupId !== 'undefined') {
-                this.data.activeGroupId = preferredGroupId;
+            if (typeof this.chooseSessionGroupForView === 'function') {
+                var preferredGroupId = this.chooseSessionGroupForView(session.id);
+                if (typeof preferredGroupId !== 'undefined') {
+                    this.data.activeGroupId = preferredGroupId;
+                }
             }
             overwritten = true;
         } else {
