@@ -188,6 +188,7 @@ var require_i18n = __commonJS({
         settingsLanguageDesc: "Plugin UI language. Restart Obsidian to apply to command names.",
         settingsSectionGeneral: "General",
         settingsTabSessions: "Sessions",
+        settingsTabGroups: "Groups",
         settingsSectionSwitching: "Session switching",
         settingsSectionSwitchCommands: "Switch commands",
         settingsSectionScrollSwitch: "Scroll switching",
@@ -610,6 +611,7 @@ var require_i18n = __commonJS({
         settingsLanguageDesc: "\u63D2\u4EF6\u754C\u9762\u8BED\u8A00\u3002\u91CD\u542F Obsidian \u540E\u547D\u4EE4\u540D\u79F0\u624D\u4F1A\u66F4\u65B0\u3002",
         settingsSectionGeneral: "\u5E38\u89C4",
         settingsTabSessions: "\u4F1A\u8BDD",
+        settingsTabGroups: "\u5206\u7EC4",
         settingsSectionSwitching: "\u4F1A\u8BDD\u81EA\u52A8\u4FDD\u5B58",
         settingsSectionSwitchPreview: "\u4F1A\u8BDD\u5207\u6362",
         settingsSectionDeletion: "\u4F1A\u8BDD\u5220\u9664",
@@ -942,6 +944,7 @@ var require_i18n = __commonJS({
         settingsLanguageDesc: "\u5916\u639B\u4ECB\u9762\u8A9E\u8A00\u3002\u91CD\u65B0\u555F\u52D5 Obsidian \u5F8C\u547D\u4EE4\u540D\u7A31\u624D\u6703\u66F4\u65B0\u3002",
         settingsSectionGeneral: "\u4E00\u822C",
         settingsTabSessions: "\u5DE5\u4F5C\u968E\u6BB5",
+        settingsTabGroups: "\u5206\u7D44",
         settingsSectionSwitching: "\u5DE5\u4F5C\u968E\u6BB5\u81EA\u52D5\u5132\u5B58",
         settingsSectionSwitchPreview: "\u5DE5\u4F5C\u968E\u6BB5\u5207\u63DB",
         settingsSectionDeletion: "\u5DE5\u4F5C\u968E\u6BB5\u522A\u9664",
@@ -1845,7 +1848,7 @@ var require_i18n = __commonJS({
         settingsZenMode: "Focus tab mode",
         settingsZenModeDesc: "Per workspace: hide inactive tab groups and maximize the active split (like Vertical Tabs zen mode).",
         settingsZenHideInactiveTabs: "Hide inactive tabs in focus mode",
-        settingsZenHideInactiveTabsDesc: "When focus mode is on, only show the active tab header in the current group.",
+        settingsZenHideInactiveTabsDesc: "When focus mode is on (hotkey or status bar), only show the active tab header in the current group.",
         zenModeEnabled: "Focus tab mode on",
         zenModeDisabled: "Focus tab mode off",
         settingsShowStatusBarWorkspace: "Show workspace status bar",
@@ -1865,7 +1868,7 @@ var require_i18n = __commonJS({
         settingsZenMode: "\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
         settingsZenModeDesc: "\u6309\u5DE5\u4F5C\u533A\u5206\u522B\u8BB0\u5F55\uFF1A\u9690\u85CF\u5176\u4ED6\u5206\u680F\u6807\u7B7E\u7EC4\uFF0C\u653E\u5927\u5F53\u524D\u5206\u680F\uFF08\u53C2\u8003 Vertical Tabs \u7684 Zen mode\uFF09\u3002",
         settingsZenHideInactiveTabs: "\u4E13\u6CE8\u6A21\u5F0F\u4E0B\u9690\u85CF\u975E\u6D3B\u52A8\u6807\u7B7E",
-        settingsZenHideInactiveTabsDesc: "\u5F00\u542F\u4E13\u6CE8\u6A21\u5F0F\u65F6\uFF0C\u5F53\u524D\u5206\u7EC4\u4EC5\u663E\u793A\u6D3B\u52A8\u6807\u7B7E\u9875\u6807\u9898\u3002",
+        settingsZenHideInactiveTabsDesc: "\u901A\u8FC7\u5FEB\u6377\u952E\u6216\u72B6\u6001\u680F\u5F00\u542F\u4E13\u6CE8\u6A21\u5F0F\u65F6\uFF0C\u5F53\u524D\u5206\u7EC4\u4EC5\u663E\u793A\u6D3B\u52A8\u6807\u7B7E\u9875\u6807\u9898\u3002",
         zenModeEnabled: "\u5DF2\u5F00\u542F\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
         zenModeDisabled: "\u5DF2\u5173\u95ED\u4E13\u6CE8\u6807\u7B7E\u6A21\u5F0F",
         settingsShowStatusBarWorkspace: "\u663E\u793A\u72B6\u6001\u680F\u5DE5\u4F5C\u533A\u63A7\u4EF6",
@@ -1885,7 +1888,7 @@ var require_i18n = __commonJS({
         settingsZenMode: "\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F",
         settingsZenModeDesc: "\u96B1\u85CF\u5176\u4ED6\u5206\u6B04\u5206\u9801\u7D44\uFF0C\u653E\u5927\u76EE\u524D\u5206\u6B04\uFF08\u53C3\u8003 Vertical Tabs \u7684 Zen mode\uFF09\u3002",
         settingsZenHideInactiveTabs: "\u5C08\u6CE8\u6A21\u5F0F\u4E0B\u96B1\u85CF\u975E\u4F7F\u7528\u4E2D\u5206\u9801",
-        settingsZenHideInactiveTabsDesc: "\u958B\u555F\u5C08\u6CE8\u6A21\u5F0F\u6642\uFF0C\u76EE\u524D\u5206\u7D44\u50C5\u986F\u793A\u4F7F\u7528\u4E2D\u5206\u9801\u6A19\u984C\u3002",
+        settingsZenHideInactiveTabsDesc: "\u900F\u904E\u5FEB\u6377\u9375\u6216\u72C0\u614B\u5217\u958B\u555F\u5C08\u6CE8\u6A21\u5F0F\u6642\uFF0C\u76EE\u524D\u5206\u7D44\u50C5\u986F\u793A\u4F7F\u7528\u4E2D\u5206\u9801\u6A19\u984C\u3002",
         zenModeEnabled: "\u5DF2\u958B\u555F\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F",
         zenModeDisabled: "\u5DF2\u95DC\u9589\u5C08\u6CE8\u5206\u9801\u6A21\u5F0F",
         settingsShowStatusBarWorkspace: "\u986F\u793A\u72C0\u614B\u5217\u5DE5\u4F5C\u5340\u63A7\u4EF6",
@@ -7142,7 +7145,7 @@ var require_settings = __commonJS({
           var tabs = [
             { id: "general", label: L.settingsSectionGeneral },
             { id: "sessions", label: L.settingsTabSessions },
-            { id: "groups", label: L.settingsSectionGroups },
+            { id: "groups", label: L.settingsTabGroups },
             { id: "advanced", label: L.settingsSectionAdvanced }
           ];
           var tabBarEl = containerEl.createDiv({ cls: "wpp-settings-tab-bar" });
@@ -7253,25 +7256,13 @@ var require_settings = __commonJS({
               }
             });
             addToggleSetting(contentEl, {
-              name: L.settingsZenMode,
-              desc: L.settingsZenModeDesc,
-              value: self.plugin.isZenModeEnabled(),
+              name: L.settingsZenHideInactiveTabs,
+              desc: L.settingsZenHideInactiveTabsDesc,
+              value: self.plugin.isZenHideInactiveTabsEnabled(),
               onChange: function(value) {
-                self.plugin.setZenMode(value).then(function() {
-                  self.display();
-                });
+                self.plugin.setZenHideInactiveTabs(value);
               }
             });
-            if (self.plugin.isZenModeEnabled()) {
-              addToggleSetting(contentEl, {
-                name: L.settingsZenHideInactiveTabs,
-                desc: L.settingsZenHideInactiveTabsDesc,
-                value: self.plugin.isZenHideInactiveTabsEnabled(),
-                onChange: function(value) {
-                  self.plugin.setZenHideInactiveTabs(value);
-                }
-              });
-            }
           }
           if (self.activeTab === "sessions") {
             addSubsection(contentEl, L.settingsSubsectionAutoSaveMode);

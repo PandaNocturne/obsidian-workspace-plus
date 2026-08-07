@@ -39,7 +39,7 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
         var tabs = [
             { id: 'general', label: L.settingsSectionGeneral },
             { id: 'sessions', label: L.settingsTabSessions },
-            { id: 'groups', label: L.settingsSectionGroups },
+            { id: 'groups', label: L.settingsTabGroups },
             { id: 'advanced', label: L.settingsSectionAdvanced },
         ];
         var tabBarEl = containerEl.createDiv({ cls: 'wpp-settings-tab-bar' });
@@ -180,27 +180,16 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
                 },
             });
 
+            // Focus/zen mode itself is toggled via command/hotkey (and optional status bar).
+            // This preference stays visible so it applies whenever focus mode is turned on.
             addToggleSetting(contentEl, {
-                name: L.settingsZenMode,
-                desc: L.settingsZenModeDesc,
-                value: self.plugin.isZenModeEnabled(),
+                name: L.settingsZenHideInactiveTabs,
+                desc: L.settingsZenHideInactiveTabsDesc,
+                value: self.plugin.isZenHideInactiveTabsEnabled(),
                 onChange: function (value) {
-                    self.plugin.setZenMode(value).then(function () {
-                        self.display();
-                    });
+                    self.plugin.setZenHideInactiveTabs(value);
                 },
             });
-
-            if (self.plugin.isZenModeEnabled()) {
-                addToggleSetting(contentEl, {
-                    name: L.settingsZenHideInactiveTabs,
-                    desc: L.settingsZenHideInactiveTabsDesc,
-                    value: self.plugin.isZenHideInactiveTabsEnabled(),
-                    onChange: function (value) {
-                        self.plugin.setZenHideInactiveTabs(value);
-                    },
-                });
-            }
 
         }
 
