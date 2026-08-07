@@ -15,8 +15,24 @@ function numberOrFallback(value, fallback) {
 }
 
 function attachSettingsStateMethods(WorkspacePlusPlus) {
+    WorkspacePlusPlus.prototype.normalizeLanguageSetting = function () {
+        var current = this.data && this.data.language;
+        if (!current || current === 'auto') {
+            this.data.language = current || 'auto';
+            return this.data.language;
+        }
+        if (!i18n.LANG_OPTIONS || !i18n.LANG_OPTIONS[current]) {
+            this.data.language = 'auto';
+        }
+        return this.data.language;
+    };
+
     WorkspacePlusPlus.prototype.setLanguageSetting = function (value, options) {
-        this.data.language = value || 'auto';
+        var next = value || 'auto';
+        if (next !== 'auto' && (!i18n.LANG_OPTIONS || !i18n.LANG_OPTIONS[next])) {
+            next = 'auto';
+        }
+        this.data.language = next;
         i18n.resolveLocale(this.data.language);
         return persistIfNeeded(this, options);
     };

@@ -45,6 +45,9 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
             self.sessionSwitchNotice = null;
             self.syncSessionOrder();
             self.registerSessionStorageListeners();
+            if (typeof self.normalizeLanguageSetting === 'function') {
+                self.normalizeLanguageSetting();
+            }
             i18n.resolveLocale(self.data.language);
             var L = i18n.L;
 
