@@ -211,11 +211,34 @@ function renderGroupTabs(options) {
     });
     groupsWrap.appendChild(addBtn);
 
-    // Pinned "All" tab on the right (not draggable)
+    // Locate current workspace — pinned left of All
+    if (typeof options.onLocateCurrentClick === 'function') {
+        var locateBtn = allWrap.createDiv({ cls: 'wpp-group-locate-btn' });
+        obsidian.setIcon(locateBtn, 'locate');
+        var locateTooltip = options.locateButtonTooltip || L.locateCurrentSession;
+        if (locateTooltip) {
+            obsidian.setTooltip(locateBtn, locateTooltip, {
+                placement: options.locateButtonTooltipPlacement || 'bottom',
+                delay: options.locateButtonTooltipDelay || 250,
+            });
+        }
+        locateBtn.addEventListener('click', function (e) {
+            if (options.stopPropagationOnMouseDown) e.stopPropagation();
+            options.onLocateCurrentClick();
+        });
+    }
+
+    // Pinned "All" tab on the right (icon, not draggable)
     var allTab = allWrap.createDiv({ cls: 'wpp-group-tab wpp-group-tab--all' });
     allTab.dataset.groupId = '__all__';
     if (!selectedGroupId) allTab.classList.add('is-active');
-    allTab.textContent = L.groupAll;
+    obsidian.setIcon(allTab, 'layout-list');
+    if (L.groupAll) {
+        obsidian.setTooltip(allTab, L.groupAll, {
+            placement: 'bottom',
+            delay: 250,
+        });
+    }
     allTab.addEventListener('click', function () {
         if (typeof options.onSelectGroup === 'function') {
             options.onSelectGroup(null);

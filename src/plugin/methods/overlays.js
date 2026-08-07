@@ -232,6 +232,42 @@ function attachOverlayMethods(WorkspacePlusPlus) {
                         refreshOrderedSessions();
                     });
                 },
+                locateButtonTooltip: L.locateCurrentSession,
+                onLocateCurrentClick: function () {
+                    locateCurrentSessionInOverlay();
+                },
+            });
+        }
+
+        function locateCurrentSessionInOverlay() {
+            var activeId = self.data.activeSessionId;
+            if (!activeId || !self.data.sessions[activeId]) return;
+
+            if ((searchInput.value || '').trim()) {
+                searchInput.value = '';
+            }
+
+            var targetGroupId = null;
+            if (self.isGroupFeatureEnabled() && typeof self.chooseSessionGroupForView === 'function') {
+                var preferred = self.chooseSessionGroupForView(activeId);
+                if (preferred === null) targetGroupId = '__ungrouped__';
+                else if (preferred) targetGroupId = preferred;
+            }
+
+            var finishLocate = function () {
+                syncSelectedIndexToActive();
+                renderList();
+            };
+
+            if (!self.isGroupFeatureEnabled() || getOverlayGroupId() === targetGroupId) {
+                ordered = self.getOrderedSessionsForGroup(getOverlayGroupId());
+                filtered = self.filterSessionsByQuery(ordered, searchInput.value);
+                finishLocate();
+                return;
+            }
+
+            applyOverlayGroupSelection(targetGroupId).then(function () {
+                finishLocate();
             });
         }
 
@@ -1197,7 +1233,13 @@ function attachOverlayMethods(WorkspacePlusPlus) {
             var allTab = document.createElement('div');
             allTab.className = 'wpp-group-tab wpp-group-tab--all';
             if (!overlayGroupId) allTab.classList.add('is-active');
-            allTab.textContent = L.groupAll;
+            obsidian.setIcon(allTab, 'layout-list');
+            if (L.groupAll) {
+                obsidian.setTooltip(allTab, L.groupAll, {
+                    placement: 'bottom',
+                    delay: 250,
+                });
+            }
             allTab.addEventListener('click', function (e) {
                 onGroupTabClick(null, e);
             });

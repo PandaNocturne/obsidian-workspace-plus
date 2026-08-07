@@ -347,6 +347,51 @@ var SessionManagerModal = /** @class */ (function (_super) {
         });
     };
 
+    SessionManagerModal.prototype.resolveLocateGroupId = function (sessionId) {
+        if (!this.plugin.isGroupFeatureEnabled()) return null;
+        if (typeof this.plugin.chooseSessionGroupForView !== 'function') return null;
+        var preferred = this.plugin.chooseSessionGroupForView(sessionId);
+        if (preferred === null) return '__ungrouped__';
+        if (preferred) return preferred;
+        return null;
+    };
+
+    SessionManagerModal.prototype.locateCurrentSession = function () {
+        var self = this;
+        var activeId = this.plugin.data.activeSessionId;
+        if (!activeId || !this.plugin.data.sessions[activeId]) {
+            return Promise.resolve(false);
+        }
+
+        if (this.panelMode === 'archive') {
+            this.panelMode = 'sessions';
+            this.selectedIds.clear();
+            this.syncPanelModeChrome();
+            this.renderGroupTabs();
+            this.persistPanelState();
+        }
+
+        if (this.filterInput && (this.filterQuery || '').trim()) {
+            this.filterQuery = '';
+            this.filterInput.value = '';
+        }
+
+        var finish = function () {
+            self.focusSessionTarget(self.getDefaultSessionTarget());
+            return true;
+        };
+
+        var targetGroupId = this.resolveLocateGroupId(activeId);
+        if (!this.plugin.isGroupFeatureEnabled() || this.getModalGroupId() === targetGroupId) {
+            this.renderList();
+            return Promise.resolve(finish());
+        }
+
+        return this.selectGroup(targetGroupId).then(function () {
+            return finish();
+        });
+    };
+
     SessionManagerModal.prototype.getNavigationSessions = function () {
         return this.getVisibleSessions();
     };
@@ -1434,6 +1479,10 @@ var SessionManagerModal = /** @class */ (function (_super) {
                 groupTabUi.openCreateGroupPrompt(self.app, self.plugin, function () {
                     self.renderGroupTabs();
                 });
+            },
+            locateButtonTooltip: L.locateCurrentSession,
+            onLocateCurrentClick: function () {
+                self.locateCurrentSession();
             },
         });
     };

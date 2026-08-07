@@ -7653,6 +7653,7 @@ var SESSION_EDIT_STRINGS = {
         deletePermanently: 'Delete permanently',
         confirmDeleteArchived: function (n) { return 'Permanently delete "' + n + '" from trash? This cannot be undone.'; },
         backToSessions: 'Back to sessions',
+        locateCurrentSession: 'Locate current workspace',
     },
     zh: {
         editSessionTitle: '编辑会话',
@@ -7689,6 +7690,7 @@ var SESSION_EDIT_STRINGS = {
         deletePermanently: '永久删除',
         confirmDeleteArchived: function (n) { return '永久删除垃圾桶中的\u201c' + n + '\u201d？此操作无法撤销。'; },
         backToSessions: '返回会话列表',
+        locateCurrentSession: '定位当前工作区',
     },
     'zh-TW': {
         editSessionTitle: '編輯工作階段',
@@ -7725,6 +7727,7 @@ var SESSION_EDIT_STRINGS = {
         deletePermanently: '永久刪除',
         confirmDeleteArchived: function (n) { return '永久刪除垃圾桶中的\u300c' + n + '\u300d？此操作無法復原。'; },
         backToSessions: '返回工作階段列表',
+        locateCurrentSession: '定位目前工作區',
     },
     ja: {
         editSessionTitle: 'セッションを編集',
@@ -7761,6 +7764,7 @@ var SESSION_EDIT_STRINGS = {
         deletePermanently: '完全に削除',
         confirmDeleteArchived: function (n) { return 'ゴミ箱の "' + n + '" を完全に削除しますか？この操作は元に戻せません。'; },
         backToSessions: 'セッション一覧に戻る',
+        locateCurrentSession: '現在のワークスペースを表示',
     },
 };
 

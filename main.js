@@ -9982,7 +9982,8 @@ var require_i18n = __commonJS({
         confirmDeleteArchived: function(n) {
           return 'Permanently delete "' + n + '" from trash? This cannot be undone.';
         },
-        backToSessions: "Back to sessions"
+        backToSessions: "Back to sessions",
+        locateCurrentSession: "Locate current workspace"
       },
       zh: {
         editSessionTitle: "\u7F16\u8F91\u4F1A\u8BDD",
@@ -10040,7 +10041,8 @@ var require_i18n = __commonJS({
         confirmDeleteArchived: function(n) {
           return "\u6C38\u4E45\u5220\u9664\u5783\u573E\u6876\u4E2D\u7684\u201C" + n + "\u201D\uFF1F\u6B64\u64CD\u4F5C\u65E0\u6CD5\u64A4\u9500\u3002";
         },
-        backToSessions: "\u8FD4\u56DE\u4F1A\u8BDD\u5217\u8868"
+        backToSessions: "\u8FD4\u56DE\u4F1A\u8BDD\u5217\u8868",
+        locateCurrentSession: "\u5B9A\u4F4D\u5F53\u524D\u5DE5\u4F5C\u533A"
       },
       "zh-TW": {
         editSessionTitle: "\u7DE8\u8F2F\u5DE5\u4F5C\u968E\u6BB5",
@@ -10098,7 +10100,8 @@ var require_i18n = __commonJS({
         confirmDeleteArchived: function(n) {
           return "\u6C38\u4E45\u522A\u9664\u5783\u573E\u6876\u4E2D\u7684\u300C" + n + "\u300D\uFF1F\u6B64\u64CD\u4F5C\u7121\u6CD5\u5FA9\u539F\u3002";
         },
-        backToSessions: "\u8FD4\u56DE\u5DE5\u4F5C\u968E\u6BB5\u5217\u8868"
+        backToSessions: "\u8FD4\u56DE\u5DE5\u4F5C\u968E\u6BB5\u5217\u8868",
+        locateCurrentSession: "\u5B9A\u4F4D\u76EE\u524D\u5DE5\u4F5C\u5340"
       },
       ja: {
         editSessionTitle: "\u30BB\u30C3\u30B7\u30E7\u30F3\u3092\u7DE8\u96C6",
@@ -10156,7 +10159,8 @@ var require_i18n = __commonJS({
         confirmDeleteArchived: function(n) {
           return '\u30B4\u30DF\u7BB1\u306E "' + n + '" \u3092\u5B8C\u5168\u306B\u524A\u9664\u3057\u307E\u3059\u304B\uFF1F\u3053\u306E\u64CD\u4F5C\u306F\u5143\u306B\u623B\u305B\u307E\u305B\u3093\u3002';
         },
-        backToSessions: "\u30BB\u30C3\u30B7\u30E7\u30F3\u4E00\u89A7\u306B\u623B\u308B"
+        backToSessions: "\u30BB\u30C3\u30B7\u30E7\u30F3\u4E00\u89A7\u306B\u623B\u308B",
+        locateCurrentSession: "\u73FE\u5728\u306E\u30EF\u30FC\u30AF\u30B9\u30DA\u30FC\u30B9\u3092\u8868\u793A"
       }
     };
     var sessionEditLangs = Object.keys(STRINGS);
@@ -11425,10 +11429,31 @@ var require_group_tab_ui = __commonJS({
         openCreateGroupPrompt(app, plugin, options.onGroupsChanged);
       });
       groupsWrap.appendChild(addBtn);
+      if (typeof options.onLocateCurrentClick === "function") {
+        var locateBtn = allWrap.createDiv({ cls: "wpp-group-locate-btn" });
+        obsidian2.setIcon(locateBtn, "locate");
+        var locateTooltip = options.locateButtonTooltip || L.locateCurrentSession;
+        if (locateTooltip) {
+          obsidian2.setTooltip(locateBtn, locateTooltip, {
+            placement: options.locateButtonTooltipPlacement || "bottom",
+            delay: options.locateButtonTooltipDelay || 250
+          });
+        }
+        locateBtn.addEventListener("click", function(e) {
+          if (options.stopPropagationOnMouseDown) e.stopPropagation();
+          options.onLocateCurrentClick();
+        });
+      }
       var allTab = allWrap.createDiv({ cls: "wpp-group-tab wpp-group-tab--all" });
       allTab.dataset.groupId = "__all__";
       if (!selectedGroupId) allTab.classList.add("is-active");
-      allTab.textContent = L.groupAll;
+      obsidian2.setIcon(allTab, "layout-list");
+      if (L.groupAll) {
+        obsidian2.setTooltip(allTab, L.groupAll, {
+          placement: "bottom",
+          delay: 250
+        });
+      }
       allTab.addEventListener("click", function() {
         if (typeof options.onSelectGroup === "function") {
           options.onSelectGroup(null);
@@ -12638,6 +12663,44 @@ var require_session_manager_modal = __commonJS({
             return result.switched;
           });
         };
+        SessionManagerModal2.prototype.resolveLocateGroupId = function(sessionId) {
+          if (!this.plugin.isGroupFeatureEnabled()) return null;
+          if (typeof this.plugin.chooseSessionGroupForView !== "function") return null;
+          var preferred = this.plugin.chooseSessionGroupForView(sessionId);
+          if (preferred === null) return "__ungrouped__";
+          if (preferred) return preferred;
+          return null;
+        };
+        SessionManagerModal2.prototype.locateCurrentSession = function() {
+          var self = this;
+          var activeId = this.plugin.data.activeSessionId;
+          if (!activeId || !this.plugin.data.sessions[activeId]) {
+            return Promise.resolve(false);
+          }
+          if (this.panelMode === "archive") {
+            this.panelMode = "sessions";
+            this.selectedIds.clear();
+            this.syncPanelModeChrome();
+            this.renderGroupTabs();
+            this.persistPanelState();
+          }
+          if (this.filterInput && (this.filterQuery || "").trim()) {
+            this.filterQuery = "";
+            this.filterInput.value = "";
+          }
+          var finish = function() {
+            self.focusSessionTarget(self.getDefaultSessionTarget());
+            return true;
+          };
+          var targetGroupId = this.resolveLocateGroupId(activeId);
+          if (!this.plugin.isGroupFeatureEnabled() || this.getModalGroupId() === targetGroupId) {
+            this.renderList();
+            return Promise.resolve(finish());
+          }
+          return this.selectGroup(targetGroupId).then(function() {
+            return finish();
+          });
+        };
         SessionManagerModal2.prototype.getNavigationSessions = function() {
           return this.getVisibleSessions();
         };
@@ -13597,6 +13660,10 @@ var require_session_manager_modal = __commonJS({
               groupTabUi.openCreateGroupPrompt(self.app, self.plugin, function() {
                 self.renderGroupTabs();
               });
+            },
+            locateButtonTooltip: L.locateCurrentSession,
+            onLocateCurrentClick: function() {
+              self.locateCurrentSession();
             }
           });
         };
@@ -16845,7 +16912,37 @@ var require_overlays = __commonJS({
                 renderGroupTabs();
                 refreshOrderedSessions();
               });
+            },
+            locateButtonTooltip: L.locateCurrentSession,
+            onLocateCurrentClick: function() {
+              locateCurrentSessionInOverlay();
             }
+          });
+        }
+        function locateCurrentSessionInOverlay() {
+          var activeId = self.data.activeSessionId;
+          if (!activeId || !self.data.sessions[activeId]) return;
+          if ((searchInput.value || "").trim()) {
+            searchInput.value = "";
+          }
+          var targetGroupId = null;
+          if (self.isGroupFeatureEnabled() && typeof self.chooseSessionGroupForView === "function") {
+            var preferred = self.chooseSessionGroupForView(activeId);
+            if (preferred === null) targetGroupId = "__ungrouped__";
+            else if (preferred) targetGroupId = preferred;
+          }
+          var finishLocate = function() {
+            syncSelectedIndexToActive();
+            renderList();
+          };
+          if (!self.isGroupFeatureEnabled() || getOverlayGroupId() === targetGroupId) {
+            ordered = self.getOrderedSessionsForGroup(getOverlayGroupId());
+            filtered = self.filterSessionsByQuery(ordered, searchInput.value);
+            finishLocate();
+            return;
+          }
+          applyOverlayGroupSelection(targetGroupId).then(function() {
+            finishLocate();
           });
         }
         overlay.appendChild(groupTabsRow);
@@ -17652,7 +17749,13 @@ var require_overlays = __commonJS({
           var allTab = document.createElement("div");
           allTab.className = "wpp-group-tab wpp-group-tab--all";
           if (!overlayGroupId) allTab.classList.add("is-active");
-          allTab.textContent = L.groupAll;
+          obsidian2.setIcon(allTab, "layout-list");
+          if (L.groupAll) {
+            obsidian2.setTooltip(allTab, L.groupAll, {
+              placement: "bottom",
+              delay: 250
+            });
+          }
           allTab.addEventListener("click", function(e) {
             onGroupTabClick(null, e);
           });

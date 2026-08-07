@@ -54,7 +54,7 @@
 
 /* Session manager: consistent side inset aligned with title / chrome */
 .modal.wpp-session-manager-modal .wpp-modal {
-    padding: 4px 16px 10px;
+    padding: 4px;
     margin: 0;
     overflow: hidden;
 }
@@ -129,14 +129,14 @@
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    min-height: 120px;
+    height: 120px;
     padding: 12px;
     border: 1px solid var(--background-modifier-border);
     border-radius: var(--radius-m, 8px);
     background: var(--background-secondary);
     box-shadow: none;
     cursor: pointer;
-    gap: 10px;
+    gap: 0px;
     overflow: visible;
 }
 
@@ -196,7 +196,7 @@
     font-size: var(--font-ui-smaller);
     color: var(--text-muted);
     line-height: 1.45;
-    margin: 2px 0 6px;
+    margin: 2px 0 0px;
     display: -webkit-box;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
@@ -756,6 +756,8 @@ body.wpp-session-list-dragging * {
     gap: 4px;
     cursor: pointer;
     max-width: 200px;
+    margin: 0 8px;
+    padding: 0 6px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1234,9 +1236,9 @@ body.wpp-session-list-dragging * {
     gap: 12px;
     width: 100%;
     min-width: 0;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
     flex-shrink: 0;
-    padding: 2px 0 8px;
+    padding: 2px 0 2px;
     border-bottom: 1px solid var(--background-modifier-border);
 }
 
@@ -1244,8 +1246,9 @@ body.wpp-session-list-dragging * {
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin-bottom: 4px;
     justify-content: space-between;
-    gap: 12px;
+    gap: 2px;
     width: 100%;
     min-width: 0;
 }
@@ -1302,6 +1305,22 @@ body.wpp-session-list-dragging * {
     color: var(--text-on-accent);
 }
 
+.wpp-group-tab--all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    max-width: none;
+    overflow: visible;
+}
+
+.wpp-group-tab--all svg {
+    width: var(--icon-xs);
+    height: var(--icon-xs);
+}
+
 /* Group tab D&D dragging */
 .wpp-group-tab.is-dragging {
     visibility: hidden;
@@ -1315,7 +1334,8 @@ body.wpp-session-list-dragging * {
 }
 
 /* Group add button */
-.wpp-group-add-btn {
+.wpp-group-add-btn,
+.wpp-group-locate-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1327,12 +1347,14 @@ body.wpp-session-list-dragging * {
     flex-shrink: 0;
 }
 
-.wpp-group-add-btn:hover {
+.wpp-group-add-btn:hover,
+.wpp-group-locate-btn:hover {
     background: var(--background-modifier-hover);
     color: var(--text-normal);
 }
 
-.wpp-group-add-btn svg {
+.wpp-group-add-btn svg,
+.wpp-group-locate-btn svg {
     width: var(--icon-xs);
     height: var(--icon-xs);
 }
