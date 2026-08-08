@@ -411,6 +411,39 @@ function ensureLeafLoaded(leaf) {
     return Promise.resolve();
 }
 
+/** Select a leaf inside its WorkspaceTabs group (needed for cold/deferred tabs). */
+function selectLeafInTabGroup(leaf) {
+    var parent = getTabGroup(leaf);
+    if (!parent || !Array.isArray(parent.children)) return false;
+    try {
+        if (typeof parent.selectTab === 'function') {
+            parent.selectTab(leaf);
+            return true;
+        }
+        if (typeof parent.selectTabIndex === 'function') {
+            var idx = parent.children.indexOf(leaf);
+            if (idx >= 0) {
+                parent.selectTabIndex(idx);
+                return true;
+            }
+        }
+    } catch (err) { /* ignore */ }
+    return false;
+}
+
+function activateWorkspaceLeaf(app, leaf) {
+    if (!app || !app.workspace || !leaf) return;
+    try {
+        selectLeafInTabGroup(leaf);
+        if (typeof app.workspace.setActiveLeaf === 'function') {
+            app.workspace.setActiveLeaf(leaf, { focus: true });
+        }
+        if (typeof app.workspace.revealLeaf === 'function') {
+            app.workspace.revealLeaf(leaf);
+        }
+    } catch (err) { /* ignore */ }
+}
+
 function fillIconOnly(host, leaf) {
     host.empty();
     var iconWrap = host.createDiv({ cls: 'wpp-tab-switcher-preview-icon' });
@@ -1117,20 +1150,11 @@ var TabSwitcherModal = /** @class */ (function () {
         if (!leaf) return;
 
         var plugin = this.plugin;
-        this.close();
-
-        try {
-            if (typeof this.app.workspace.setActiveLeaf === 'function') {
-                this.app.workspace.setActiveLeaf(leaf, { focus: true });
-            }
-            if (typeof this.app.workspace.revealLeaf === 'function') {
-                this.app.workspace.revealLeaf(leaf);
-            }
-        } catch (err) { /* ignore */ }
-
-        if (!plugin) return;
+        var app = this.app;
+        this.close({ skipZenRefresh: true });
 
         var finish = function () {
+            if (!plugin) return;
             if (typeof plugin.rememberZenFocusLeaf === 'function') {
                 plugin.rememberZenFocusLeaf(leaf, { force: true });
             }
@@ -1139,11 +1163,16 @@ var TabSwitcherModal = /** @class */ (function () {
             }
         };
 
-        if (typeof plugin.setZenMode === 'function') {
-            Promise.resolve(plugin.setZenMode(true)).then(finish).catch(finish);
-        } else {
-            finish();
-        }
+        var activateAndZen = function () {
+            activateWorkspaceLeaf(app, leaf);
+            if (plugin && typeof plugin.setZenMode === 'function') {
+                Promise.resolve(plugin.setZenMode(true)).then(finish).catch(finish);
+            } else {
+                finish();
+            }
+        };
+
+        ensureLeafLoaded(leaf).then(activateAndZen).catch(activateAndZen);
     };
 
     TabSwitcherModal.prototype.shiftSplitGroup = function (delta) {
@@ -1971,17 +2000,47 @@ var TabSwitcherModal = /** @class */ (function () {
 
     TabSwitcherModal.prototype.activateFocused = function () {
         var leaf = this.leaves[this.focusedIndex];
-        this.close();
-        if (!leaf) return;
-        if (typeof this.app.workspace.setActiveLeaf === 'function') {
-            this.app.workspace.setActiveLeaf(leaf, { focus: true });
+        var plugin = this.plugin;
+        var app = this.app;
+        if (!leaf) {
+            this.close();
+            return;
         }
-        if (typeof this.app.workspace.revealLeaf === 'function') {
-            this.app.workspace.revealLeaf(leaf);
-        }
+        // Skip zen refresh on close — re-pin after the target leaf is active,
+        // otherwise cold Excalidraw / deferred tabs can lose the first switch.
+        this.close({ skipZenRefresh: true });
+
+        var finishZen = function () {
+            if (!plugin) return;
+            if (typeof plugin.rememberZenFocusLeaf === 'function') {
+                plugin.rememberZenFocusLeaf(leaf, { force: true });
+            }
+            if (typeof plugin.refreshZenModeFocus === 'function') {
+                plugin.refreshZenModeFocus();
+            }
+        };
+
+        var activate = function () {
+            activateWorkspaceLeaf(app, leaf);
+            finishZen();
+        };
+
+        // Wake deferred leaves (common for unopened Excalidraw) then re-assert
+        // after a couple frames — first mount can remount the view DOM.
+        ensureLeafLoaded(leaf)
+            .then(function () {
+                activate();
+                return waitFrames(2);
+            })
+            .then(function () {
+                activateWorkspaceLeaf(app, leaf);
+                finishZen();
+            })
+            .catch(activate);
     };
 
-    TabSwitcherModal.prototype.close = function () {
+    TabSwitcherModal.prototype.close = function (options) {
+        options = options || {};
         var doc = this._overlayDoc || getDoc(this.activeLeaf);
 
         this.cancelPreviewQueue();
@@ -2048,7 +2107,9 @@ var TabSwitcherModal = /** @class */ (function () {
         this.focusedIndex = 0;
 
         // Re-pin zen after task view closes (refresh was paused while overlay was open)
-        if (this.plugin && typeof this.plugin.refreshZenModeFocus === 'function') {
+        if (!options.skipZenRefresh
+            && this.plugin
+            && typeof this.plugin.refreshZenModeFocus === 'function') {
             this.plugin.refreshZenModeFocus();
         }
     };

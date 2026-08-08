@@ -5547,6 +5547,38 @@ var require_tab_switcher_modal = __commonJS({
       }
       return Promise.resolve();
     }
+    function selectLeafInTabGroup(leaf) {
+      var parent = getTabGroup(leaf);
+      if (!parent || !Array.isArray(parent.children)) return false;
+      try {
+        if (typeof parent.selectTab === "function") {
+          parent.selectTab(leaf);
+          return true;
+        }
+        if (typeof parent.selectTabIndex === "function") {
+          var idx = parent.children.indexOf(leaf);
+          if (idx >= 0) {
+            parent.selectTabIndex(idx);
+            return true;
+          }
+        }
+      } catch (err) {
+      }
+      return false;
+    }
+    function activateWorkspaceLeaf(app, leaf) {
+      if (!app || !app.workspace || !leaf) return;
+      try {
+        selectLeafInTabGroup(leaf);
+        if (typeof app.workspace.setActiveLeaf === "function") {
+          app.workspace.setActiveLeaf(leaf, { focus: true });
+        }
+        if (typeof app.workspace.revealLeaf === "function") {
+          app.workspace.revealLeaf(leaf);
+        }
+      } catch (err) {
+      }
+    }
     function fillIconOnly(host, leaf) {
       host.empty();
       var iconWrap = host.createDiv({ cls: "wpp-tab-switcher-preview-icon" });
@@ -6146,18 +6178,10 @@ var require_tab_switcher_modal = __commonJS({
           }
           if (!leaf) return;
           var plugin = this.plugin;
-          this.close();
-          try {
-            if (typeof this.app.workspace.setActiveLeaf === "function") {
-              this.app.workspace.setActiveLeaf(leaf, { focus: true });
-            }
-            if (typeof this.app.workspace.revealLeaf === "function") {
-              this.app.workspace.revealLeaf(leaf);
-            }
-          } catch (err) {
-          }
-          if (!plugin) return;
+          var app = this.app;
+          this.close({ skipZenRefresh: true });
           var finish = function() {
+            if (!plugin) return;
             if (typeof plugin.rememberZenFocusLeaf === "function") {
               plugin.rememberZenFocusLeaf(leaf, { force: true });
             }
@@ -6165,11 +6189,15 @@ var require_tab_switcher_modal = __commonJS({
               plugin.refreshZenModeFocus();
             }
           };
-          if (typeof plugin.setZenMode === "function") {
-            Promise.resolve(plugin.setZenMode(true)).then(finish).catch(finish);
-          } else {
-            finish();
-          }
+          var activateAndZen = function() {
+            activateWorkspaceLeaf(app, leaf);
+            if (plugin && typeof plugin.setZenMode === "function") {
+              Promise.resolve(plugin.setZenMode(true)).then(finish).catch(finish);
+            } else {
+              finish();
+            }
+          };
+          ensureLeafLoaded(leaf).then(activateAndZen).catch(activateAndZen);
         };
         TabSwitcherModal2.prototype.shiftSplitGroup = function(delta) {
           this.groups = collectRootTabGroups(this.app);
@@ -6856,16 +6884,36 @@ var require_tab_switcher_modal = __commonJS({
         };
         TabSwitcherModal2.prototype.activateFocused = function() {
           var leaf = this.leaves[this.focusedIndex];
-          this.close();
-          if (!leaf) return;
-          if (typeof this.app.workspace.setActiveLeaf === "function") {
-            this.app.workspace.setActiveLeaf(leaf, { focus: true });
+          var plugin = this.plugin;
+          var app = this.app;
+          if (!leaf) {
+            this.close();
+            return;
           }
-          if (typeof this.app.workspace.revealLeaf === "function") {
-            this.app.workspace.revealLeaf(leaf);
-          }
+          this.close({ skipZenRefresh: true });
+          var finishZen = function() {
+            if (!plugin) return;
+            if (typeof plugin.rememberZenFocusLeaf === "function") {
+              plugin.rememberZenFocusLeaf(leaf, { force: true });
+            }
+            if (typeof plugin.refreshZenModeFocus === "function") {
+              plugin.refreshZenModeFocus();
+            }
+          };
+          var activate = function() {
+            activateWorkspaceLeaf(app, leaf);
+            finishZen();
+          };
+          ensureLeafLoaded(leaf).then(function() {
+            activate();
+            return waitFrames(2);
+          }).then(function() {
+            activateWorkspaceLeaf(app, leaf);
+            finishZen();
+          }).catch(activate);
         };
-        TabSwitcherModal2.prototype.close = function() {
+        TabSwitcherModal2.prototype.close = function(options) {
+          options = options || {};
           var doc = this._overlayDoc || getDoc(this.activeLeaf);
           this.cancelPreviewQueue();
           try {
@@ -6923,7 +6971,7 @@ var require_tab_switcher_modal = __commonJS({
           this._overlayDoc = null;
           this._cardDragLeaf = null;
           this.focusedIndex = 0;
-          if (this.plugin && typeof this.plugin.refreshZenModeFocus === "function") {
+          if (!options.skipZenRefresh && this.plugin && typeof this.plugin.refreshZenModeFocus === "function") {
             this.plugin.refreshZenModeFocus();
           }
         };
