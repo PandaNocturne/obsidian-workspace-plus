@@ -10869,6 +10869,7 @@ var require_layout_utils = __commonJS({
       var filesCache = null;
       var restoreByFilename = options.restoreByFilename !== false;
       var restoreByUid = options.restoreByUid !== false;
+      var mainOnly = options.scope === "main-only";
       function ensureFiles() {
         if (filesCache) return filesCache;
         try {
@@ -10938,15 +10939,21 @@ var require_layout_utils = __commonJS({
         }
         if (Array.isArray(node.children)) walk(node.children);
         if (node.main) walk(node.main);
-        if (node.left) walk(node.left);
-        if (node.right) walk(node.right);
-        if (node.floating) walk(node.floating);
+        if (!mainOnly) {
+          if (node.left) walk(node.left);
+          if (node.right) walk(node.right);
+          if (node.floating) walk(node.floating);
+        }
       }
-      walk(working);
-      if (Array.isArray(working.lastOpenFiles)) {
-        working.lastOpenFiles = working.lastOpenFiles.map(function(filePath) {
-          return resolvePath(filePath, "");
-        });
+      if (mainOnly) {
+        if (working.main) walk(working.main);
+      } else {
+        walk(working);
+        if (Array.isArray(working.lastOpenFiles)) {
+          working.lastOpenFiles = working.lastOpenFiles.map(function(filePath) {
+            return resolvePath(filePath, "");
+          });
+        }
       }
       return {
         layout: working,
@@ -11161,7 +11168,7 @@ var require_layout_restore = __commonJS({
         }
         var currentLayout = null;
         try {
-          currentLayout = this.getCurrentWorkspaceLayout();
+          currentLayout = this.app.workspace.getLayout();
         } catch (e) {
           currentLayout = null;
         }
@@ -11245,28 +11252,51 @@ var require_layout_restore = __commonJS({
           { inPlace: !!options.inPlace }
         ).layout;
       };
-      WorkspacePlusPlus2.prototype.remapMissingLayoutPaths = function(layout) {
+      WorkspacePlusPlus2.prototype.remapMissingLayoutPaths = function(layout, options) {
+        options = options || {};
         if (!layout) {
           return { layout, changed: false, remaps: [] };
         }
+        var scope = options.scope || this.getWorkspaceRestoreScope();
         return layoutUtils.remapMissingLayoutFilePaths(
           layout,
           this.createLayoutPathVaultApi(),
           {
             inPlace: true,
             restoreByFilename: this.isRestoreTabsByFilenameEnabled(),
-            restoreByUid: this.isNoteUidBindingEnabled()
+            restoreByUid: this.isNoteUidBindingEnabled(),
+            scope: scope === "main-only" ? "main-only" : "full"
           }
         );
+      };
+      WorkspacePlusPlus2.prototype.preserveLiveSidebarsOnLayout = function(layout) {
+        if (!layout || typeof layout !== "object") return layout;
+        var live = null;
+        try {
+          live = this.app.workspace.getLayout();
+        } catch (e) {
+          live = null;
+        }
+        if (!live || typeof live !== "object") return layout;
+        layout.left = live.left !== void 0 ? layoutUtils.cloneLayout(live.left) : layout.left;
+        layout.right = live.right !== void 0 ? layoutUtils.cloneLayout(live.right) : layout.right;
+        if (Object.prototype.hasOwnProperty.call(live, "floating")) {
+          layout.floating = layoutUtils.cloneLayout(live.floating);
+        }
+        return layout;
       };
       WorkspacePlusPlus2.prototype.applyWorkspaceLayout = function(layout, options) {
         options = options || {};
         if (!layout) return Promise.resolve();
+        var scope = this.getWorkspaceRestoreScope();
         var nextLayout = this.buildLayoutForRestore(layout);
-        var remapResult = this.remapMissingLayoutPaths(nextLayout);
+        var remapResult = this.remapMissingLayoutPaths(nextLayout, { scope });
         nextLayout = remapResult.layout || nextLayout;
         if (remapResult.changed && layout && layout !== nextLayout) {
-          this.remapMissingLayoutPaths(layout);
+          this.remapMissingLayoutPaths(layout, { scope });
+        }
+        if (scope === "main-only") {
+          this.preserveLiveSidebarsOnLayout(nextLayout);
         }
         var layoutToApply = layoutUtils.stripLayoutNoteUids(nextLayout);
         var apply = Promise.resolve(this.app.workspace.changeLayout(layoutToApply));

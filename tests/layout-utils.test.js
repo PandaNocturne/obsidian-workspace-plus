@@ -320,6 +320,41 @@ test('remapMissingLayoutFilePaths ignores recorded UID when restoreByUid is off'
     assert.equal(result.layout.main.state.state.file, 'Old/Note.md');
 });
 
+test('remapMissingLayoutFilePaths main-only scope leaves sidebars untouched', function () {
+    const layout = {
+        main: {
+            type: 'leaf',
+            state: { type: 'markdown', state: { file: 'Old/Main.md' } },
+        },
+        left: {
+            type: 'leaf',
+            state: { type: 'markdown', state: { file: 'Old/Side.md' } },
+        },
+        right: {
+            type: 'leaf',
+            state: { type: 'markdown', state: { file: 'Old/Right.md' } },
+        },
+        lastOpenFiles: ['Old/Main.md', 'Old/Side.md'],
+    };
+    const existing = {
+        'New/Main.md': true,
+        'New/Side.md': true,
+        'New/Right.md': true,
+    };
+    const result = layoutUtils.remapMissingLayoutFilePaths(layout, {
+        pathExists: function (p) { return !!existing[p]; },
+        getFiles: function () {
+            return Object.keys(existing).map(function (p) { return { path: p }; });
+        },
+    }, { scope: 'main-only' });
+
+    assert.equal(result.changed, true);
+    assert.equal(result.layout.main.state.state.file, 'New/Main.md');
+    assert.equal(result.layout.left.state.state.file, 'Old/Side.md');
+    assert.equal(result.layout.right.state.state.file, 'Old/Right.md');
+    assert.deepEqual(result.layout.lastOpenFiles, ['Old/Main.md', 'Old/Side.md']);
+});
+
 test('annotateLayoutNoteUids records existing UIDs without inventing them', function () {
     const layout = {
         main: {

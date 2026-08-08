@@ -310,6 +310,7 @@ function stripLayoutNoteUids(layout, options) {
  * options.inPlace: mutate layout instead of cloning
  * options.restoreByFilename: enable basename fallback (default true)
  * options.restoreByUid: enable recorded UID lookup (default true)
+ * options.scope: 'full' (default) or 'main-only' — main-only skips left/right/floating
  */
 function remapMissingLayoutFilePaths(layout, vaultApi, options) {
     options = options || {};
@@ -324,6 +325,7 @@ function remapMissingLayoutFilePaths(layout, vaultApi, options) {
     var filesCache = null;
     var restoreByFilename = options.restoreByFilename !== false;
     var restoreByUid = options.restoreByUid !== false;
+    var mainOnly = options.scope === 'main-only';
 
     function ensureFiles() {
         if (filesCache) return filesCache;
@@ -405,17 +407,22 @@ function remapMissingLayoutFilePaths(layout, vaultApi, options) {
 
         if (Array.isArray(node.children)) walk(node.children);
         if (node.main) walk(node.main);
-        if (node.left) walk(node.left);
-        if (node.right) walk(node.right);
-        if (node.floating) walk(node.floating);
+        if (!mainOnly) {
+            if (node.left) walk(node.left);
+            if (node.right) walk(node.right);
+            if (node.floating) walk(node.floating);
+        }
     }
 
-    walk(working);
-
-    if (Array.isArray(working.lastOpenFiles)) {
-        working.lastOpenFiles = working.lastOpenFiles.map(function (filePath) {
-            return resolvePath(filePath, '');
-        });
+    if (mainOnly) {
+        if (working.main) walk(working.main);
+    } else {
+        walk(working);
+        if (Array.isArray(working.lastOpenFiles)) {
+            working.lastOpenFiles = working.lastOpenFiles.map(function (filePath) {
+                return resolvePath(filePath, '');
+            });
+        }
     }
 
     return {
