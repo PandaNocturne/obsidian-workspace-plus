@@ -4,9 +4,11 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const attachSettingsStateMethods = require('../src/plugin/methods/settings-state');
+const attachLayoutRestoreMethods = require('../src/plugin/methods/layout-restore');
 
 function createPlugin(initialData) {
     function PluginMock() {}
+    attachLayoutRestoreMethods(PluginMock);
     attachSettingsStateMethods(PluginMock);
     const plugin = new PluginMock();
     plugin.data = Object.assign({
@@ -84,6 +86,31 @@ test('settings state stores sidebar restore preference', async function () {
 
     assert.equal(plugin.data.restoreSidebars, false);
     assert.equal(plugin.persistCalls, 1);
+});
+
+test('settings state stores filename restore and note UID property', async function () {
+    const plugin = createPlugin({
+        restoreTabsByFilename: true,
+        noteUidProperty: 'uid',
+    });
+
+    assert.equal(plugin.isRestoreTabsByFilenameEnabled(), true);
+    assert.equal(plugin.getNoteUidPropertyName(), 'uid');
+    assert.equal(plugin.isNoteUidBindingEnabled(), true);
+
+    await plugin.setRestoreTabsByFilename(false);
+    await plugin.setNoteUidPropertyName('  note-id  ');
+
+    assert.equal(plugin.data.restoreTabsByFilename, false);
+    assert.equal(plugin.isRestoreTabsByFilenameEnabled(), false);
+    assert.equal(plugin.data.noteUidProperty, 'note-id');
+    assert.equal(plugin.getNoteUidPropertyName(), 'note-id');
+    assert.equal(plugin.isNoteUidBindingEnabled(), true);
+
+    await plugin.setNoteUidPropertyName('   ');
+    assert.equal(plugin.getNoteUidPropertyName(), '');
+    assert.equal(plugin.isNoteUidBindingEnabled(), false);
+    assert.equal(plugin.persistCalls, 3);
 });
 
 test('settings state starts and stops version history timer with the setting', async function () {

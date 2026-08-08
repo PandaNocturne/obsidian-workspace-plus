@@ -14,6 +14,8 @@ module.exports = {
     warnOnUnsavedSwitch: true,
     highlightUnsavedSessionChanges: true,
     restoreSidebars: true,
+    restoreTabsByFilename: true,
+    noteUidProperty: 'uid',
     taskViewThumbnailRatio: '4:3',
     taskViewContentZoom: 0.45,
     showTaskViewHints: true,

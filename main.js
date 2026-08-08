@@ -1470,17 +1470,32 @@ var require_i18n = __commonJS({
       en: {
         settingsSubsectionSessionRestore: "Session restore",
         settingsRestoreSidebars: "Restore sidebars",
-        settingsRestoreSidebarsDesc: "When off, switching or restoring a session restores only the main editor area and keeps the current left and right sidebars."
+        settingsRestoreSidebarsDesc: "When off, switching or restoring a session restores only the main editor area and keeps the current left and right sidebars.",
+        settingsRestoreTabsByFilename: "Restore tabs by filename",
+        settingsRestoreTabsByFilenameDesc: "When a saved note path is missing, try to reopen the tab by matching the filename in the vault.",
+        settingsNoteUidProperty: "Note UID property",
+        settingsNoteUidPropertyDesc: "Frontmatter property used to identify notes when saving and restoring sessions. If a note has this property, its value is recorded and preferred over path. If missing, the path is used. Leave empty to disable UID binding. The property is never created automatically.",
+        settingsNoteUidPropertyPlaceholder: "uid"
       },
       zh: {
         settingsSubsectionSessionRestore: "\u4F1A\u8BDD\u6062\u590D",
         settingsRestoreSidebars: "\u6062\u590D\u4FA7\u8FB9\u680F",
-        settingsRestoreSidebarsDesc: "\u5173\u95ED\u540E\uFF0C\u5207\u6362\u6216\u6062\u590D\u4F1A\u8BDD\u65F6\u53EA\u6062\u590D\u4E3B\u7F16\u8F91\u533A\uFF0C\u5E76\u4FDD\u7559\u5F53\u524D\u5DE6\u53F3\u4FA7\u8FB9\u680F\u3002"
+        settingsRestoreSidebarsDesc: "\u5173\u95ED\u540E\uFF0C\u5207\u6362\u6216\u6062\u590D\u4F1A\u8BDD\u65F6\u53EA\u6062\u590D\u4E3B\u7F16\u8F91\u533A\uFF0C\u5E76\u4FDD\u7559\u5F53\u524D\u5DE6\u53F3\u4FA7\u8FB9\u680F\u3002",
+        settingsRestoreTabsByFilename: "\u81EA\u52A8\u6839\u636E\u6587\u4EF6\u540D\u6062\u590D\u6807\u7B7E\u9875",
+        settingsRestoreTabsByFilenameDesc: "\u5F53\u4F1A\u8BDD\u4E2D\u4FDD\u5B58\u7684\u7B14\u8BB0\u8DEF\u5F84\u4E0D\u5B58\u5728\u65F6\uFF0C\u5C1D\u8BD5\u6309\u6587\u4EF6\u540D\u5728\u5E93\u4E2D\u5339\u914D\u5E76\u91CD\u65B0\u6253\u5F00\u8BE5\u6807\u7B7E\u9875\u3002",
+        settingsNoteUidProperty: "\u7ED1\u5B9A\u7B14\u8BB0 UID \u6807\u8BC6",
+        settingsNoteUidPropertyDesc: "\u7528\u4E8E\u5728\u4FDD\u5B58/\u6062\u590D\u4F1A\u8BDD\u65F6\u8BC6\u522B\u7B14\u8BB0\u7684 frontmatter \u5C5E\u6027\u540D\u3002\u82E5\u7B14\u8BB0\u5DF2\u6709\u8BE5\u5C5E\u6027\u5219\u8BB0\u5F55\u5176\u503C\u5E76\u4F18\u5148\u7528 UID \u786E\u8BA4\uFF1B\u82E5\u65E0\u5219\u6309\u8DEF\u5F84\u786E\u8BA4\u3002\u7559\u7A7A\u5219\u5173\u95ED\u8BE5\u529F\u80FD\u3002\u4E0D\u4F1A\u81EA\u52A8\u521B\u5EFA\u8BE5\u5C5E\u6027\u3002",
+        settingsNoteUidPropertyPlaceholder: "uid"
       },
       "zh-TW": {
         settingsSubsectionSessionRestore: "\u5DE5\u4F5C\u968E\u6BB5\u9084\u539F",
         settingsRestoreSidebars: "\u9084\u539F\u5074\u908A\u6B04",
-        settingsRestoreSidebarsDesc: "\u95DC\u9589\u5F8C\uFF0C\u5207\u63DB\u6216\u9084\u539F\u5DE5\u4F5C\u968E\u6BB5\u6642\u53EA\u9084\u539F\u4E3B\u8981\u7DE8\u8F2F\u5340\uFF0C\u4E26\u4FDD\u7559\u76EE\u524D\u5DE6\u53F3\u5074\u908A\u6B04\u3002"
+        settingsRestoreSidebarsDesc: "\u95DC\u9589\u5F8C\uFF0C\u5207\u63DB\u6216\u9084\u539F\u5DE5\u4F5C\u968E\u6BB5\u6642\u53EA\u9084\u539F\u4E3B\u8981\u7DE8\u8F2F\u5340\uFF0C\u4E26\u4FDD\u7559\u76EE\u524D\u5DE6\u53F3\u5074\u908A\u6B04\u3002",
+        settingsRestoreTabsByFilename: "\u81EA\u52D5\u4F9D\u6A94\u540D\u9084\u539F\u5206\u9801",
+        settingsRestoreTabsByFilenameDesc: "\u7576\u5DE5\u4F5C\u968E\u6BB5\u4E2D\u5132\u5B58\u7684\u7B46\u8A18\u8DEF\u5F91\u4E0D\u5B58\u5728\u6642\uFF0C\u5617\u8A66\u4F9D\u6A94\u540D\u5728\u5EAB\u4E2D\u6BD4\u5C0D\u4E26\u91CD\u65B0\u958B\u555F\u8A72\u5206\u9801\u3002",
+        settingsNoteUidProperty: "\u7D81\u5B9A\u7B46\u8A18 UID \u8B58\u5225",
+        settingsNoteUidPropertyDesc: "\u7528\u65BC\u5728\u5132\u5B58/\u9084\u539F\u5DE5\u4F5C\u968E\u6BB5\u6642\u8B58\u5225\u7B46\u8A18\u7684 frontmatter \u5C6C\u6027\u540D\u7A31\u3002\u82E5\u7B46\u8A18\u5DF2\u6709\u8A72\u5C6C\u6027\u5247\u8A18\u9304\u5176\u503C\u4E26\u512A\u5148\u4EE5 UID \u78BA\u8A8D\uFF1B\u82E5\u7121\u5247\u4F9D\u8DEF\u5F91\u78BA\u8A8D\u3002\u7559\u7A7A\u5247\u95DC\u9589\u6B64\u529F\u80FD\u3002\u4E0D\u6703\u81EA\u52D5\u5EFA\u7ACB\u8A72\u5C6C\u6027\u3002",
+        settingsNoteUidPropertyPlaceholder: "uid"
       }
     };
     var restoreLangs = Object.keys(RESTORE_STRINGS);
@@ -7265,6 +7280,22 @@ var require_settings = __commonJS({
             });
           }
           if (self.activeTab === "sessions") {
+            addSubsection(contentEl, L.settingsSubsectionSessionRestore);
+            addToggleSetting(contentEl, {
+              name: L.settingsRestoreTabsByFilename,
+              desc: L.settingsRestoreTabsByFilenameDesc,
+              value: self.plugin.isRestoreTabsByFilenameEnabled(),
+              onChange: function(value) {
+                self.plugin.setRestoreTabsByFilename(value);
+              }
+            });
+            new obsidian2.Setting(contentEl).setName(L.settingsNoteUidProperty).setDesc(L.settingsNoteUidPropertyDesc).addText(function(text) {
+              text.setPlaceholder(L.settingsNoteUidPropertyPlaceholder || "uid");
+              text.setValue(self.plugin.getNoteUidPropertyName());
+              text.onChange(function(value) {
+                self.plugin.setNoteUidPropertyName(value);
+              });
+            });
             addSubsection(contentEl, L.settingsSubsectionAutoSaveMode);
             var autoSaveOnSwitch = self.plugin.isAutoSaveOnSwitchEnabled();
             new obsidian2.Setting(contentEl).setName(L.settingsAutoSaveOnSwitch).setDesc(L.settingsAutoSaveOnSwitchDesc).addToggle(function(toggle) {
@@ -7726,6 +7757,8 @@ var require_default_data = __commonJS({
       warnOnUnsavedSwitch: true,
       highlightUnsavedSessionChanges: true,
       restoreSidebars: true,
+      restoreTabsByFilename: true,
+      noteUidProperty: "uid",
       taskViewThumbnailRatio: "4:3",
       taskViewContentZoom: 0.45,
       showTaskViewHints: true,
@@ -9393,6 +9426,8 @@ var require_persistence = __commonJS({
       "sessionManagerPanelMode",
       "sessionManagerViewGroupId",
       "restoreSidebars",
+      "restoreTabsByFilename",
+      "noteUidProperty",
       "taskViewThumbnailRatio",
       "taskViewContentZoom",
       "showTaskViewHints",
@@ -10597,6 +10632,7 @@ var require_session_sync = __commonJS({
 var require_layout_utils = __commonJS({
   "src/layout-utils.js"(exports2, module2) {
     "use strict";
+    var NOTE_UID_LAYOUT_KEY = "wppNoteUid";
     function serializeLayout(layout) {
       try {
         return JSON.stringify(layout || null);
@@ -10650,7 +10686,8 @@ var require_layout_utils = __commonJS({
         eState: true,
         lastOpenFiles: true,
         scroll: true,
-        top: true
+        top: true,
+        wppNoteUid: true
       };
       function normalizeNode(value, depth) {
         if (Array.isArray(value)) {
@@ -10692,6 +10729,16 @@ var require_layout_utils = __commonJS({
     function stripMdExtension(name) {
       return String(name || "").replace(/\.md$/i, "");
     }
+    function normalizeUidValue(value) {
+      if (value == null) return "";
+      if (typeof value === "number" && isFinite(value)) return String(value);
+      if (typeof value === "boolean") return value ? "true" : "false";
+      if (typeof value === "string") return value.trim();
+      if (Array.isArray(value) && value.length === 1) {
+        return normalizeUidValue(value[0]);
+      }
+      return "";
+    }
     function findVaultPathByBasename(files, baseName) {
       var targetBase = getPathBasename(baseName);
       var targetStem = stripMdExtension(targetBase);
@@ -10714,6 +10761,113 @@ var require_layout_utils = __commonJS({
       if (stem.length > 0) return stem[0];
       return null;
     }
+    function findVaultPathByUid(files, uid, getUidForPath) {
+      var target = normalizeUidValue(uid);
+      if (!target || typeof getUidForPath !== "function") return null;
+      var filesList = Array.isArray(files) ? files : [];
+      for (var i = 0; i < filesList.length; i++) {
+        var entry = filesList[i];
+        var path = typeof entry === "string" ? entry : entry && entry.path;
+        if (!path || typeof path !== "string") continue;
+        var fileUid = "";
+        try {
+          fileUid = normalizeUidValue(getUidForPath(path, entry));
+        } catch (e) {
+          fileUid = "";
+        }
+        if (fileUid && fileUid === target) return path;
+      }
+      return null;
+    }
+    function getLeafFilePath(node) {
+      if (!node || typeof node !== "object" || !node.state || typeof node.state !== "object") {
+        return "";
+      }
+      if (node.state.state && typeof node.state.state === "object" && typeof node.state.state.file === "string") {
+        return node.state.state.file;
+      }
+      if (typeof node.state.file === "string") return node.state.file;
+      return "";
+    }
+    function setLeafFilePath(node, filePath) {
+      if (!node || typeof node !== "object" || !node.state || typeof node.state !== "object") {
+        return;
+      }
+      if (node.state.state && typeof node.state.state === "object" && typeof node.state.state.file === "string") {
+        node.state.state.file = filePath;
+      }
+      if (typeof node.state.file === "string") {
+        node.state.file = filePath;
+      }
+    }
+    function annotateLayoutNoteUids(layout, vaultApi, options) {
+      options = options || {};
+      vaultApi = vaultApi || {};
+      if (!layout || typeof layout !== "object") {
+        return { layout, changed: false };
+      }
+      var working = options.inPlace ? layout : cloneLayout(layout);
+      var changed = false;
+      function readUid(filePath) {
+        if (!filePath || typeof vaultApi.getFileUid !== "function") return "";
+        try {
+          return normalizeUidValue(vaultApi.getFileUid(filePath));
+        } catch (e) {
+          return "";
+        }
+      }
+      function walk(node) {
+        if (!node) return;
+        if (Array.isArray(node)) {
+          for (var i = 0; i < node.length; i++) walk(node[i]);
+          return;
+        }
+        if (typeof node !== "object") return;
+        var filePath = getLeafFilePath(node);
+        if (filePath) {
+          var uid = readUid(filePath);
+          if (uid) {
+            if (node[NOTE_UID_LAYOUT_KEY] !== uid) {
+              node[NOTE_UID_LAYOUT_KEY] = uid;
+              changed = true;
+            }
+          } else if (Object.prototype.hasOwnProperty.call(node, NOTE_UID_LAYOUT_KEY)) {
+            delete node[NOTE_UID_LAYOUT_KEY];
+            changed = true;
+          }
+        }
+        if (Array.isArray(node.children)) walk(node.children);
+        if (node.main) walk(node.main);
+        if (node.left) walk(node.left);
+        if (node.right) walk(node.right);
+        if (node.floating) walk(node.floating);
+      }
+      walk(working);
+      return { layout: working, changed };
+    }
+    function stripLayoutNoteUids(layout, options) {
+      options = options || {};
+      if (!layout || typeof layout !== "object") return layout;
+      var working = options.inPlace ? layout : cloneLayout(layout);
+      function walk(node) {
+        if (!node) return;
+        if (Array.isArray(node)) {
+          for (var i = 0; i < node.length; i++) walk(node[i]);
+          return;
+        }
+        if (typeof node !== "object") return;
+        if (Object.prototype.hasOwnProperty.call(node, NOTE_UID_LAYOUT_KEY)) {
+          delete node[NOTE_UID_LAYOUT_KEY];
+        }
+        if (Array.isArray(node.children)) walk(node.children);
+        if (node.main) walk(node.main);
+        if (node.left) walk(node.left);
+        if (node.right) walk(node.right);
+        if (node.floating) walk(node.floating);
+      }
+      walk(working);
+      return working;
+    }
     function remapMissingLayoutFilePaths(layout, vaultApi, options) {
       options = options || {};
       vaultApi = vaultApi || {};
@@ -10724,6 +10878,8 @@ var require_layout_utils = __commonJS({
       var remaps = [];
       var seenFrom = {};
       var filesCache = null;
+      var restoreByFilename = options.restoreByFilename !== false;
+      var restoreByUid = options.restoreByUid !== false;
       function ensureFiles() {
         if (filesCache) return filesCache;
         try {
@@ -10733,8 +10889,34 @@ var require_layout_utils = __commonJS({
         }
         return filesCache;
       }
-      function resolvePath(filePath) {
+      function recordRemap(fromPath, toPath) {
+        if (!fromPath || !toPath || fromPath === toPath) return;
+        if (!seenFrom[fromPath]) {
+          seenFrom[fromPath] = true;
+          remaps.push({ from: fromPath, to: toPath });
+        }
+      }
+      function resolvePath(filePath, storedUid) {
         if (!filePath || typeof filePath !== "string") return filePath;
+        var uid = restoreByUid ? normalizeUidValue(storedUid) : "";
+        if (uid) {
+          var foundByUid = null;
+          try {
+            if (typeof vaultApi.findPathByUid === "function") {
+              foundByUid = vaultApi.findPathByUid(uid);
+            } else if (typeof vaultApi.getFileUid === "function") {
+              foundByUid = findVaultPathByUid(ensureFiles(), uid, function(path) {
+                return vaultApi.getFileUid(path);
+              });
+            }
+          } catch (e) {
+            foundByUid = null;
+          }
+          if (foundByUid) {
+            recordRemap(filePath, foundByUid);
+            return foundByUid;
+          }
+        }
         var exists = false;
         try {
           exists = typeof vaultApi.pathExists === "function" && !!vaultApi.pathExists(filePath);
@@ -10742,12 +10924,10 @@ var require_layout_utils = __commonJS({
           exists = false;
         }
         if (exists) return filePath;
+        if (!restoreByFilename) return filePath;
         var found = findVaultPathByBasename(ensureFiles(), filePath);
         if (found && found !== filePath) {
-          if (!seenFrom[filePath]) {
-            seenFrom[filePath] = true;
-            remaps.push({ from: filePath, to: found });
-          }
+          recordRemap(filePath, found);
           return found;
         }
         return filePath;
@@ -10759,12 +10939,12 @@ var require_layout_utils = __commonJS({
           return;
         }
         if (typeof node !== "object") return;
-        if (node.state && typeof node.state === "object") {
-          if (node.state.state && typeof node.state.state === "object" && typeof node.state.state.file === "string") {
-            node.state.state.file = resolvePath(node.state.state.file);
-          }
-          if (typeof node.state.file === "string") {
-            node.state.file = resolvePath(node.state.file);
+        var filePath = getLeafFilePath(node);
+        if (filePath) {
+          var storedUid = Object.prototype.hasOwnProperty.call(node, NOTE_UID_LAYOUT_KEY) ? node[NOTE_UID_LAYOUT_KEY] : "";
+          var nextPath = resolvePath(filePath, storedUid);
+          if (nextPath !== filePath) {
+            setLeafFilePath(node, nextPath);
           }
         }
         if (Array.isArray(node.children)) walk(node.children);
@@ -10775,7 +10955,9 @@ var require_layout_utils = __commonJS({
       }
       walk(working);
       if (Array.isArray(working.lastOpenFiles)) {
-        working.lastOpenFiles = working.lastOpenFiles.map(resolvePath);
+        working.lastOpenFiles = working.lastOpenFiles.map(function(filePath) {
+          return resolvePath(filePath, "");
+        });
       }
       return {
         layout: working,
@@ -10784,6 +10966,7 @@ var require_layout_utils = __commonJS({
       };
     }
     module2.exports = {
+      NOTE_UID_LAYOUT_KEY,
       serializeLayout,
       layoutsEqual,
       cloneLayout,
@@ -10791,7 +10974,11 @@ var require_layout_utils = __commonJS({
       normalizeLayoutForComparison,
       layoutsEqualStructural,
       getPathBasename,
+      normalizeUidValue,
       findVaultPathByBasename,
+      findVaultPathByUid,
+      annotateLayoutNoteUids,
+      stripLayoutNoteUids,
       remapMissingLayoutFilePaths
     };
   }
@@ -10927,7 +11114,17 @@ var require_sessions = __commonJS({
         return this.data.sessions[this.data.activeSessionId] || null;
       };
       WorkspacePlusPlus2.prototype.getCurrentWorkspaceLayout = function() {
-        return this.app.workspace.getLayout();
+        var layout = this.app.workspace.getLayout();
+        if (typeof this.isNoteUidBindingEnabled === "function" && !this.isNoteUidBindingEnabled()) {
+          return layout;
+        }
+        if (typeof this.getNoteUidPropertyName === "function" && !this.getNoteUidPropertyName()) {
+          return layout;
+        }
+        if (typeof this.annotateLayoutNoteUids !== "function") {
+          return layout;
+        }
+        return this.annotateLayoutNoteUids(layoutUtils.cloneLayout(layout), { inPlace: true });
       };
       WorkspacePlusPlus2.prototype.serializeLayout = function(layout) {
         return layoutUtils.serializeLayout(layout);
@@ -10953,6 +11150,18 @@ var require_layout_restore = __commonJS({
       WorkspacePlusPlus2.prototype.isSidebarRestoreEnabled = function() {
         return this.data.restoreSidebars !== false;
       };
+      WorkspacePlusPlus2.prototype.isRestoreTabsByFilenameEnabled = function() {
+        return this.data.restoreTabsByFilename !== false;
+      };
+      WorkspacePlusPlus2.prototype.getNoteUidPropertyName = function() {
+        if (this.data.noteUidProperty === void 0 || this.data.noteUidProperty === null) {
+          return "uid";
+        }
+        return String(this.data.noteUidProperty).trim();
+      };
+      WorkspacePlusPlus2.prototype.isNoteUidBindingEnabled = function() {
+        return !!this.getNoteUidPropertyName();
+      };
       WorkspacePlusPlus2.prototype.getWorkspaceRestoreScope = function() {
         return this.isSidebarRestoreEnabled() ? "full" : "main-only";
       };
@@ -10969,8 +11178,58 @@ var require_layout_restore = __commonJS({
         }
         return layoutUtils.mergeMainLayoutIntoCurrent(layout, currentLayout);
       };
-      WorkspacePlusPlus2.prototype.createLayoutPathVaultApi = function() {
+      WorkspacePlusPlus2.prototype.readNoteUidForPath = function(filePath) {
+        if (!this.isNoteUidBindingEnabled() || !filePath) return "";
+        var prop = this.getNoteUidPropertyName();
+        if (!prop) return "";
         var vault = this.app && this.app.vault;
+        var metadataCache = this.app && this.app.metadataCache;
+        if (!vault || typeof vault.getAbstractFileByPath !== "function") return "";
+        if (!metadataCache || typeof metadataCache.getFileCache !== "function") return "";
+        try {
+          var file = vault.getAbstractFileByPath(filePath);
+          if (!file) return "";
+          var cache = metadataCache.getFileCache(file);
+          var fm = cache && cache.frontmatter;
+          if (!fm || fm[prop] == null) return "";
+          return layoutUtils.normalizeUidValue(fm[prop]);
+        } catch (e) {
+          return "";
+        }
+      };
+      WorkspacePlusPlus2.prototype.createLayoutPathVaultApi = function() {
+        var self = this;
+        var vault = this.app && this.app.vault;
+        var uidIndex = null;
+        function getFiles() {
+          if (!vault || typeof vault.getFiles !== "function") return [];
+          try {
+            return vault.getFiles() || [];
+          } catch (e) {
+            return [];
+          }
+        }
+        function getFileUid(filePath) {
+          return self.readNoteUidForPath(filePath);
+        }
+        function findPathByUid(uid) {
+          var target = layoutUtils.normalizeUidValue(uid);
+          if (!target) return null;
+          if (!uidIndex) {
+            uidIndex = {};
+            var files = getFiles();
+            for (var i = 0; i < files.length; i++) {
+              var entry = files[i];
+              var path = typeof entry === "string" ? entry : entry && entry.path;
+              if (!path) continue;
+              var fileUid = getFileUid(path);
+              if (fileUid && uidIndex[fileUid] === void 0) {
+                uidIndex[fileUid] = path;
+              }
+            }
+          }
+          return uidIndex[target] || null;
+        }
         return {
           pathExists: function(filePath) {
             if (!vault || typeof vault.getAbstractFileByPath !== "function") return false;
@@ -10980,15 +11239,22 @@ var require_layout_restore = __commonJS({
               return false;
             }
           },
-          getFiles: function() {
-            if (!vault || typeof vault.getFiles !== "function") return [];
-            try {
-              return vault.getFiles() || [];
-            } catch (e) {
-              return [];
-            }
-          }
+          getFiles,
+          getFileUid,
+          findPathByUid
         };
+      };
+      WorkspacePlusPlus2.prototype.annotateLayoutNoteUids = function(layout, options) {
+        options = options || {};
+        if (!layout) return layout;
+        if (!this.isNoteUidBindingEnabled()) {
+          return options.inPlace ? layout : layoutUtils.cloneLayout(layout);
+        }
+        return layoutUtils.annotateLayoutNoteUids(
+          layout,
+          this.createLayoutPathVaultApi(),
+          { inPlace: !!options.inPlace }
+        ).layout;
       };
       WorkspacePlusPlus2.prototype.remapMissingLayoutPaths = function(layout) {
         if (!layout) {
@@ -10997,7 +11263,11 @@ var require_layout_restore = __commonJS({
         return layoutUtils.remapMissingLayoutFilePaths(
           layout,
           this.createLayoutPathVaultApi(),
-          { inPlace: true }
+          {
+            inPlace: true,
+            restoreByFilename: this.isRestoreTabsByFilenameEnabled(),
+            restoreByUid: this.isNoteUidBindingEnabled()
+          }
         );
       };
       WorkspacePlusPlus2.prototype.applyWorkspaceLayout = function(layout, options) {
@@ -11009,7 +11279,8 @@ var require_layout_restore = __commonJS({
         if (remapResult.changed && layout && layout !== nextLayout) {
           this.remapMissingLayoutPaths(layout);
         }
-        var apply = Promise.resolve(this.app.workspace.changeLayout(nextLayout));
+        var layoutToApply = layoutUtils.stripLayoutNoteUids(nextLayout);
+        var apply = Promise.resolve(this.app.workspace.changeLayout(layoutToApply));
         if (options.catchErrors === false) return apply;
         return apply.catch(function() {
         });
@@ -13444,6 +13715,14 @@ var require_settings_state = __commonJS({
       };
       WorkspacePlusPlus2.prototype.setRestoreSidebars = function(enabled, options) {
         this.data.restoreSidebars = !!enabled;
+        return persistIfNeeded(this, options);
+      };
+      WorkspacePlusPlus2.prototype.setRestoreTabsByFilename = function(enabled, options) {
+        this.data.restoreTabsByFilename = !!enabled;
+        return persistIfNeeded(this, options);
+      };
+      WorkspacePlusPlus2.prototype.setNoteUidPropertyName = function(value, options) {
+        this.data.noteUidProperty = String(value == null ? "" : value).trim();
         return persistIfNeeded(this, options);
       };
       WorkspacePlusPlus2.prototype.getTaskViewThumbnailRatio = function() {

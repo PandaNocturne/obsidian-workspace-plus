@@ -81,6 +81,16 @@ function attachSettingsStateMethods(WorkspacePlusPlus) {
         return persistIfNeeded(this, options);
     };
 
+    WorkspacePlusPlus.prototype.setRestoreTabsByFilename = function (enabled, options) {
+        this.data.restoreTabsByFilename = !!enabled;
+        return persistIfNeeded(this, options);
+    };
+
+    WorkspacePlusPlus.prototype.setNoteUidPropertyName = function (value, options) {
+        this.data.noteUidProperty = String(value == null ? '' : value).trim();
+        return persistIfNeeded(this, options);
+    };
+
     WorkspacePlusPlus.prototype.getTaskViewThumbnailRatio = function () {
         var value = String(this.data.taskViewThumbnailRatio || DEFAULT_DATA.taskViewThumbnailRatio || '4:3');
         var allowed = { '16:9': 1, '4:3': 1, '3:2': 1, '1:1': 1 };

@@ -250,3 +250,96 @@ test('remapMissingLayoutFilePaths can mutate layout in place', function () {
     assert.equal(layout.main.state.state.file, 'B/Doc.md');
     assert.equal(result.layout, layout);
 });
+
+test('remapMissingLayoutFilePaths can skip basename restore', function () {
+    const layout = {
+        main: {
+            type: 'leaf',
+            state: { type: 'markdown', state: { file: 'A/Doc.md' } },
+        },
+    };
+    const result = layoutUtils.remapMissingLayoutFilePaths(layout, {
+        pathExists: function () { return false; },
+        getFiles: function () { return [{ path: 'B/Doc.md' }]; },
+    }, { restoreByFilename: false });
+
+    assert.equal(result.changed, false);
+    assert.equal(result.layout.main.state.state.file, 'A/Doc.md');
+});
+
+test('remapMissingLayoutFilePaths prefers recorded UID over path and filename', function () {
+    const layout = {
+        main: {
+            type: 'leaf',
+            wppNoteUid: 'alpha-1',
+            state: { type: 'markdown', state: { file: 'Old/Note.md' } },
+        },
+    };
+    const uids = {
+        'Notes/Renamed.md': 'alpha-1',
+        'Other/Note.md': 'beta-2',
+    };
+    const existing = {
+        'Old/Note.md': true,
+        'Notes/Renamed.md': true,
+        'Other/Note.md': true,
+    };
+    const result = layoutUtils.remapMissingLayoutFilePaths(layout, {
+        pathExists: function (p) { return !!existing[p]; },
+        getFiles: function () {
+            return Object.keys(existing).map(function (p) { return { path: p }; });
+        },
+        getFileUid: function (p) { return uids[p] || ''; },
+        findPathByUid: function (uid) {
+            const keys = Object.keys(uids);
+            for (let i = 0; i < keys.length; i++) {
+                if (uids[keys[i]] === uid) return keys[i];
+            }
+            return null;
+        },
+    });
+
+    assert.equal(result.changed, true);
+    assert.equal(result.layout.main.state.state.file, 'Notes/Renamed.md');
+});
+
+test('remapMissingLayoutFilePaths ignores recorded UID when restoreByUid is off', function () {
+    const layout = {
+        main: {
+            type: 'leaf',
+            wppNoteUid: 'alpha-1',
+            state: { type: 'markdown', state: { file: 'Old/Note.md' } },
+        },
+    };
+    const result = layoutUtils.remapMissingLayoutFilePaths(layout, {
+        pathExists: function (p) { return p === 'Old/Note.md'; },
+        findPathByUid: function () { return 'Notes/Renamed.md'; },
+    }, { restoreByUid: false });
+
+    assert.equal(result.changed, false);
+    assert.equal(result.layout.main.state.state.file, 'Old/Note.md');
+});
+
+test('annotateLayoutNoteUids records existing UIDs without inventing them', function () {
+    const layout = {
+        main: {
+            type: 'leaf',
+            state: { type: 'markdown', state: { file: 'HasUid.md' } },
+            children: undefined,
+        },
+        left: {
+            type: 'leaf',
+            state: { type: 'markdown', state: { file: 'NoUid.md' } },
+        },
+    };
+    const result = layoutUtils.annotateLayoutNoteUids(layout, {
+        getFileUid: function (path) {
+            return path === 'HasUid.md' ? 'uid-123' : '';
+        },
+    });
+
+    assert.equal(result.changed, true);
+    assert.equal(result.layout.main.wppNoteUid, 'uid-123');
+    assert.equal(Object.prototype.hasOwnProperty.call(result.layout.left, 'wppNoteUid'), false);
+    assert.equal(layout.main.wppNoteUid, undefined);
+});

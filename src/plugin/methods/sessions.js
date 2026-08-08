@@ -139,7 +139,17 @@ function attachSessionMethods(WorkspacePlusPlus) {
     };
 
     WorkspacePlusPlus.prototype.getCurrentWorkspaceLayout = function () {
-        return this.app.workspace.getLayout();
+        var layout = this.app.workspace.getLayout();
+        if (typeof this.isNoteUidBindingEnabled === 'function' && !this.isNoteUidBindingEnabled()) {
+            return layout;
+        }
+        if (typeof this.getNoteUidPropertyName === 'function' && !this.getNoteUidPropertyName()) {
+            return layout;
+        }
+        if (typeof this.annotateLayoutNoteUids !== 'function') {
+            return layout;
+        }
+        return this.annotateLayoutNoteUids(layoutUtils.cloneLayout(layout), { inPlace: true });
     };
 
     WorkspacePlusPlus.prototype.serializeLayout = function (layout) {

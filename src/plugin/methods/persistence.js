@@ -58,6 +58,8 @@ var SETTINGS_KEYS = [
     'sessionManagerPanelMode',
     'sessionManagerViewGroupId',
     'restoreSidebars',
+    'restoreTabsByFilename',
+    'noteUidProperty',
     'taskViewThumbnailRatio',
     'taskViewContentZoom',
     'showTaskViewHints',

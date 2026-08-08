@@ -195,6 +195,28 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
 
         // ── Sessions tab ──
         if (self.activeTab === 'sessions') {
+            addSubsection(contentEl, L.settingsSubsectionSessionRestore);
+
+            addToggleSetting(contentEl, {
+                name: L.settingsRestoreTabsByFilename,
+                desc: L.settingsRestoreTabsByFilenameDesc,
+                value: self.plugin.isRestoreTabsByFilenameEnabled(),
+                onChange: function (value) {
+                    self.plugin.setRestoreTabsByFilename(value);
+                },
+            });
+
+            new obsidian.Setting(contentEl)
+                .setName(L.settingsNoteUidProperty)
+                .setDesc(L.settingsNoteUidPropertyDesc)
+                .addText(function (text) {
+                    text.setPlaceholder(L.settingsNoteUidPropertyPlaceholder || 'uid');
+                    text.setValue(self.plugin.getNoteUidPropertyName());
+                    text.onChange(function (value) {
+                        self.plugin.setNoteUidPropertyName(value);
+                    });
+                });
+
             addSubsection(contentEl, L.settingsSubsectionAutoSaveMode);
 
             var autoSaveOnSwitch = self.plugin.isAutoSaveOnSwitchEnabled();
