@@ -470,12 +470,6 @@ var require_i18n = __commonJS({
         rotationBackupNone: "No backups available.",
         rotationBackupGeneration: function(count) {
           return count + " session" + (count !== 1 ? "s" : "");
-        },
-        frontmatterSessionNotFound: function(n) {
-          return 'Session "' + n + '" not found (workspace-session)';
-        },
-        frontmatterAlreadyActive: function(n) {
-          return 'Session "' + n + '" is already active';
         }
       },
       zh: {
@@ -803,12 +797,6 @@ var require_i18n = __commonJS({
         rotationBackupNone: "\u6CA1\u6709\u53EF\u7528\u7684\u5907\u4EFD\u3002",
         rotationBackupGeneration: function(count) {
           return count + " \u4E2A\u4F1A\u8BDD";
-        },
-        frontmatterSessionNotFound: function(n) {
-          return "\u4F1A\u8BDD\u201C" + n + "\u201D\u672A\u627E\u5230\uFF08workspace-session\uFF09";
-        },
-        frontmatterAlreadyActive: function(n) {
-          return "\u4F1A\u8BDD\u201C" + n + "\u201D\u5DF2\u5904\u4E8E\u6D3B\u52A8\u72B6\u6001";
         }
       },
       "zh-TW": {
@@ -1136,12 +1124,6 @@ var require_i18n = __commonJS({
         rotationBackupNone: "\u6C92\u6709\u53EF\u7528\u7684\u5099\u4EFD\u3002",
         rotationBackupGeneration: function(count) {
           return count + " \u500B\u5DE5\u4F5C\u968E\u6BB5";
-        },
-        frontmatterSessionNotFound: function(n) {
-          return "\u5DE5\u4F5C\u968E\u6BB5\u300C" + n + "\u300D\u672A\u627E\u5230\uFF08workspace-session\uFF09";
-        },
-        frontmatterAlreadyActive: function(n) {
-          return "\u5DE5\u4F5C\u968E\u6BB5\u300C" + n + "\u300D\u5DF2\u8655\u65BC\u6D3B\u52D5\u72C0\u614B";
         }
       }
     };
@@ -1361,47 +1343,6 @@ var require_i18n = __commonJS({
         resetSessionsAndSettingsFailed: "\u91CD\u8A2D\u5DE5\u4F5C\u968E\u6BB5\u8207\u8A2D\u5B9A\u5931\u6557\u3002"
       }
     };
-    var NOTE_SESSION_STRINGS = {
-      en: {
-        cmdSaveCurrentNoteNameAsSession: "Save current note name as session",
-        noActiveMarkdownFile: "No active Markdown note.",
-        savedCurrentNoteNameAsSession: function(n) {
-          return 'Saved current note as session "' + n + '"';
-        },
-        saveCurrentNoteNameAsSessionFailed: "Failed to save current note name as session."
-      },
-      zh: {
-        cmdSaveCurrentNoteNameAsSession: "\u5C06\u5F53\u524D\u7B14\u8BB0\u540D\u4FDD\u5B58\u4E3A\u4F1A\u8BDD",
-        noActiveMarkdownFile: "\u6CA1\u6709\u6D3B\u52A8\u7684 Markdown \u7B14\u8BB0\u3002",
-        savedCurrentNoteNameAsSession: function(n) {
-          return "\u5DF2\u5C06\u5F53\u524D\u7B14\u8BB0\u4FDD\u5B58\u4E3A\u4F1A\u8BDD\u201C" + n + "\u201D";
-        },
-        saveCurrentNoteNameAsSessionFailed: "\u65E0\u6CD5\u5C06\u5F53\u524D\u7B14\u8BB0\u540D\u4FDD\u5B58\u4E3A\u4F1A\u8BDD\u3002"
-      },
-      "zh-TW": {
-        cmdSaveCurrentNoteNameAsSession: "\u5C07\u76EE\u524D\u7B46\u8A18\u540D\u7A31\u5132\u5B58\u70BA\u5DE5\u4F5C\u968E\u6BB5",
-        noActiveMarkdownFile: "\u6C92\u6709\u4F5C\u7528\u4E2D\u7684 Markdown \u7B46\u8A18\u3002",
-        savedCurrentNoteNameAsSession: function(n) {
-          return "\u5DF2\u5C07\u76EE\u524D\u7B46\u8A18\u5132\u5B58\u70BA\u5DE5\u4F5C\u968E\u6BB5\u300C" + n + "\u300D";
-        },
-        saveCurrentNoteNameAsSessionFailed: "\u7121\u6CD5\u5C07\u76EE\u524D\u7B46\u8A18\u540D\u7A31\u5132\u5B58\u70BA\u5DE5\u4F5C\u968E\u6BB5\u3002"
-      }
-    };
-    var noteSessionLangs = Object.keys(NOTE_SESSION_STRINGS);
-    for (noteSessionLangIndex = 0; noteSessionLangIndex < noteSessionLangs.length; noteSessionLangIndex++) {
-      noteSessionLang = noteSessionLangs[noteSessionLangIndex];
-      if (!EXTENDED_STRINGS[noteSessionLang]) EXTENDED_STRINGS[noteSessionLang] = {};
-      noteSessionKeys = Object.keys(NOTE_SESSION_STRINGS[noteSessionLang]);
-      for (noteSessionKeyIndex = 0; noteSessionKeyIndex < noteSessionKeys.length; noteSessionKeyIndex++) {
-        noteSessionKey = noteSessionKeys[noteSessionKeyIndex];
-        EXTENDED_STRINGS[noteSessionLang][noteSessionKey] = NOTE_SESSION_STRINGS[noteSessionLang][noteSessionKey];
-      }
-    }
-    var noteSessionLang;
-    var noteSessionKeys;
-    var noteSessionKey;
-    var noteSessionKeyIndex;
-    var noteSessionLangIndex;
     var extendedLangs = Object.keys(EXTENDED_STRINGS);
     for (extendedLangIndex = 0; extendedLangIndex < extendedLangs.length; extendedLangIndex++) {
       extendedLang = extendedLangs[extendedLangIndex];
@@ -13515,182 +13456,6 @@ var require_history = __commonJS({
   }
 });
 
-// src/plugin/methods/frontmatter.js
-var require_frontmatter = __commonJS({
-  "src/plugin/methods/frontmatter.js"(exports2, module2) {
-    "use strict";
-    var obsidian2 = require("obsidian");
-    var i18n2 = require_i18n();
-    module2.exports = function attachFrontmatterMethods(WorkspacePlusPlus2) {
-      WorkspacePlusPlus2.prototype.getFileFrontmatter = function(file) {
-        if (!file) return null;
-        var cache = this.app.metadataCache.getFileCache(file);
-        return cache && cache.frontmatter || null;
-      };
-      WorkspacePlusPlus2.prototype.isMarkdownNoteFile = function(file) {
-        return !!file && String(file.extension || "").toLowerCase() === "md";
-      };
-      WorkspacePlusPlus2.prototype.getSessionNameFromNoteFile = function(file) {
-        if (!this.isMarkdownNoteFile(file)) return "";
-        if (typeof file.basename === "string" && file.basename.trim()) {
-          return file.basename.trim();
-        }
-        var name = typeof file.name === "string" ? file.name : "";
-        if (!name && typeof file.path === "string") {
-          var parts = file.path.split("/");
-          name = parts[parts.length - 1] || "";
-        }
-        return name.replace(/\.md$/i, "").trim();
-      };
-      WorkspacePlusPlus2.prototype.setWorkspaceSessionFrontmatter = function(file, sessionName) {
-        if (!this.app.fileManager || typeof this.app.fileManager.processFrontMatter !== "function") {
-          return Promise.reject(new Error("processFrontMatter unavailable"));
-        }
-        return this.app.fileManager.processFrontMatter(file, function(frontmatter) {
-          frontmatter["workspace-session"] = sessionName;
-        });
-      };
-      WorkspacePlusPlus2.prototype.saveCurrentNoteNameAsSession = function(options) {
-        var L = i18n2.L;
-        options = options || {};
-        var file = this.app.workspace.getActiveFile ? this.app.workspace.getActiveFile() : null;
-        var sessionName = this.getSessionNameFromNoteFile(file);
-        var self = this;
-        if (!file || !sessionName) {
-          if (!options.silent) new obsidian2.Notice(L.noActiveMarkdownFile);
-          return Promise.resolve(false);
-        }
-        return this.setWorkspaceSessionFrontmatter(file, sessionName).then(function() {
-          return self.saveCurrentLayoutAsSessionName(sessionName, { silent: true });
-        }).then(function(result) {
-          if (!options.silent) {
-            new obsidian2.Notice(L.savedCurrentNoteNameAsSession(sessionName));
-          }
-          return result;
-        }).catch(function() {
-          if (!options.silent) {
-            new obsidian2.Notice(L.saveCurrentNoteNameAsSessionFailed);
-          }
-          return false;
-        });
-      };
-      WorkspacePlusPlus2.prototype.parseWorkspaceSessionValue = function(value) {
-        if (!value || typeof value !== "string") return null;
-        value = value.trim();
-        if (!value) return null;
-        var slashIndex = value.indexOf("/");
-        if (slashIndex === -1) {
-          return { groupName: null, sessionName: value };
-        }
-        var candidateGroup = value.substring(0, slashIndex).trim();
-        var candidateSession = value.substring(slashIndex + 1).trim();
-        if (!candidateGroup || !candidateSession) {
-          return { groupName: null, sessionName: value };
-        }
-        var groups = this.data.groups || {};
-        var groupKeys = Object.keys(groups);
-        var matchedGroup = null;
-        for (var i = 0; i < groupKeys.length; i++) {
-          if (groups[groupKeys[i]].name === candidateGroup) {
-            matchedGroup = groups[groupKeys[i]];
-            break;
-          }
-        }
-        if (matchedGroup) {
-          return { groupName: candidateGroup, groupId: matchedGroup.id, sessionName: candidateSession };
-        }
-        return { groupName: null, sessionName: value };
-      };
-      WorkspacePlusPlus2.prototype.findSessionByName = function(name) {
-        if (!name) return null;
-        var sessions = this.data.sessions || {};
-        var keys = Object.keys(sessions);
-        for (var i = 0; i < keys.length; i++) {
-          if (sessions[keys[i]].name === name) {
-            return sessions[keys[i]];
-          }
-        }
-        return null;
-      };
-      WorkspacePlusPlus2.prototype.handleWorkspaceSessionProperty = function(value) {
-        var L = i18n2.L;
-        var parsed = this.parseWorkspaceSessionValue(value);
-        if (!parsed) return;
-        var session = this.findSessionByName(parsed.sessionName);
-        if (!session) {
-          new obsidian2.Notice(L.frontmatterSessionNotFound(parsed.sessionName));
-          return;
-        }
-        var alreadyOnSession = session.id === this.data.activeSessionId;
-        var alreadyOnGroup = !parsed.groupId || this.data.activeGroupId === parsed.groupId;
-        if (alreadyOnSession && alreadyOnGroup) {
-          new obsidian2.Notice(L.frontmatterAlreadyActive(parsed.sessionName));
-          return;
-        }
-        var self = this;
-        if (parsed.groupId && this.isGroupFeatureEnabled() && !alreadyOnGroup) {
-          this.setActiveGroup(parsed.groupId).then(function() {
-            if (session.id !== self.data.activeSessionId) {
-              self.switchSession(session.id);
-            }
-          });
-        } else if (!alreadyOnSession) {
-          this.switchSession(session.id);
-        }
-      };
-      WorkspacePlusPlus2.prototype.handleFrontmatterTriggers = function(file) {
-        var fm = this.getFileFrontmatter(file);
-        if (!fm) return;
-        if (fm["workspace-session"]) {
-          this.handleWorkspaceSessionProperty(fm["workspace-session"]);
-        }
-      };
-      WorkspacePlusPlus2.prototype.getFrontmatterTriggerLeafId = function() {
-        var activeLeaf = this.app.workspace.activeLeaf || null;
-        return activeLeaf && activeLeaf.id ? activeLeaf.id : "active";
-      };
-      WorkspacePlusPlus2.prototype.markCurrentFrontmatterFilesLoaded = function() {
-        var loadedByLeaf = {};
-        if (typeof this.app.workspace.iterateAllLeaves === "function") {
-          this.app.workspace.iterateAllLeaves(function(leaf) {
-            var file = leaf && leaf.view && leaf.view.file;
-            if (!leaf || !leaf.id || !file || !file.path) return;
-            loadedByLeaf[leaf.id] = file.path;
-          });
-        }
-        this.frontmatterLoadedFilePathsByLeaf = loadedByLeaf;
-      };
-      WorkspacePlusPlus2.prototype.clearFrontmatterFileForActiveLeaf = function() {
-        if (!this.frontmatterLoadedFilePathsByLeaf) return;
-        delete this.frontmatterLoadedFilePathsByLeaf[this.getFrontmatterTriggerLeafId()];
-      };
-      WorkspacePlusPlus2.prototype.shouldHandleFrontmatterFileOpen = function(file) {
-        var filePath = file && file.path ? file.path : "";
-        if (!filePath) return false;
-        var leafId = this.getFrontmatterTriggerLeafId();
-        if (!this.frontmatterLoadedFilePathsByLeaf) this.frontmatterLoadedFilePathsByLeaf = {};
-        if (this.frontmatterLoadedFilePathsByLeaf[leafId] === filePath) return false;
-        this.frontmatterLoadedFilePathsByLeaf[leafId] = filePath;
-        return true;
-      };
-      WorkspacePlusPlus2.prototype.registerFrontmatterListeners = function() {
-        var self = this;
-        this.markCurrentFrontmatterFilesLoaded();
-        this.registerEvent(this.app.workspace.on("file-open", function(file) {
-          if (self.isSwitchingSession) return;
-          if (self.getStartupSettleRemainingMs() > 0) return;
-          if (!file) {
-            self.clearFrontmatterFileForActiveLeaf();
-            return;
-          }
-          if (!self.shouldHandleFrontmatterFileOpen(file)) return;
-          self.handleFrontmatterTriggers(file);
-        }));
-      };
-    };
-  }
-});
-
 // src/plugin/methods/settings-state.js
 var require_settings_state = __commonJS({
   "src/plugin/methods/settings-state.js"(exports2, module2) {
@@ -13738,7 +13503,8 @@ var require_settings_state = __commonJS({
         var removedActionMap = {
           quickSwitcher: "sessionManager",
           previousSession: "none",
-          nextSession: "none"
+          nextSession: "none",
+          saveCurrentNoteNameAsSession: "none"
         };
         var actions = this.data.statusBarActions || {};
         var slotKeys = Object.keys(actions);
@@ -14522,7 +14288,6 @@ var require_methods = __commonJS({
     var attachSessionSwitchingMethods = require_session_switching();
     var attachSessionCommandMethods = require_session_commands();
     var attachHistoryMethods = require_history();
-    var attachFrontmatterMethods = require_frontmatter();
     var attachSettingsStateMethods = require_settings_state();
     var attachZenModeMethods = require_zen_mode();
     function attachPluginMethods2(WorkspacePlusPlus2) {
@@ -14541,7 +14306,6 @@ var require_methods = __commonJS({
       attachSessionSwitchingMethods(WorkspacePlusPlus2);
       attachSessionCommandMethods(WorkspacePlusPlus2);
       attachHistoryMethods(WorkspacePlusPlus2);
-      attachFrontmatterMethods(WorkspacePlusPlus2);
       attachSettingsStateMethods(WorkspacePlusPlus2);
       attachZenModeMethods(WorkspacePlusPlus2);
     }
@@ -14611,6 +14375,9 @@ var WorkspacePlusPlus = (
         if (!self.data.sessionOrder) self.data.sessionOrder = [];
         self.normalizeGroupFeatureState();
         self.migrateZenModeToSessions();
+        if (typeof self.migrateRemovedStatusBarActions === "function") {
+          self.migrateRemovedStatusBarActions();
+        }
         self.isSwitchingSession = false;
         self.pendingSwitchRequest = null;
         self.switchLockAt = 0;
@@ -14658,7 +14425,6 @@ var WorkspacePlusPlus = (
           self.scheduleStartupFlush();
           self.startHistorySnapshotTimer();
           self.initRotationBackupTimestamp();
-          self.registerFrontmatterListeners();
           self.scheduleStartupSessionStorageChecks();
           if (typeof self.restoreZenFocusLeaf === "function") {
             self.restoreZenFocusLeaf();

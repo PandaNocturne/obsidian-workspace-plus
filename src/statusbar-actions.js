@@ -71,13 +71,6 @@ var ACTIONS = [
         },
     },
     {
-        id: 'saveCurrentNoteNameAsSession',
-        labelKey: 'cmdSaveCurrentNoteNameAsSession',
-        run: function (plugin) {
-            return plugin.saveCurrentNoteNameAsSession();
-        },
-    },
-    {
         id: 'reloadWithoutSaving',
         labelKey: 'statusBarActionReloadWithoutSaving',
         run: function (plugin) {

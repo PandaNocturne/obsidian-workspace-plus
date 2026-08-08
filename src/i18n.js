@@ -371,8 +371,6 @@ var STRINGS = {
         rotationBackupRestoreFailed: 'Failed to restore from backup.',
         rotationBackupNone: 'No backups available.',
         rotationBackupGeneration: function (count) { return count + ' session' + (count !== 1 ? 's' : ''); },
-        frontmatterSessionNotFound: function (n) { return 'Session "' + n + '" not found (workspace-session)'; },
-        frontmatterAlreadyActive: function (n) { return 'Session "' + n + '" is already active'; },
     },
     zh: {
         settingsStatusBarModScrollSwitch: '按住 Ctrl/Cmd 并滚动以切换会话',
@@ -607,8 +605,6 @@ var STRINGS = {
         rotationBackupRestoreFailed: '从备份恢复失败。',
         rotationBackupNone: '没有可用的备份。',
         rotationBackupGeneration: function (count) { return count + ' 个会话'; },
-        frontmatterSessionNotFound: function (n) { return '\u4f1a\u8bdd\u201c' + n + '\u201d\u672a\u627e\u5230\uff08workspace-session\uff09'; },
-        frontmatterAlreadyActive: function (n) { return '\u4f1a\u8bdd\u201c' + n + '\u201d\u5df2\u5904\u4e8e\u6d3b\u52a8\u72b6\u6001'; },
     },
     'zh-TW': {
         settingsStatusBarModScrollSwitch: '按住 Ctrl/Cmd 並捲動以切換工作階段',
@@ -843,8 +839,6 @@ var STRINGS = {
         rotationBackupRestoreFailed: '從備份還原失敗。',
         rotationBackupNone: '沒有可用的備份。',
         rotationBackupGeneration: function (count) { return count + ' 個工作階段'; },
-        frontmatterSessionNotFound: function (n) { return '\u5de5\u4f5c\u968e\u6bb5\u300c' + n + '\u300d\u672a\u627e\u5230\uff08workspace-session\uff09'; },
-        frontmatterAlreadyActive: function (n) { return '\u5de5\u4f5c\u968e\u6bb5\u300c' + n + '\u300d\u5df2\u8655\u65bc\u6d3b\u52d5\u72c0\u614b'; },
     },
 };
 
@@ -1044,38 +1038,6 @@ var EXTENDED_STRINGS = {
         resetSessionsAndSettingsFailed: '重設工作階段與設定失敗。',
     },
 };
-
-var NOTE_SESSION_STRINGS = {
-    en: {
-        cmdSaveCurrentNoteNameAsSession: 'Save current note name as session',
-        noActiveMarkdownFile: 'No active Markdown note.',
-        savedCurrentNoteNameAsSession: function (n) { return 'Saved current note as session "' + n + '"'; },
-        saveCurrentNoteNameAsSessionFailed: 'Failed to save current note name as session.',
-    },
-    zh: {
-        cmdSaveCurrentNoteNameAsSession: '将当前笔记名保存为会话',
-        noActiveMarkdownFile: '没有活动的 Markdown 笔记。',
-        savedCurrentNoteNameAsSession: function (n) { return '已将当前笔记保存为会话“' + n + '”'; },
-        saveCurrentNoteNameAsSessionFailed: '无法将当前笔记名保存为会话。',
-    },
-    'zh-TW': {
-        cmdSaveCurrentNoteNameAsSession: '將目前筆記名稱儲存為工作階段',
-        noActiveMarkdownFile: '沒有作用中的 Markdown 筆記。',
-        savedCurrentNoteNameAsSession: function (n) { return '已將目前筆記儲存為工作階段「' + n + '」'; },
-        saveCurrentNoteNameAsSessionFailed: '無法將目前筆記名稱儲存為工作階段。',
-    },
-};
-
-var noteSessionLangs = Object.keys(NOTE_SESSION_STRINGS);
-for (var noteSessionLangIndex = 0; noteSessionLangIndex < noteSessionLangs.length; noteSessionLangIndex++) {
-    var noteSessionLang = noteSessionLangs[noteSessionLangIndex];
-    if (!EXTENDED_STRINGS[noteSessionLang]) EXTENDED_STRINGS[noteSessionLang] = {};
-    var noteSessionKeys = Object.keys(NOTE_SESSION_STRINGS[noteSessionLang]);
-    for (var noteSessionKeyIndex = 0; noteSessionKeyIndex < noteSessionKeys.length; noteSessionKeyIndex++) {
-        var noteSessionKey = noteSessionKeys[noteSessionKeyIndex];
-        EXTENDED_STRINGS[noteSessionLang][noteSessionKey] = NOTE_SESSION_STRINGS[noteSessionLang][noteSessionKey];
-    }
-}
 
 var extendedLangs = Object.keys(EXTENDED_STRINGS);
 

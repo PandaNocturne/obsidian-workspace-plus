@@ -15,7 +15,6 @@ function loadStatusBarActions() {
             statusBarActionNone: 'Do nothing',
             statusBarActionSessionManager: 'Open Session Manager',
             cmdSaveAs: 'Save current session as...',
-            cmdSaveCurrentNoteNameAsSession: 'Save current note name as session',
             cmdRename: 'Rename current session',
             cmdDuplicate: 'Duplicate current session',
             cmdNewEmpty: 'Create blank session',
@@ -68,7 +67,6 @@ test('status bar actions expose core action ids without switch shortcuts', funct
     const expected = [
         'sessionManager',
         'saveAsSession',
-        'saveCurrentNoteNameAsSession',
         'renameSession',
         'duplicateSession',
         'newEmptySession',
@@ -94,10 +92,6 @@ test('status bar actions delegate core actions to plugin methods', async functio
             calls.push('saveAsSession');
             return Promise.resolve(true);
         },
-        saveCurrentNoteNameAsSession: function () {
-            calls.push('saveCurrentNoteNameAsSession');
-            return Promise.resolve(true);
-        },
         renameCurrentSession: function () {
             calls.push('renameCurrentSession');
         },
@@ -116,7 +110,6 @@ test('status bar actions delegate core actions to plugin methods', async functio
     };
 
     await statusBarActions.executeStatusBarAction(plugin, 'saveAsSession');
-    await statusBarActions.executeStatusBarAction(plugin, 'saveCurrentNoteNameAsSession');
     await statusBarActions.executeStatusBarAction(plugin, 'renameSession');
     await statusBarActions.executeStatusBarAction(plugin, 'duplicateSession');
     await statusBarActions.executeStatusBarAction(plugin, 'newEmptySession');
@@ -124,7 +117,6 @@ test('status bar actions delegate core actions to plugin methods', async functio
 
     assert.deepEqual(calls, [
         'saveAsSession',
-        'saveCurrentNoteNameAsSession',
         'renameCurrentSession',
         'duplicateCurrentSession',
         'createEmptySession',
@@ -138,7 +130,6 @@ test('status bar action labels reuse existing localized command labels', functio
         statusBarActionNone: 'Do nothing',
         statusBarActionSessionManager: 'Open Session Manager',
         cmdSaveAs: 'Save current session as...',
-        cmdSaveCurrentNoteNameAsSession: 'Save current note name as session',
         cmdRename: 'Rename current session',
         cmdDuplicate: 'Duplicate current session',
         cmdNewEmpty: 'Create blank session',
@@ -147,10 +138,6 @@ test('status bar action labels reuse existing localized command labels', functio
 
     assert.equal(statusBarActions.getActionLabel(L, 'sessionManager'), 'Open Session Manager');
     assert.equal(statusBarActions.getActionLabel(L, 'saveAsSession'), 'Save current session as...');
-    assert.equal(
-        statusBarActions.getActionLabel(L, 'saveCurrentNoteNameAsSession'),
-        'Save current note name as session'
-    );
     assert.equal(statusBarActions.getActionLabel(L, 'renameSession'), 'Rename current session');
     assert.equal(statusBarActions.getActionLabel(L, 'duplicateSession'), 'Duplicate current session');
     assert.equal(statusBarActions.getActionLabel(L, 'newEmptySession'), 'Create blank session');

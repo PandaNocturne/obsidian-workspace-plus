@@ -32,6 +32,9 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
 
             self.normalizeGroupFeatureState();
             self.migrateZenModeToSessions();
+            if (typeof self.migrateRemovedStatusBarActions === 'function') {
+                self.migrateRemovedStatusBarActions();
+            }
             self.isSwitchingSession = false;
             self.pendingSwitchRequest = null;
             self.switchLockAt = 0;
@@ -89,7 +92,6 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
                 self.scheduleStartupFlush();
                 self.startHistorySnapshotTimer();
                 self.initRotationBackupTimestamp();
-                self.registerFrontmatterListeners();
                 self.scheduleStartupSessionStorageChecks();
                 if (typeof self.restoreZenFocusLeaf === 'function') {
                     self.restoreZenFocusLeaf();

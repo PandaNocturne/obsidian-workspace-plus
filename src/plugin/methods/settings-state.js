@@ -50,6 +50,7 @@ function attachSettingsStateMethods(WorkspacePlusPlus) {
             quickSwitcher: 'sessionManager',
             previousSession: 'none',
             nextSession: 'none',
+            saveCurrentNoteNameAsSession: 'none',
         };
         var actions = this.data.statusBarActions || {};
         var slotKeys = Object.keys(actions);
