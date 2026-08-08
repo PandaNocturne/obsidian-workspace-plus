@@ -39,7 +39,8 @@ function attachGroupMethods(WorkspacePlusPlus) {
     WorkspacePlusPlus.prototype.attachSessionToActiveGroup = function (sessionId) {
         if (!this.isGroupFeatureEnabled()) return;
         var activeGroupId = this.data.activeGroupId;
-        if (!activeGroupId) return;
+        if (!activeGroupId || activeGroupId === '__ungrouped__' || activeGroupId === '__all__') return;
+        if (!this.data.groups || !this.data.groups[activeGroupId]) return;
         if (!this.data.sessionGroups) this.data.sessionGroups = {};
         if (!Array.isArray(this.data.sessionGroups[sessionId])) {
             this.data.sessionGroups[sessionId] = [];
@@ -117,6 +118,32 @@ function attachGroupMethods(WorkspacePlusPlus) {
         if (!this.isGroupFeatureEnabled()) return null;
         if (!this.data.activeGroupId) return null;
         return (this.data.groups || {})[this.data.activeGroupId] || null;
+    };
+
+    // Pick the group that should drive status-bar nesting / active view for a session.
+    // Returns undefined when groups are disabled, null for Default/ungrouped sessions
+    // (no nesting), or a real group id when the session belongs to one or more groups.
+    WorkspacePlusPlus.prototype.chooseSessionGroupForView = function (sessionId) {
+        if (!this.isGroupFeatureEnabled()) return undefined;
+
+        var data = this.data || {};
+        var groups = data.groups || {};
+        var sessionGroups = data.sessionGroups || {};
+        var groupIds = Array.isArray(sessionGroups[sessionId]) ? sessionGroups[sessionId] : [];
+        var validGroupIds = groupIds.filter(function (groupId) {
+            return !!groups[groupId];
+        });
+
+        // Default / ungrouped: never nest under a real group label
+        if (validGroupIds.length === 0) return null;
+        if (validGroupIds.indexOf(data.activeGroupId) !== -1) return data.activeGroupId;
+
+        var ordered = this.getOrderedGroupTabIds();
+        for (var i = 0; i < ordered.length; i++) {
+            if (ordered[i] === '__all__') continue;
+            if (validGroupIds.indexOf(ordered[i]) !== -1) return ordered[i];
+        }
+        return validGroupIds[0];
     };
 
     WorkspacePlusPlus.prototype.createGroup = function (name) {
@@ -233,6 +260,44 @@ function attachGroupMethods(WorkspacePlusPlus) {
         var nextIdx = currentIdx + offset;
         if (nextIdx < 0 || nextIdx >= ordered.length) return null;
         return ordered[nextIdx].id;
+    };
+
+    WorkspacePlusPlus.prototype.resolveGroupViewSelection = function (groupId) {
+        if (!this.isGroupFeatureEnabled()) {
+            return Promise.resolve({
+                switched: false,
+                targetGroupId: null,
+                resolvedGroupId: null,
+                sessions: this.getOrderedSessionsUnfiltered(),
+            });
+        }
+
+        var targetGroupId = groupId || null;
+        var groups = this.data.groups || {};
+        var resolvedGroupId = targetGroupId;
+        if (resolvedGroupId === '__ungrouped__') {
+            // Virtual Default / uncategorized tab
+        } else if (resolvedGroupId && !groups[resolvedGroupId]) {
+            resolvedGroupId = null;
+        }
+
+        return Promise.resolve({
+            switched: false,
+            targetGroupId: targetGroupId,
+            resolvedGroupId: resolvedGroupId,
+            sessions: this.getOrderedSessionsForGroup(resolvedGroupId),
+        });
+    };
+
+    WorkspacePlusPlus.prototype.clearSessionGroupMembership = function (sessionId, options) {
+        if (!sessionId || !this.data.sessions[sessionId]) return Promise.resolve(false);
+        if (!this.data.sessionGroups || !this.data.sessionGroups[sessionId]) {
+            return Promise.resolve(false);
+        }
+        delete this.data.sessionGroups[sessionId];
+        this.syncSessionCommands();
+        if (options && options.persist === false) return Promise.resolve(true);
+        return this.persistData().then(function () { return true; });
     };
 
     WorkspacePlusPlus.prototype.resolveGroupSelection = function (groupId) {

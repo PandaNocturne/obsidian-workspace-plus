@@ -3,6 +3,7 @@
 var obsidian = require('obsidian');
 var i18n = require('./i18n');
 var ConfirmModal = require('./modals/confirm-modal');
+var DeleteOrArchiveModal = require('./modals/delete-or-archive-modal');
 var RenameModal = require('./modals/rename-modal');
 
 function resolveApp(options) {
@@ -19,13 +20,22 @@ function renameSessionWithPrompt(options) {
     var session = options.session;
     if (!app || !plugin || !session) return;
 
+    var allowNote = options.showNote !== false;
     var modalOptions = Object.assign({
         emptyNotice: L.emptyName,
+        title: allowNote ? L.editSessionTitle : L.renameTitle,
+        buttonText: allowNote ? L.saveChanges : L.rename,
+        showNote: allowNote,
+        currentNote: session.note || '',
+        notePlaceholder: L.sessionNotePlaceholder,
     }, options.modalOptions || {});
 
-    new RenameModal(app, session.name, function (newName) {
-        plugin.renameSessionById(session.id, newName).then(function (renamed) {
-            if (!renamed) return;
+    new RenameModal(app, session.name, function (newName, note) {
+        var editPromise = allowNote && typeof plugin.editSessionById === 'function'
+            ? plugin.editSessionById(session.id, newName, note)
+            : plugin.renameSessionById(session.id, newName);
+        editPromise.then(function (updated) {
+            if (!updated) return;
             if (typeof options.onRenamed === 'function') {
                 options.onRenamed(session, newName);
             }
@@ -70,7 +80,42 @@ function deleteSessionWithPrompt(options) {
         });
     };
 
+    var doArchive = function () {
+        return plugin.archiveSession(session.id).then(function (archived) {
+            if (!archived) {
+                if (options.notifyCannotDelete !== false) {
+                    new obsidian.Notice(L.cannotDeleteLast);
+                }
+                return false;
+            }
+            if (options.notifyArchived !== false) {
+                new obsidian.Notice(L.archived(session.name));
+            }
+            if (typeof options.onArchived === 'function') {
+                options.onArchived(session);
+            } else if (typeof options.onDeleted === 'function') {
+                // Refresh list even if caller only provided onDeleted.
+                options.onDeleted(session);
+            }
+            return true;
+        });
+    };
+
+    var allowArchive = options.allowArchive !== false
+        && typeof plugin.archiveSession === 'function';
     var shouldConfirm = !!options.forceConfirm || plugin.data.confirmDeleteByHotkey !== false;
+
+    if (shouldConfirm && allowArchive) {
+        new DeleteOrArchiveModal(
+            app,
+            options.archiveConfirmMessage || L.confirmDeleteOrArchive(session.name),
+            doArchive,
+            doDelete,
+            options.confirmOptions || {}
+        ).open();
+        return Promise.resolve(true);
+    }
+
     if (shouldConfirm) {
         new ConfirmModal(
             app,

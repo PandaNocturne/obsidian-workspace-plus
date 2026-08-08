@@ -1,213 +1,92 @@
-# Workspace++
+﻿# Workspace++ Beta
 
-Workspace++ is an [Obsidian](https://obsidian.md/) community plugin for saving, switching, and organizing workspace sessions. It is built for people who want Obsidian layouts to feel fast, native, and keyboard-friendly.
+Workspace++ Beta 是 [Workspace++](https://github.com/s1m4ne/obsidian-workspace-plus) 的功能修改版，用于保存、切换与组织 Obsidian 工作区会话。工作区管理能力可追溯至 [Workspaces Plus](https://github.com/jsmorabito/obsidian-workspaces-plus)。
 
-![Workspace++ session manager workflow](assets/readme/session-manager-modal.png)
+本分支在上游基础上增加了卡片化管理面板、回收站归档、版本历史（含手动快照）、会话恢复（侧边栏 / 文件名 / UID）、任务视图与专注模式等能力。相比原版，本版本将核心操作集中到工作区面板上——无需复杂命令，直接在面板中即可完成工作区的创建、切换与管理。
 
-## Highlights
+## 插件介绍
 
-- Save the current workspace layout as a named session.
-- Switch sessions from the status bar, quick switcher, command palette, hotkeys, or session manager.
-- Use automatic save-on-switch, or turn it off for a manual save workflow.
-- Organize sessions into groups.
-- Customize status bar click, middle-click, right-click, and modified-click actions.
-- Scroll on the status bar to switch sessions.
-- See a status bar warning when a manual-save session has unsaved layout changes.
-- Save, reload, duplicate, rename, delete, reorder, and bulk-delete sessions.
-- Keep per-session version history and restore previous layouts.
-- Export, import, and restore session backups.
-- Load sessions from note frontmatter with `workspace-session`.
-- Save the current note name as a session and write the matching frontmatter automatically.
-- Use Workspace++ in 21 interface locales.
+### 工作区管理面板
 
-## Features
+![工作区管理](assets/workspace-manager.png)
 
-### Quick switching
+- 可以对工作区进行创建、注释、切换、删除、备份、复制
+- 支持分组管理工作区，可自定义创建分组，对工作区进行分类、批量操作与切换分组视图
+- 支持对两侧侧边栏是否随会话恢复进行控制，方便在切换工作区时只恢复主编辑区、保留当前左右侧边栏
+- 支持版本历史回溯；切换时可自动保存，也可手动保存命名快照
+- 支持回收站：删除的工作区可归档，之后在回收站中恢复或永久删除
+- 恢复会话时，可按文件名匹配缺失路径，也可通过笔记属性UID标识识别
+- 底部状态栏显示当前分组与工作区（可开关），单击即可打开工作区管理面板
 
-Cycle through sessions with `Cmd/Ctrl+Shift+Enter`, or move backward/forward with `Cmd/Ctrl+Shift+,` and `Cmd/Ctrl+Shift+.`. You can also register numbered or name-based session switch commands for custom hotkeys.
+### 任务视图模式
 
-![Workspace++ quick switching overlay](assets/readme/quick-switcher-overlay.png)
+![任务视图](assets/task-view.gif)
 
-### Session manager
+通过命令「切换标签页（任务视图）」打开类 Mission Control 的网格预览：
 
-Open the session manager to switch, create, rename, duplicate, delete, reorder, bulk-delete, and group sessions.
+- 点击预览卡片即可切换到对应标签页；点击蒙版或空白处关闭任务视图
+- 拖动卡片头部可在当前分栏内排序；拖到其他分栏区域可跨分栏移动标签
+- 顶部页码可切换根分栏预览；在任务视图内任意位置滚动鼠标滚轮，也可快速切换分栏（仅切换预览，不改变后台焦点）
+- 数字键 `1`–`9` 可跳转到对应分栏；双击分栏页码可进入该分栏的专注模式
+- 可在设置中调整缩略图比例、内容缩放，以及是否显示悬停操作提示
 
-![Workspace++ session manager overlay](assets/readme/session-manager-overlay.png)
+### 专注模式
 
-### Create, duplicate, delete
+专注模式可配合工作区与任务视图使用：
 
-Create sessions from the current layout, duplicate the active session with `Cmd/Ctrl+Shift+M`, or delete it with `Cmd/Ctrl+Shift+Backspace`.
+- 底部状态栏可显示是否处于专注模式
+- 每个工作区的专注状态单独保存，互不影响
+- 专注模式下可隐藏非活动标签
+- 任务视图下可直接切换分栏视图，或双击页码进入对应分栏专注
 
-### Rename and reorder
+## 设置概览
 
-Rename the current session with `Cmd/Ctrl+Shift+R`, right-click sessions for context actions, and drag sessions to reorder them.
-
-### Status bar workflow
-
-The status bar shows the active group and session. By default, click opens the quick switcher, `Cmd/Ctrl+Click` saves the current session, right-click opens the session menu, and `Cmd/Ctrl+Right-click` restores the latest version history entry.
-
-You can customize status bar click actions in settings, including save, save as, reload without saving, rename, duplicate, previous/next session, blank session, version history, and "save current note name as session".
-
-### Save modes
-
-Workspace++ defaults to automatic save-on-switch. If you prefer a manual workflow, turn auto-save off and use explicit save/reload commands. In manual mode, Workspace++ can warn before switching away from unsaved layout changes and highlight the status bar when the current layout differs from the saved session.
-
-Manual-save tools include:
-
-- Save current session.
-- Save current session as a new session.
-- Save the current layout to another existing session.
-- Reload the current session without saving local layout changes.
-
-### Session groups
-
-Groups let you organize sessions without deleting or duplicating them. You can switch groups, show all sessions, move sessions between groups, remove sessions from groups, and disable the group feature if you do not need it.
-
-### Version history and backups
-
-Workspace++ keeps per-session version history for layout changes and can restore previous layouts. It also keeps session backup files in the vault and supports manual export/import snapshots from settings or commands.
-
-Automatic rotation backups are created on save, hourly, up to 3 generations.
-
-### Frontmatter sessions
-
-Add this property to a note to load a session when that note is opened:
-
-```yaml
-workspace-session: My Session
-```
-
-Workspace++ also provides a command, **Save current note name as session**, that writes `workspace-session: <note-name>` to the current Markdown note and creates or overwrites the matching session using the current layout.
-
-### Local settings
-
-Workspace++ can keep settings local to the current vault, while session data remains in the vault-level Workspace++ storage folder. This is useful when syncing `.obsidian` settings across vaults but keeping Workspace++ behavior different per vault.
-
-## Installation
-
-### From Community Plugins
-
-1. Open Obsidian **Settings** > **Community plugins**.
-2. Click **Browse** and search for **Workspace++**.
-3. Click **Install**, then **Enable**.
-
-Community plugin page:
-
-https://community.obsidian.md/plugins/workspace-plus-plus
-
-### From release
-
-1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/s1m4ne/obsidian-workspace-plus/releases/latest).
-2. Create a folder at `<your-vault>/.obsidian/plugins/workspace-plus-plus/`.
-3. Place the three files into that folder.
-4. Open Obsidian **Settings** > **Community plugins** and enable **Workspace++**.
-
-### With BRAT
-
-Use BRAT if you want to test unreleased changes directly from GitHub.
-
-1. Install the [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin.
-2. Open **Settings** > **BRAT** > **Add Beta plugin**.
-3. Paste this URL and click **Add Plugin**:
-
-```text
-https://github.com/s1m4ne/obsidian-workspace-plus
-```
-
-## Commands
-
-All commands can be assigned custom hotkeys in **Settings** > **Hotkeys**.
-
-| Command | Default hotkey |
+| 分类 | 主要内容 |
 | --- | --- |
-| Manage sessions | - |
-| Create new session | - |
-| Create blank session | - |
-| Duplicate current session | `Cmd/Ctrl+Shift+M` |
-| Rename current session | `Cmd/Ctrl+Shift+R` |
-| Delete current session | `Cmd/Ctrl+Shift+Backspace` |
-| Previous session | `Cmd/Ctrl+Shift+,` |
-| Next session | `Cmd/Ctrl+Shift+Enter`, `Cmd/Ctrl+Shift+.` |
-| Switch to session 1-9 | Assignable |
-| Save current session | `Cmd/Ctrl+Shift+S` |
-| Save current session as... | - |
-| Save current note name as session | - |
-| Save current layout to session... | - |
-| Reload current session without saving | - |
-| Toggle auto-save on switch | - |
-| Enable auto-save on switch | - |
-| Disable auto-save on switch | - |
-| Search sessions | - |
-| View session version history | - |
-| Export sessions snapshot | - |
-| Import latest sessions snapshot | - |
-| Switch group | - |
-| Show all sessions / exit group | - |
-| Next group | `Cmd/Ctrl+Shift+Tab` |
-| Previous group | - |
+| 常规 | 语言、快捷键入口、恢复侧边栏、状态栏控件、任务视图预览、专注模式隐藏非活动标签 |
+| 会话 | 会话恢复（按文件名 / UID）、自动保存模式、筛选与删除确认、版本历史、轮转备份 |
+| 分组 | 启用分组、创建 / 管理分组 |
+| 高级 | 会话存储位置、重置与清理等 |
 
-## Sync and storage
+## 安装
 
-Workspace++ stores session data in the Obsidian plugin folder for new installs:
+### 使用 BRAT
 
-```text
-.obsidian/plugins/workspace-plus-plus/sessions.json
-```
+1. 安装 [BRAT](https://github.com/TfTHacker/obsidian42-brat)
+2. 打开 **设置** > **BRAT** > **Add Beta plugin** 
+3. 粘贴本仓库地址并添加
 
-Existing installs that already use the older vault-local folder keep using it automatically:
+### 从 Release 安装
 
-```text
-.workspace-plus-plus/sessions.json
-```
+1. 从本仓库最新 Release 下载 `main.js`、`manifest.json`、`styles.css`
+2. 在库中创建目录：`<你的库>/.obsidian/plugins/workspace-plus-plus-beta/`（或与本地插件文件夹名一致）
+3. 将上述三个文件放入该目录
+4. 打开 **设置** > **社区插件**，启用 **Workspace++ Beta**
 
-You can move session storage in **Settings** > **Workspace++** > **Advanced**. Use the Obsidian plugin folder if you want Obsidian Sync to sync Workspace++ sessions across devices. Use the vault-local `.workspace-plus-plus` folder if you share `.obsidian` across multiple vaults with tools such as Settings Profiles and want each vault to keep separate sessions.
+## 命令
 
-Immediate backups and rotation backups are stored next to the active session file:
+可在 **设置** > **快捷键** 中为下列命令绑定自定义快捷键。
 
-```text
-sessions.backup.json
-backups/
-```
+| 命令 | 推荐快捷键 |
+| --- | --- |
+| 管理会话 | Alt + 1 |
+| 切换标签页（任务视图） | Alt + 2 |
+| 切换专注标签模式 | F4 |
+| 保存当前会话 | - |
+| 切换会话切换时自动保存 | - |
+| 启用会话切换时自动保存 | - |
+| 禁用会话切换时自动保存 | - |
+| 查看会话版本历史 | - |
 
-Workspace++ watches the active session file for external changes and reloads synced updates when possible, but concurrent edits are not a full conflict-free merge system. If you use Syncthing, Dropbox, iCloud, Obsidian Sync, or another file sync tool, let sync finish before editing sessions on another device. Automatic backups help recover from corrupted session data, but they are not a full multi-device conflict resolver.
+## 致谢
 
-## Languages
+欢迎在本仓库提交问题、功能建议与 PR。
 
-Workspace++ includes 21 interface locales:
+上游项目：
 
-English, Arabic, Bengali, Chinese Simplified, Chinese Traditional, French, German, Hindi, Indonesian, Italian, Japanese, Korean, Malay, Persian, Polish, Portuguese, Russian, Spanish, Thai, Turkish, and Vietnamese.
+- [Workspace++](https://github.com/s1m4ne/obsidian-workspace-plus) by s1m4ne
+- [Workspaces Plus](https://github.com/jsmorabito/obsidian-workspaces-plus) by Johnny / Nothingislost
 
-## Video Demos
-
-<details>
-<summary>Show video demos</summary>
-
-### Quick switching
-
-https://github.com/user-attachments/assets/b1dc94f7-b979-4b09-97e6-3ebf4837b5ed
-
-### Session manager
-
-https://github.com/user-attachments/assets/27a02a7b-aaa8-4795-b67d-4348fa4012f7
-
-### Create, duplicate, delete
-
-https://github.com/user-attachments/assets/c86b8000-c49e-442c-8246-17c181a4d921
-
-### Rename and reorder
-
-https://github.com/user-attachments/assets/6041d80f-9c15-4a59-8d27-8a8f39d9dba6
-
-https://github.com/user-attachments/assets/6c2b5a13-cc9f-43ca-bff1-944c5b318a92
-
-</details>
-
-## Community
-
-Bug reports, feature requests, and pull requests are welcome. Feel free to open an [issue](https://github.com/s1m4ne/obsidian-workspace-plus/issues) or PR.
-
-If you find this plugin useful, please give it a star on GitHub. It helps others discover it.
-
-## License
+## 许可
 
 MIT

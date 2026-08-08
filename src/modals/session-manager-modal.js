@@ -3,6 +3,8 @@
 var obsidian = require('obsidian');
 var i18n = require('../i18n');
 var ConfirmModal = require('./confirm-modal');
+var HistoryModal = require('./history-modal');
+var HistoryEntryModal = require('./history-entry-modal');
 var formatRelativeTime = require('./format-relative-time');
 var groupTabUi = require('../group-tab-ui');
 var navigationUtils = require('../navigation-utils');
@@ -38,11 +40,23 @@ var SessionManagerModal = /** @class */ (function (_super) {
         var contentEl = this.contentEl;
         contentEl.empty();
         contentEl.addClass('wpp-modal');
+        this.modalEl.addClass('wpp-session-manager-modal');
+        // Inline size so CSS BOM / theme cascade cannot shrink the 3-column card layout
+        this.modalEl.style.setProperty('width', 'min(80vw, 800px)', 'important');
+        this.modalEl.style.setProperty('max-width', 'min(80vw, 800px)', 'important');
+        this.modalEl.style.setProperty('height', 'min(60vh, 600px)', 'important');
+        this.modalEl.style.setProperty('max-height', 'min(60vh, 600px)', 'important');
 
         this.titleEl.setText(L.modalTitle);
+        var savedPanel = this.plugin.resolveSessionManagerPanelState
+            ? this.plugin.resolveSessionManagerPanelState()
+            : { panelMode: 'sessions', viewGroupId: null };
+        this.panelMode = savedPanel.panelMode || 'sessions';
+        this.openingSessionId = null;
 
         // Save section
         var saveContainer = contentEl.createDiv({ cls: 'wpp-save-container' });
+        this.saveContainerEl = saveContainer;
         this.nameInput = saveContainer.createEl('input', {
             type: 'text',
             placeholder: L.savePlaceholder,
@@ -67,7 +81,7 @@ var SessionManagerModal = /** @class */ (function (_super) {
 
         var self = this;
         this.modalGroupId = this.plugin.isGroupFeatureEnabled()
-            ? (this.plugin.data.activeGroupId || null)
+            ? (savedPanel.viewGroupId || null)
             : null;
         saveBtn.addEventListener('click', function () { self.onSave(); });
         saveBtn.addEventListener('focus', function () {
@@ -93,7 +107,6 @@ var SessionManagerModal = /** @class */ (function (_super) {
 
         // Group tabs
         this.groupTabsRow = contentEl.createDiv({ cls: 'wpp-group-tabs-row' });
-        this.renderGroupTabs();
 
         // Focus & selection state
         this.keyboardTarget = { zone: 'none', rowIndex: null, actionKey: null };
@@ -113,26 +126,49 @@ var SessionManagerModal = /** @class */ (function (_super) {
 
         // Session list
         this.listEl = contentEl.createDiv({ cls: 'wpp-session-list' });
-        this.renderList();
-
-        // Set initial focus to active session
-        this.setKeyboardTarget(this.getDefaultSessionTarget());
 
         this.contentFocusHandler = function (e) {
             self.syncKeyboardTargetFromElement(e.target);
         };
         contentEl.addEventListener('focusin', this.contentFocusHandler, true);
 
-        // Hotkey footer
-        var nextKey = this.plugin.getCommandHotkey('next-session');
-        var footer = contentEl.createDiv({ cls: 'wpp-modal-footer' });
-        if (nextKey) {
-            footer.createDiv({ text: L.cmdNext + '  ' + nextKey });
-        }
-        footer.createDiv({ text: L.footerDragReorder });
+        // Footer: settings (left) | hints | trash/back (right)
+        var footer = contentEl.createDiv({ cls: 'wpp-modal-footer wpp-modal-footer-bar' });
+
+        var footerLeft = footer.createDiv({ cls: 'wpp-modal-footer-left' });
+        this.settingsBtn = footerLeft.createDiv({
+            cls: 'wpp-icon-btn wpp-settings-btn',
+            attr: { role: 'button', tabindex: '0' },
+        });
+        obsidian.setIcon(this.settingsBtn, 'settings');
+        obsidian.setTooltip(this.settingsBtn, L.contextOpenSettings, { delay: 250 });
+        this.settingsBtn.addEventListener('click', function () {
+            self.app.setting.open();
+            self.app.setting.openTabById(self.plugin.manifest.id);
+        });
+
+        var footerHints = footer.createDiv({ cls: 'wpp-modal-footer-hints' });
+        this.footerHintsEl = footerHints;
+        footerHints.createDiv({ text: L.footerDragReorder });
         if (this.plugin.getOrderedGroups().length > 0) {
-            footer.createDiv({ text: L.footerDragToGroup });
+            footerHints.createDiv({ text: L.footerDragToGroup });
         }
+        var archiveBtnWrap = footer.createDiv({ cls: 'wpp-archive-btn-wrap' });
+        this.archiveBtn = archiveBtnWrap.createDiv({
+            cls: 'wpp-icon-btn wpp-archive-btn',
+            attr: { role: 'button', tabindex: '0' },
+        });
+        this.archiveBadge = archiveBtnWrap.createSpan({ cls: 'wpp-archive-badge' });
+        this.archiveBtn.addEventListener('click', function () {
+            self.toggleArchiveMode();
+        });
+
+        // Restore chrome + content for last remembered page
+        this.syncPanelModeChrome();
+        this.renderGroupTabs();
+        this.renderList();
+        this.updateArchiveBadge();
+        this.setKeyboardTarget(this.getDefaultSessionTarget());
 
         // Right-click on empty area → settings context menu
         contentEl.addEventListener('contextmenu', function (e) {
@@ -195,12 +231,83 @@ var SessionManagerModal = /** @class */ (function (_super) {
     };
 
     SessionManagerModal.prototype.getVisibleSessions = function () {
+        if (this.panelMode === 'archive') {
+            var archived = this.plugin.getArchivedSessions
+                ? this.plugin.getArchivedSessions()
+                : [];
+            var archiveQuery = (this.filterQuery || '').trim().toLowerCase();
+            if (!archiveQuery) return archived;
+            return archived.filter(function (s) {
+                var name = (s.name || '').toLowerCase();
+                var note = (s.note || '').toLowerCase();
+                return name.indexOf(archiveQuery) !== -1 || note.indexOf(archiveQuery) !== -1;
+            });
+        }
         var sessions = this.plugin.getOrderedSessionsForGroup(this.getModalGroupId());
         var query = (this.filterQuery || '').trim().toLowerCase();
         if (!query) return sessions;
         return sessions.filter(function (s) {
-            return (s.name || '').toLowerCase().indexOf(query) !== -1;
+            var name = (s.name || '').toLowerCase();
+            var note = (s.note || '').toLowerCase();
+            return name.indexOf(query) !== -1 || note.indexOf(query) !== -1;
         });
+    };
+
+    SessionManagerModal.prototype.updateArchiveBadge = function () {
+        if (!this.archiveBadge) return;
+        var count = this.plugin.getArchivedCount ? this.plugin.getArchivedCount() : 0;
+        if (count > 0) {
+            this.archiveBadge.textContent = String(count);
+            this.archiveBadge.style.display = '';
+        } else {
+            this.archiveBadge.textContent = '';
+            this.archiveBadge.style.display = 'none';
+        }
+    };
+
+    SessionManagerModal.prototype.persistPanelState = function () {
+        if (!this.plugin.setSessionManagerPanelState) return;
+        this.plugin.setSessionManagerPanelState({
+            panelMode: this.panelMode === 'archive' ? 'archive' : 'sessions',
+            viewGroupId: this.modalGroupId || null,
+        });
+    };
+
+    SessionManagerModal.prototype.syncPanelModeChrome = function () {
+        var L = i18n.L;
+        if (this.panelMode === 'archive') {
+            this.titleEl.setText(L.archiveArea);
+            if (this.saveContainerEl) this.saveContainerEl.style.display = 'none';
+            if (this.groupTabsRow) this.groupTabsRow.style.display = 'none';
+            if (this.footerHintsEl) this.footerHintsEl.style.display = 'none';
+            if (this.archiveBtn) {
+                obsidian.setIcon(this.archiveBtn, 'arrow-left');
+                obsidian.setTooltip(this.archiveBtn, L.backToSessions, { delay: 250 });
+            }
+        } else {
+            this.titleEl.setText(L.modalTitle);
+            if (this.saveContainerEl) this.saveContainerEl.style.display = '';
+            if (this.groupTabsRow) {
+                this.groupTabsRow.style.display = this.plugin.isGroupFeatureEnabled() ? '' : 'none';
+            }
+            if (this.footerHintsEl) this.footerHintsEl.style.display = '';
+            if (this.archiveBtn) {
+                obsidian.setIcon(this.archiveBtn, 'trash-2');
+                obsidian.setTooltip(this.archiveBtn, L.archiveArea, { delay: 250 });
+            }
+        }
+    };
+
+    SessionManagerModal.prototype.toggleArchiveMode = function () {
+        this.panelMode = this.panelMode === 'archive' ? 'sessions' : 'archive';
+        this.selectedIds.clear();
+        this.syncPanelModeChrome();
+        if (this.panelMode !== 'archive') {
+            this.renderGroupTabs();
+        }
+        this.persistPanelState();
+        this.updateArchiveBadge();
+        this.renderList();
     };
 
     SessionManagerModal.prototype.getModalGroupId = function () {
@@ -208,9 +315,15 @@ var SessionManagerModal = /** @class */ (function (_super) {
             this.modalGroupId = null;
             return null;
         }
+        if (this.modalGroupId === '__ungrouped__') {
+            return '__ungrouped__';
+        }
         var groups = this.plugin.data.groups || {};
         if (this.modalGroupId && !groups[this.modalGroupId]) {
             this.modalGroupId = this.plugin.data.activeGroupId || null;
+            if (this.modalGroupId && !groups[this.modalGroupId]) {
+                this.modalGroupId = null;
+            }
         }
         return this.modalGroupId || null;
     };
@@ -218,17 +331,64 @@ var SessionManagerModal = /** @class */ (function (_super) {
     SessionManagerModal.prototype.selectGroup = function (groupId) {
         if (!this.plugin.isGroupFeatureEnabled()) {
             this.modalGroupId = null;
+            this.persistPanelState();
             this.renderGroupTabs();
             this.renderList();
             return Promise.resolve(false);
         }
         var self = this;
         var nextGroupId = groupId || null;
-        return this.plugin.resolveGroupSelection(nextGroupId).then(function (result) {
+        return this.plugin.resolveGroupViewSelection(nextGroupId).then(function (result) {
             self.modalGroupId = result.resolvedGroupId || null;
+            self.persistPanelState();
             self.renderGroupTabs();
             self.renderList();
             return result.switched;
+        });
+    };
+
+    SessionManagerModal.prototype.resolveLocateGroupId = function (sessionId) {
+        if (!this.plugin.isGroupFeatureEnabled()) return null;
+        if (typeof this.plugin.chooseSessionGroupForView !== 'function') return null;
+        var preferred = this.plugin.chooseSessionGroupForView(sessionId);
+        if (preferred === null) return '__ungrouped__';
+        if (preferred) return preferred;
+        return null;
+    };
+
+    SessionManagerModal.prototype.locateCurrentSession = function () {
+        var self = this;
+        var activeId = this.plugin.data.activeSessionId;
+        if (!activeId || !this.plugin.data.sessions[activeId]) {
+            return Promise.resolve(false);
+        }
+
+        if (this.panelMode === 'archive') {
+            this.panelMode = 'sessions';
+            this.selectedIds.clear();
+            this.syncPanelModeChrome();
+            this.renderGroupTabs();
+            this.persistPanelState();
+        }
+
+        if (this.filterInput && (this.filterQuery || '').trim()) {
+            this.filterQuery = '';
+            this.filterInput.value = '';
+        }
+
+        var finish = function () {
+            self.focusSessionTarget(self.getDefaultSessionTarget());
+            return true;
+        };
+
+        var targetGroupId = this.resolveLocateGroupId(activeId);
+        if (!this.plugin.isGroupFeatureEnabled() || this.getModalGroupId() === targetGroupId) {
+            this.renderList();
+            return Promise.resolve(finish());
+        }
+
+        return this.selectGroup(targetGroupId).then(function () {
+            return finish();
         });
     };
 
@@ -273,14 +433,19 @@ var SessionManagerModal = /** @class */ (function (_super) {
         if (desiredKey) {
             target = rowEl.querySelector('.wpp-session-actions [data-action-key="' + desiredKey + '"]');
         }
+        if ((!target || !isElementVisible(target)) && desiredKey === 'load') {
+            if (rowEl.getAttribute('data-action-key') === 'load') return rowEl;
+        }
         if ((!target || !isElementVisible(target)) && desiredKey !== 'load') {
             target = rowEl.querySelector('.wpp-session-actions [data-action-key="load"]');
+            if (!target && rowEl.getAttribute('data-action-key') === 'load') return rowEl;
         }
         if (target && isElementVisible(target)) return target;
         var rowControls = Array.from(rowEl.querySelectorAll('.wpp-session-actions button, .wpp-session-actions .wpp-icon-btn'));
         for (var i = 0; i < rowControls.length; i++) {
             if (isElementVisible(rowControls[i])) return rowControls[i];
         }
+        if (rowEl.getAttribute('data-action-key') === 'load') return rowEl;
         return null;
     };
 
@@ -330,6 +495,14 @@ var SessionManagerModal = /** @class */ (function (_super) {
 
     SessionManagerModal.prototype.syncKeyboardTargetFromElement = function (el) {
         if (!el || !this.contentEl.contains(el)) return;
+        if (el.classList && el.classList.contains('wpp-session-item') && el.getAttribute('data-action-key') === 'load') {
+            this.setKeyboardTarget({
+                zone: 'session-action',
+                rowIndex: this.getVisibleRowIndex(el),
+                actionKey: 'load',
+            });
+            return;
+        }
         var rowAction = el.closest ? el.closest('.wpp-session-actions') : null;
         if (rowAction && this.contentEl.contains(rowAction)) {
             var rowEl = el.closest('.wpp-session-item');
@@ -383,6 +556,20 @@ var SessionManagerModal = /** @class */ (function (_super) {
             return;
         }
         if (!controlEl) return;
+        if (controlEl.classList && controlEl.classList.contains('wpp-session-item')
+            && controlEl.getAttribute('data-action-key') === 'load') {
+            var rowActionBar = controlEl.querySelector('.wpp-session-actions');
+            if (!rowActionBar) return;
+            var firstControls = Array.from(rowActionBar.querySelectorAll('button, .wpp-icon-btn')).filter(function (el) {
+                return isElementVisible(el);
+            });
+            if (e.key === 'ArrowRight' && firstControls.length > 0) {
+                e.preventDefault();
+                e.stopPropagation();
+                firstControls[0].focus();
+            }
+            return;
+        }
         var actionRow = controlEl.closest('.wpp-session-actions');
         if (!actionRow || !this.contentEl.contains(actionRow)) return;
         var rowControls = Array.from(actionRow.querySelectorAll('button, .wpp-icon-btn')).filter(function (el) {
@@ -392,7 +579,16 @@ var SessionManagerModal = /** @class */ (function (_super) {
         var rowIndex = rowControls.indexOf(controlEl);
         if (rowIndex === -1) return;
         var nextRowIndex = rowIndex + (e.key === 'ArrowRight' ? 1 : -1);
-        if (nextRowIndex < 0 || nextRowIndex >= rowControls.length) return;
+        if (nextRowIndex < 0) {
+            var parentRow = actionRow.closest('.wpp-session-item');
+            if (parentRow && parentRow.getAttribute('data-action-key') === 'load') {
+                e.preventDefault();
+                e.stopPropagation();
+                parentRow.focus();
+            }
+            return;
+        }
+        if (nextRowIndex >= rowControls.length) return;
 
         e.preventDefault();
         e.stopPropagation();
@@ -570,7 +766,24 @@ var SessionManagerModal = /** @class */ (function (_super) {
     SessionManagerModal.prototype.renderList = function () {
         var L = i18n.L;
         this.listEl.empty();
+        var cardLayout = true;
+        this.listEl.toggleClass('wpp-session-list--cards', cardLayout);
+        this.listEl.toggleClass('wpp-session-list--archive', this.panelMode === 'archive');
+
         var sessions = this.getVisibleSessions();
+        if (this.panelMode === 'archive') {
+            for (var ai = 0; ai < sessions.length; ai++) {
+                this.renderArchivedItem(sessions[ai], ai);
+            }
+            if (sessions.length === 0) {
+                this.listEl.createDiv({ text: L.archiveEmpty, cls: 'wpp-empty-state' });
+            }
+            this.updateFocusUI();
+            this.updateSelectionUI();
+            this.updateArchiveBadge();
+            return;
+        }
+
         var selectedGroupId = this.getModalGroupId();
         var ordered = this.plugin.getOrderedSessionsForGroup(selectedGroupId);
         var orderIndex = {};
@@ -601,22 +814,51 @@ var SessionManagerModal = /** @class */ (function (_super) {
         });
         this.updateFocusUI();
         this.updateSelectionUI();
+        this.updateArchiveBadge();
     };
 
     SessionManagerModal.prototype.renderSessionItem = function (session, index, orderIndex) {
         var L = i18n.L;
         var isActive = session.id === this.plugin.data.activeSessionId;
+        var isOpening = this.openingSessionId === session.id;
+        var cardLayout = true;
         var self = this;
 
         var item = this.listEl.createDiv({ cls: 'wpp-session-item' });
         item.dataset.sessionId = session.id;
+        item.setAttribute('tabindex', '-1');
+        item.setAttribute('data-action-key', 'load');
+        if (isActive) item.addClass('is-active');
+        if (isOpening) item.addClass('is-opening');
+        if (cardLayout) item.addClass('wpp-session-item--card');
 
-        // Click handler for focus / Cmd+Click selection
+        var dragHandle = item.createDiv({
+            cls: 'wpp-session-item-drag',
+            attr: { 'aria-label': L.footerDragReorder },
+        });
+        obsidian.setIcon(dragHandle, 'move');
+        dragHandle.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        if (isOpening) {
+            var loadingBadge = item.createSpan({
+                cls: 'wpp-session-badge wpp-session-badge--loading',
+            });
+            loadingBadge.createSpan({ cls: 'wpp-session-badge-spinner' });
+        } else if (isActive && cardLayout) {
+            var activeBadge = item.createSpan({
+                cls: 'wpp-session-badge wpp-session-badge--active',
+            });
+            obsidian.setIcon(activeBadge, 'check');
+        }
+
+        // Click handler for focus / Cmd+Click selection / click-to-switch
         item.addEventListener('click', function (e) {
             // Always move focus to clicked item
             self.setKeyboardTarget({ zone: 'session-action', rowIndex: index, actionKey: 'load' });
 
-            if (e.target.closest('button, .wpp-icon-btn')) return;
+            if (e.target.closest('button, .wpp-icon-btn, .wpp-session-item-drag')) return;
             self.blurFocusedControl();
             var cmdKey = utils.isModPressed(e);
             if (cmdKey) {
@@ -627,8 +869,12 @@ var SessionManagerModal = /** @class */ (function (_super) {
                     self.selectedIds.add(session.id);
                 }
                 self.updateSelectionUI();
+            } else if (!isActive && !isOpening) {
+                self.selectedIds.clear();
+                self.updateSelectionUI();
+                self.onLoad(session.id);
             } else if (!cmdKey) {
-                // Normal click: move focus only
+                // Normal click on active: move focus only
                 self.selectedIds.clear();
                 self.updateSelectionUI();
             }
@@ -645,7 +891,7 @@ var SessionManagerModal = /** @class */ (function (_super) {
                 isActive: isActive,
                 event: e,
                 showSwitch: true,
-                showRemoveFromGroup: !!selectedGroupId,
+                showRemoveFromGroup: !!selectedGroupId && selectedGroupId !== '__ungrouped__',
                 getViewGroupId: function () {
                     return self.getModalGroupId();
                 },
@@ -663,60 +909,89 @@ var SessionManagerModal = /** @class */ (function (_super) {
             });
         });
 
-        // Hotkey hint
+        // Index label (hidden in card layout)
         var hintIndex = typeof orderIndex === 'number' ? orderIndex : index;
-        var hk = hintIndex <= 8 ? self.plugin.getCommandHotkey('switch-to-' + (hintIndex + 1)) : '';
-        item.createSpan({ text: hk || String(hintIndex + 1), cls: 'wpp-session-index' });
+        item.createSpan({ text: String(hintIndex + 1), cls: 'wpp-session-index' });
 
-        // Info section
+        // Main: centered title + note (matches sticky-notes workspace cards)
         var info = item.createDiv({ cls: 'wpp-session-info' });
         var nameRow = info.createDiv({ cls: 'wpp-session-name-row' });
         nameRow.createSpan({ text: session.name, cls: 'wpp-session-name' });
         if (session.isDefault && session.name !== this.plugin.getDefaultSessionName()) {
             nameRow.createSpan({ text: L.defaultLabel, cls: 'wpp-default-label' });
         }
-        if (isActive) {
-            nameRow.createSpan({ text: L.active, cls: 'wpp-active-badge' });
+        if (session.note && String(session.note).trim()) {
+            info.createDiv({ text: session.note, cls: 'wpp-session-note' });
         }
-        info.createDiv({ text: formatRelativeTime(session.modified), cls: 'wpp-session-modified' });
 
-        // Action buttons
-        var actions = item.createDiv({ cls: 'wpp-session-actions' });
+        // Footer: time left, tools right (always visible)
+        var footer = item.createDiv({ cls: 'wpp-session-item-footer' });
+        var footLeft = footer.createDiv({ cls: 'wpp-session-item-footer-left' });
+        footLeft.createDiv({ text: formatRelativeTime(session.modified), cls: 'wpp-session-modified' });
 
-        var loadBtn = actions.createEl('button', { text: L.load, cls: 'wpp-load-btn' });
-        loadBtn.setAttribute('data-action-key', 'load');
-        loadBtn.addEventListener('click', function () { self.onLoad(session.id); });
+        var actions = footer.createDiv({ cls: 'wpp-session-actions' });
 
         if (isActive && !self.plugin.isAutoSaveOnSwitchEnabled()) {
-            var saveCurrentBtn = actions.createEl('button', {
-                text: L.saveInline,
-                cls: 'wpp-save-inline-btn',
+            var saveCurrentBtn = actions.createDiv({
+                cls: 'wpp-icon-btn',
+                attr: { role: 'button', tabindex: '-1', 'data-action-key': 'save-inline' },
             });
-            saveCurrentBtn.setAttribute('data-action-key', 'save-inline');
+            obsidian.setIcon(saveCurrentBtn, 'hard-drive');
+            obsidian.setTooltip(saveCurrentBtn, L.saveInline, { delay: 250 });
             saveCurrentBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 self.plugin.saveActiveSession().then(function () {
                     self.renderList();
                 });
             });
-            actions.insertBefore(saveCurrentBtn, loadBtn);
-            // Keep the save button width consistent with the switch button.
-            saveCurrentBtn.style.width = loadBtn.offsetWidth + 'px';
         }
 
-        // Rename button
+        if (self.plugin.isVersionHistoryEnabled()) {
+            var manualSaveBtn = actions.createDiv({
+                cls: 'wpp-icon-btn',
+                attr: { role: 'button', tabindex: '-1', 'data-action-key': 'manual-save' },
+            });
+            obsidian.setIcon(manualSaveBtn, 'save');
+            obsidian.setTooltip(manualSaveBtn, L.historyManualSave, { delay: 250 });
+            manualSaveBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                self.onManualSave(session);
+            });
+
+            var historyBtn = actions.createDiv({
+                cls: 'wpp-icon-btn',
+                attr: { role: 'button', tabindex: '-1', 'data-action-key': 'history' },
+            });
+            obsidian.setIcon(historyBtn, 'history');
+            obsidian.setTooltip(historyBtn, L.contextVersionHistory, { delay: 250 });
+            historyBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                new HistoryModal(self.app, self.plugin, session).open();
+            });
+        }
+
         var renameBtn = actions.createDiv({
             cls: 'wpp-icon-btn',
             attr: { role: 'button', tabindex: '-1', 'data-action-key': 'rename' },
         });
-        obsidian.setIcon(renameBtn, 'pencil');
-        obsidian.setTooltip(renameBtn, L.rename, { delay: 250 });
+        obsidian.setIcon(renameBtn, 'pen-line');
+        obsidian.setTooltip(renameBtn, L.editSessionTitle || L.rename, { delay: 250 });
         renameBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             self.onRename(session);
         });
 
-        // Delete button (hidden for last remaining session)
+        var duplicateBtn = actions.createDiv({
+            cls: 'wpp-icon-btn',
+            attr: { role: 'button', tabindex: '-1', 'data-action-key': 'duplicate' },
+        });
+        obsidian.setIcon(duplicateBtn, 'copy');
+        obsidian.setTooltip(duplicateBtn, L.contextDuplicateSession, { delay: 250 });
+        duplicateBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            self.onDuplicate(session);
+        });
+
         if (Object.keys(self.plugin.data.sessions).length > 1) {
             var deleteBtn = actions.createDiv({
                 cls: 'wpp-icon-btn',
@@ -731,21 +1006,45 @@ var SessionManagerModal = /** @class */ (function (_super) {
         }
     };
 
+    SessionManagerModal.prototype.getSessionItemIndexAtPoint = function (x, y) {
+        var items = this.listEl.querySelectorAll('.wpp-session-item');
+        for (var i = 0; i < items.length; i++) {
+            var rect = items[i].getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                return i;
+            }
+        }
+        return -1;
+    };
+
     SessionManagerModal.prototype.setupDragAndDrop = function () {
         var self = this;
         if ((this.filterQuery || '').trim()) return;
 
-        this.listEl.querySelectorAll('.wpp-session-item').forEach(function (item) {
-            item.addEventListener('mousedown', function (e) {
+        this.listEl.querySelectorAll('.wpp-session-item-drag').forEach(function (handle) {
+            var item = handle.closest('.wpp-session-item');
+            if (!item) return;
+
+            handle.addEventListener('mousedown', function (e) {
                 if (e.button !== 0) return;
-                if (e.target.closest('button, input, .wpp-icon-btn')) return;
                 if (utils.isModPressed(e)) return;
+                e.preventDefault();
+                e.stopPropagation();
 
                 var startX = e.clientX;
                 var startY = e.clientY;
                 var dragStarted = false;
                 var draggedEl = item;
                 var cloneEl = null;
+                var items = Array.prototype.slice.call(self.listEl.querySelectorAll('.wpp-session-item'));
+                var fromIndex = items.indexOf(item);
+                if (fromIndex < 0) return;
+
+                function clearSessionDropTargets() {
+                    items.forEach(function (el) {
+                        el.classList.remove('is-drop-target');
+                    });
+                }
 
                 function startDrag(ev) {
                     dragStarted = true;
@@ -755,20 +1054,20 @@ var SessionManagerModal = /** @class */ (function (_super) {
                     var offsetY = startY - rect.top;
 
                     cloneEl = item.cloneNode(true);
+                    cloneEl.classList.remove('is-dragging', 'is-drop-target', 'wpp-just-moved');
                     cloneEl.classList.add('wpp-drag-clone');
                     cloneEl.style.position = 'fixed';
                     cloneEl.style.width = rect.width + 'px';
+                    cloneEl.style.height = rect.height + 'px';
                     cloneEl.style.top = (ev.clientY - offsetY) + 'px';
                     cloneEl.style.left = (ev.clientX - offsetX) + 'px';
-                    cloneEl.style.zIndex = '10000';
+                    cloneEl.style.zIndex = '10050';
                     cloneEl.style.pointerEvents = 'none';
                     document.body.appendChild(cloneEl);
-
-                    item.classList.add('is-dragging');
-
-                    // Store offset for move handler
                     cloneEl._offsetX = offsetX;
                     cloneEl._offsetY = offsetY;
+
+                    item.classList.add('is-dragging');
                 }
 
                 function updateGroupDropTarget(ev) {
@@ -797,34 +1096,24 @@ var SessionManagerModal = /** @class */ (function (_super) {
 
                 function onMouseMove(ev) {
                     if (!dragStarted) {
-                        var dx = ev.clientX - startX;
-                        var dy = ev.clientY - startY;
-                        if (Math.abs(dx) + Math.abs(dy) < 5) return;
+                        if (Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY) < 5) return;
                         startDrag(ev);
                     }
+                    if (!cloneEl) return;
 
                     cloneEl.style.top = (ev.clientY - cloneEl._offsetY) + 'px';
                     cloneEl.style.left = (ev.clientX - cloneEl._offsetX) + 'px';
 
-                    // Check if hovering over a group tab
                     var hoverTab = updateGroupDropTarget(ev);
-                    if (hoverTab) return; // Don't reorder while over group tabs
+                    if (hoverTab) {
+                        clearSessionDropTargets();
+                        return;
+                    }
 
-                    var siblings = self.listEl.querySelectorAll('.wpp-session-item');
-                    var placed = false;
-                    for (var i = 0; i < siblings.length; i++) {
-                        var el = siblings[i];
-                        if (el === draggedEl) continue;
-                        var r = el.getBoundingClientRect();
-                        if (ev.clientY < r.top + r.height / 2) {
-                            self.listEl.insertBefore(draggedEl, el);
-                            placed = true;
-                            break;
-                        }
-                    }
-                    if (!placed) {
-                        self.listEl.appendChild(draggedEl);
-                    }
+                    var overIndex = self.getSessionItemIndexAtPoint(ev.clientX, ev.clientY);
+                    items.forEach(function (el, i) {
+                        el.classList.toggle('is-drop-target', overIndex === i && i !== fromIndex);
+                    });
                 }
 
                 function onMouseUp(ev) {
@@ -832,16 +1121,37 @@ var SessionManagerModal = /** @class */ (function (_super) {
                     document.removeEventListener('mouseup', onMouseUp);
                     document.body.classList.remove('wpp-session-list-dragging');
 
-                    if (!dragStarted) return;
-
-                    cloneEl.remove();
+                    var dropTab = dragStarted ? updateGroupDropTarget(ev) : null;
+                    clearGroupDropTargets();
+                    clearSessionDropTargets();
+                    if (cloneEl) {
+                        cloneEl.remove();
+                        cloneEl = null;
+                    }
                     draggedEl.classList.remove('is-dragging');
 
-                    // Check if dropped on a group tab
-                    var dropTab = updateGroupDropTarget(ev);
-                    clearGroupDropTargets();
+                    if (!dragStarted) return;
 
-                    if (dropTab && dropTab.dataset.groupId && dropTab.dataset.groupId !== '__all__') {
+                    if (dropTab && dropTab.dataset.groupId === '__ungrouped__') {
+                        var ungroupSessionId = draggedEl.dataset.sessionId;
+                        var ungroupSessionName = (self.plugin.data.sessions[ungroupSessionId] || {}).name || '';
+                        self.plugin.clearSessionGroupMembership(ungroupSessionId).then(function (changed) {
+                            if (changed) {
+                                new obsidian.Notice(
+                                    i18n.L.groupMovedToDefault
+                                        ? i18n.L.groupMovedToDefault(ungroupSessionName)
+                                        : ('Moved "' + ungroupSessionName + '" to Default')
+                                );
+                            }
+                            self.renderGroupTabs();
+                            self.renderList();
+                        });
+                        return;
+                    }
+
+                    if (dropTab && dropTab.dataset.groupId
+                        && dropTab.dataset.groupId !== '__all__'
+                        && dropTab.dataset.groupId !== '__ungrouped__') {
                         var sessionId = draggedEl.dataset.sessionId;
                         var groupId = dropTab.dataset.groupId;
                         var sessionName = (self.plugin.data.sessions[sessionId] || {}).name || '';
@@ -854,8 +1164,10 @@ var SessionManagerModal = /** @class */ (function (_super) {
                         return;
                     } else {
                         var currentGroupId = self.getModalGroupId();
-                        if (dropTab && dropTab.dataset.groupId === '__all__' && currentGroupId) {
-                        // Drop on "All" tab while viewing a group → remove from group
+                        if (dropTab && dropTab.dataset.groupId === '__all__'
+                            && currentGroupId
+                            && currentGroupId !== '__ungrouped__') {
+                            // Drop on "All" tab while viewing a group → remove from group
                             var rmSessionId = draggedEl.dataset.sessionId;
                             var rmGroupId = currentGroupId;
                             var rmSessionName = (self.plugin.data.sessions[rmSessionId] || {}).name || '';
@@ -869,27 +1181,31 @@ var SessionManagerModal = /** @class */ (function (_super) {
                         }
                     }
 
-                    // Read order from DOM
-                    var newVisibleOrder = [];
-                    var items = self.listEl.querySelectorAll('.wpp-session-item');
-                    items.forEach(function (el) {
-                        newVisibleOrder.push(el.dataset.sessionId);
+                    var toIndex = self.getSessionItemIndexAtPoint(ev.clientX, ev.clientY);
+                    if (toIndex < 0 || toIndex === fromIndex) return;
+
+                    var orderItems = Array.prototype.slice.call(self.listEl.querySelectorAll('.wpp-session-item'));
+                    var moved = orderItems[fromIndex];
+                    if (!moved) return;
+                    orderItems.splice(fromIndex, 1);
+                    orderItems.splice(toIndex, 0, moved);
+
+                    orderItems.forEach(function (el) {
+                        self.listEl.appendChild(el);
                     });
 
-                    // Update index labels in-place
-                    items.forEach(function (el, i) {
+                    var newVisibleOrder = [];
+                    orderItems.forEach(function (el, i) {
+                        newVisibleOrder.push(el.dataset.sessionId);
                         var indexEl = el.querySelector('.wpp-session-index');
                         if (indexEl) {
-                            var hk = i <= 8 ? self.plugin.getCommandHotkey('switch-to-' + (i + 1)) : '';
-                            indexEl.textContent = hk || String(i + 1);
+                            indexEl.textContent = String(i + 1);
                         }
                     });
 
-                    // Highlight moved item
-                    draggedEl.classList.add('wpp-just-moved');
-                    var movedRef = draggedEl;
+                    moved.classList.add('wpp-just-moved');
                     setTimeout(function () {
-                        movedRef.classList.remove('wpp-just-moved');
+                        moved.classList.remove('wpp-just-moved');
                     }, 600);
 
                     self.plugin.setSessionOrderFromVisible(newVisibleOrder, { syncCommands: false });
@@ -909,6 +1225,7 @@ var SessionManagerModal = /** @class */ (function (_super) {
             if (!result || !result.created) return;
             var createdName = result.name;
             self.modalGroupId = result.viewGroupId || null;
+            self.persistPanelState();
             self.nameInput.value = '';
             self.renderGroupTabs();
             self.renderList();
@@ -918,9 +1235,71 @@ var SessionManagerModal = /** @class */ (function (_super) {
 
     SessionManagerModal.prototype.onLoad = function (sessionId) {
         if (sessionId === this.plugin.data.activeSessionId) return;
+        if (this.openingSessionId === sessionId) return;
         var self = this;
-        this.plugin.switchSession(sessionId).then(function (switched) {
-            if (switched) self.close();
+        this.openingSessionId = sessionId;
+        this.renderList();
+        this.plugin.switchSession(sessionId).then(function () {
+            self.openingSessionId = null;
+            self.renderList();
+        }).catch(function () {
+            self.openingSessionId = null;
+            self.renderList();
+        });
+    };
+
+    SessionManagerModal.prototype.renderArchivedItem = function (session, index) {
+        var L = i18n.L;
+        var self = this;
+        var item = this.listEl.createDiv({ cls: 'wpp-session-item wpp-session-item--card wpp-session-item--archived' });
+        item.dataset.sessionId = session.id;
+
+        var info = item.createDiv({ cls: 'wpp-session-info' });
+        info.createDiv({ cls: 'wpp-session-name-row' })
+            .createSpan({ text: session.name, cls: 'wpp-session-name' });
+        if (session.note && String(session.note).trim()) {
+            info.createDiv({ text: session.note, cls: 'wpp-session-note' });
+        }
+
+        var footer = item.createDiv({ cls: 'wpp-session-item-footer' });
+        var footLeft = footer.createDiv({ cls: 'wpp-session-item-footer-left' });
+        footLeft.createDiv({ text: formatRelativeTime(session.modified), cls: 'wpp-session-modified' });
+
+        var actions = footer.createDiv({ cls: 'wpp-session-actions' });
+        var restoreBtn = actions.createDiv({
+            cls: 'wpp-icon-btn',
+            attr: { role: 'button', tabindex: '-1', 'data-action-key': 'restore' },
+        });
+        obsidian.setIcon(restoreBtn, 'rotate-ccw');
+        obsidian.setTooltip(restoreBtn, L.restoreFromArchive, { delay: 250 });
+        restoreBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            self.plugin.restoreArchivedSession(session.id).then(function (ok) {
+                if (ok) {
+                    new obsidian.Notice(L.restoredFromArchive(session.name));
+                    self.renderList();
+                    self.updateArchiveBadge();
+                }
+            });
+        });
+
+        var deleteBtn = actions.createDiv({
+            cls: 'wpp-icon-btn',
+            attr: { role: 'button', tabindex: '-1', 'data-action-key': 'delete' },
+        });
+        obsidian.setIcon(deleteBtn, 'trash');
+        obsidian.setTooltip(deleteBtn, L.deletePermanently, { delay: 250 });
+        deleteBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            new ConfirmModal(self.app, L.confirmDeleteArchived(session.name), function () {
+                return self.plugin.permanentlyDeleteArchivedSession(session.id).then(function (ok) {
+                    if (ok) {
+                        new obsidian.Notice(L.deleted(session.name));
+                        self.renderList();
+                        self.updateArchiveBadge();
+                    }
+                });
+            }).open();
         });
     };
 
@@ -934,6 +1313,30 @@ var SessionManagerModal = /** @class */ (function (_super) {
                 self.renderList();
             },
         });
+    };
+
+    SessionManagerModal.prototype.onDuplicate = function (session) {
+        var self = this;
+        this.plugin.duplicateSession(session.id).then(function () {
+            self.renderList();
+        });
+    };
+
+    SessionManagerModal.prototype.onManualSave = function (session) {
+        var L = i18n.L;
+        var self = this;
+        new HistoryEntryModal(this.app, {
+            mode: 'create',
+            title: L.historyManualSaveTitle,
+            placeholder: L.historyEntryTitlePlaceholder,
+            buttonText: L.historyManualSave,
+            emptyNotice: L.historyTitleRequired,
+            onSubmit: function (title) {
+                self.plugin.saveManualHistoryEntry(session.id, title).then(function (ok) {
+                    if (ok) self.renderList();
+                });
+            },
+        }).open();
     };
 
     SessionManagerModal.prototype.onDelete = function (session) {
@@ -1054,10 +1457,12 @@ var SessionManagerModal = /** @class */ (function (_super) {
             },
             onResetViewGroup: function () {
                 self.modalGroupId = null;
+                self.persistPanelState();
             },
             onDeleteGroup: function (deletedGroupId) {
                 if (self.modalGroupId === deletedGroupId) {
-                    self.modalGroupId = self.plugin.data.activeGroupId || null;
+                    self.modalGroupId = null;
+                    self.persistPanelState();
                 }
             },
             onGroupsChanged: function () {
@@ -1075,10 +1480,15 @@ var SessionManagerModal = /** @class */ (function (_super) {
                     self.renderGroupTabs();
                 });
             },
+            locateButtonTooltip: L.locateCurrentSession,
+            onLocateCurrentClick: function () {
+                self.locateCurrentSession();
+            },
         });
     };
 
     SessionManagerModal.prototype.onClose = function () {
+        this.persistPanelState();
         document.body.classList.remove('wpp-session-list-dragging');
         if (this.modalKeyHandler) {
             document.removeEventListener('keydown', this.modalKeyHandler, true);

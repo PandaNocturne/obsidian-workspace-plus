@@ -257,23 +257,49 @@ function attachSessionSwitchingMethods(WorkspacePlusPlus) {
         if (target.id === this.data.activeSessionId) return Promise.resolve(false);
 
         var performSwitch = function (skipCurrentSave) {
-            // 1. Save current session state
+            // 1. Save current session state (layout + per-session zen)
             var current = self.getActiveSession();
-            if (current && !skipCurrentSave) {
-                self.pushLayoutToHistory(current);
-                current.layout = self.getCurrentWorkspaceLayout();
-                current.modified = Date.now();
+            if (current) {
+                current.zenMode = self.isZenModeEnabled();
+                if (typeof self.rememberZenFocusFromWorkspace === 'function') {
+                    self.rememberZenFocusFromWorkspace({ force: true, persist: false });
+                }
+                if (!skipCurrentSave) {
+                    self.pushLayoutToHistory(current);
+                    current.layout = self.getCurrentWorkspaceLayout();
+                    current.modified = Date.now();
+                }
             }
 
-            // 2. Update active
-            self.data.activeSessionId = targetId;
+            // Clear zen UI before layout swap — avoids blank page when target has zen off
+            // or when focus flags from the previous layout no longer match.
+            self.clearZenModeClasses();
 
-            // 3. Apply target layout
+            // 2. Update active session and sync group view for status-bar nesting
+            self.data.activeSessionId = targetId;
+            if (typeof self.chooseSessionGroupForView === 'function') {
+                var preferredGroupId = self.chooseSessionGroupForView(targetId);
+                if (typeof preferredGroupId !== 'undefined'
+                    && self.data.activeGroupId !== preferredGroupId) {
+                    self.data.activeGroupId = preferredGroupId;
+                    if (typeof self.syncSessionCommands === 'function') {
+                        self.syncSessionCommands();
+                    }
+                }
+            }
+
+            // 3. Apply target layout, then restore that session's zen state
             var applyLayout = target.layout
                 ? self.applyWorkspaceLayout(target.layout)
                 : Promise.resolve();
 
             return applyLayout.then(function () {
+                if (typeof self.restoreZenFocusLeaf === 'function') {
+                    self.restoreZenFocusLeaf();
+                }
+                self.applyZenModeClasses();
+                self.scheduleZenModeRefresh(50);
+                self.scheduleZenModeRefresh(300);
                 self.updateStatusBar();
                 return self.persistData();
             }).then(function () {

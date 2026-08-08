@@ -4,7 +4,6 @@ var obsidian = require('obsidian');
 var i18n = require('./i18n');
 var modals = require('./modals');
 var formatRelativeTime = require('./modals/format-relative-time');
-var statusBarActions = require('./statusbar-actions');
 var settingsUi = require('./settings-ui');
 
 var GroupSessionsModal = settingsUi.GroupSessionsModal;
@@ -40,7 +39,7 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
         var tabs = [
             { id: 'general', label: L.settingsSectionGeneral },
             { id: 'sessions', label: L.settingsTabSessions },
-            { id: 'groups', label: L.settingsSectionGroups },
+            { id: 'groups', label: L.settingsTabGroups },
             { id: 'advanced', label: L.settingsSectionAdvanced },
         ];
         var tabBarEl = containerEl.createDiv({ cls: 'wpp-settings-tab-bar' });
@@ -74,7 +73,11 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
                     for (var i = 0; i < order.length; i++) {
                         dropdown.addOption(order[i], i18n.LANG_OPTIONS[order[i]]);
                     }
-                    dropdown.setValue(self.plugin.data.language || 'auto');
+                    var currentLang = self.plugin.data.language || 'auto';
+                    if (currentLang !== 'auto' && (!i18n.LANG_OPTIONS || !i18n.LANG_OPTIONS[currentLang])) {
+                        currentLang = 'auto';
+                    }
+                    dropdown.setValue(currentLang);
                     dropdown.onChange(function (value) {
                         self.plugin.setLanguageSetting(value).then(function () {
                             self.display();
@@ -97,48 +100,123 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
                     });
                 });
 
-            // ── Status bar click actions ──
-            addSection(L.settingsSectionStatusBar);
+            addToggleSetting(contentEl, {
+                name: L.settingsRestoreSidebars,
+                desc: L.settingsRestoreSidebarsDesc,
+                value: self.plugin.isSidebarRestoreEnabled(),
+                onChange: function (value) {
+                    self.plugin.setRestoreSidebars(value);
+                },
+            });
 
-            var slotKeys = statusBarActions.SLOT_KEYS;
-            var actionIds = statusBarActions.ACTION_IDS;
-            var slotLabelMap = {
-                click: 'statusBarSlotClick',
-                altClick: 'statusBarSlotAltClick',
-                modClick: 'statusBarSlotModClick',
-                shiftClick: 'statusBarSlotShiftClick',
-                middleClick: 'statusBarSlotMiddleClick',
-                altMiddleClick: 'statusBarSlotAltMiddleClick',
-                modMiddleClick: 'statusBarSlotModMiddleClick',
-                shiftMiddleClick: 'statusBarSlotShiftMiddleClick',
-                rightClick: 'statusBarSlotRightClick',
-                altRightClick: 'statusBarSlotAltRightClick',
-                modRightClick: 'statusBarSlotModRightClick',
-                shiftRightClick: 'statusBarSlotShiftRightClick',
-            };
+            addToggleSetting(contentEl, {
+                name: L.settingsShowStatusBarWorkspace,
+                desc: L.settingsShowStatusBarWorkspaceDesc,
+                value: self.plugin.isStatusBarWorkspaceEnabled(),
+                onChange: function (value) {
+                    self.plugin.setShowStatusBarWorkspace(value);
+                },
+            });
 
-            for (var si = 0; si < slotKeys.length; si++) {
-                (function (slotKey) {
-                    var labelKey = slotLabelMap[slotKey];
-                    var slotLabel = typeof L[labelKey] === 'function' ? L[labelKey]() : L[labelKey];
-                    new obsidian.Setting(contentEl)
-                        .setName(slotLabel)
-                        .addDropdown(function (dropdown) {
-                            for (var ai = 0; ai < actionIds.length; ai++) {
-                                var aid = actionIds[ai];
-                                dropdown.addOption(aid, statusBarActions.getActionLabel(L, aid));
-                            }
-                            dropdown.setValue((self.plugin.data.statusBarActions || {})[slotKey] || 'none');
-                            dropdown.onChange(function (value) {
-                                self.plugin.setStatusBarAction(slotKey, value);
-                            });
+            addToggleSetting(contentEl, {
+                name: L.settingsShowStatusBarZenMode,
+                desc: L.settingsShowStatusBarZenModeDesc,
+                value: self.plugin.isStatusBarZenModeEnabled(),
+                onChange: function (value) {
+                    self.plugin.setShowStatusBarZenMode(value);
+                },
+            });
+
+            new obsidian.Setting(contentEl)
+                .setName(L.settingsTaskViewThumbnailRatio)
+                .setDesc(L.settingsTaskViewThumbnailRatioDesc)
+                .addDropdown(function (dropdown) {
+                    dropdown.addOption('16:9', '16:9');
+                    dropdown.addOption('4:3', '4:3');
+                    dropdown.addOption('3:2', '3:2');
+                    dropdown.addOption('1:1', '1:1');
+                    dropdown.setValue(self.plugin.getTaskViewThumbnailRatio());
+                    dropdown.onChange(function (value) {
+                        self.plugin.setTaskViewThumbnailRatio(value);
+                    });
+                });
+
+            // Preview content zoom (CSS zoom), patterned after colorful-stickynotes
+            var contentZoomDefault = 0.45;
+            var contentZoomSetting = new obsidian.Setting(contentEl)
+                .setName(L.settingsTaskViewContentZoom)
+                .setDesc(L.settingsTaskViewContentZoomDesc)
+                .addSlider(function (slider) {
+                    slider
+                        .setLimits(0.1, 1, 0.05)
+                        .setValue(self.plugin.getTaskViewContentZoom())
+                        .setDynamicTooltip()
+                        .onChange(function (value) {
+                            self.plugin.setTaskViewContentZoom(value);
                         });
-                })(slotKeys[si]);
-            }
+                    if (typeof slider.setInstant === 'function') {
+                        slider.setInstant(true);
+                    }
+                });
+            contentZoomSetting.addExtraButton(function (btn) {
+                btn.setIcon('rotate-ccw');
+                btn.setTooltip(
+                    (L.settingsTaskViewContentZoomReset || 'Reset to {value}')
+                        .replace('{value}', String(Math.round(contentZoomDefault * 100)) + '%')
+                );
+                btn.onClick(function () {
+                    self.plugin.setTaskViewContentZoom(contentZoomDefault).then(function () {
+                        self.display();
+                    });
+                });
+            });
+
+            addToggleSetting(contentEl, {
+                name: L.settingsShowTaskViewHints,
+                desc: L.settingsShowTaskViewHintsDesc,
+                value: self.plugin.isTaskViewHintsEnabled(),
+                onChange: function (value) {
+                    self.plugin.setShowTaskViewHints(value);
+                },
+            });
+
+            // Focus/zen mode itself is toggled via command/hotkey (and optional status bar).
+            // This preference stays visible so it applies whenever focus mode is turned on.
+            addToggleSetting(contentEl, {
+                name: L.settingsZenHideInactiveTabs,
+                desc: L.settingsZenHideInactiveTabsDesc,
+                value: self.plugin.isZenHideInactiveTabsEnabled(),
+                onChange: function (value) {
+                    self.plugin.setZenHideInactiveTabs(value);
+                },
+            });
+
         }
 
         // ── Sessions tab ──
         if (self.activeTab === 'sessions') {
+            addSubsection(contentEl, L.settingsSubsectionSessionRestore);
+
+            addToggleSetting(contentEl, {
+                name: L.settingsRestoreTabsByFilename,
+                desc: L.settingsRestoreTabsByFilenameDesc,
+                value: self.plugin.isRestoreTabsByFilenameEnabled(),
+                onChange: function (value) {
+                    self.plugin.setRestoreTabsByFilename(value);
+                },
+            });
+
+            new obsidian.Setting(contentEl)
+                .setName(L.settingsNoteUidProperty)
+                .setDesc(L.settingsNoteUidPropertyDesc)
+                .addText(function (text) {
+                    text.setPlaceholder(L.settingsNoteUidPropertyPlaceholder || 'uid');
+                    text.setValue(self.plugin.getNoteUidPropertyName());
+                    text.onChange(function (value) {
+                        self.plugin.setNoteUidPropertyName(value);
+                    });
+                });
+
             addSubsection(contentEl, L.settingsSubsectionAutoSaveMode);
 
             var autoSaveOnSwitch = self.plugin.isAutoSaveOnSwitchEnabled();
@@ -182,190 +260,6 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
                     },
                 });
             }
-
-            addSubsection(contentEl, L.settingsSubsectionSessionRestore);
-
-            addToggleSetting(contentEl, {
-                name: L.settingsRestoreSidebars,
-                desc: L.settingsRestoreSidebarsDesc,
-                value: self.plugin.isSidebarRestoreEnabled(),
-                onChange: function (value) {
-                    self.plugin.setRestoreSidebars(value);
-                },
-            });
-
-            addSubsection(contentEl, L.settingsSubsectionScrollSwitch);
-
-            addToggleSetting(contentEl, {
-                name: L.settingsStatusBarModScrollSwitch,
-                desc: L.settingsStatusBarModScrollSwitchDesc,
-                value: !!self.plugin.data.statusBarModScrollSwitch,
-                onChange: function (value) {
-                    self.plugin.setStatusBarModScrollSwitch(value).then(function () {
-                        self.display();
-                    });
-                },
-            });
-
-            if (self.plugin.data.statusBarModScrollSwitch) {
-                addDropdownSetting(contentEl, {
-                    name: L.settingsStatusBarScrollPreset,
-                    desc: L.settingsStatusBarScrollPresetDesc,
-                    value: self.plugin.data.statusBarScrollPreset || 'trackpad',
-                    items: {
-                        trackpad: L.settingsStatusBarScrollPresetTrackpad,
-                        notchedWheel: L.settingsStatusBarScrollPresetNotchedWheel,
-                        freeSpinWheel: L.settingsStatusBarScrollPresetFreeSpinWheel,
-                        custom: L.settingsStatusBarScrollPresetCustom,
-                    },
-                    onChange: function (value) {
-                        self.plugin.setStatusBarScrollPreset(value).then(function () {
-                            self.display();
-                        });
-                    },
-                });
-
-                addDropdownSetting(contentEl, {
-                    name: L.settingsStatusBarScrollModifier,
-                    desc: L.settingsStatusBarScrollModifierDesc,
-                    value: self.plugin.data.statusBarScrollModifierMode === 'recommended'
-                        ? 'modOrAlt'
-                        : (self.plugin.data.statusBarScrollModifierMode || 'none'),
-                    items: {
-                        none: L.settingsStatusBarScrollModifierNone,
-                        modOnly: L.settingsStatusBarScrollModifierModOnly,
-                        altOnly: L.settingsStatusBarScrollModifierAltOnly,
-                        modOrAlt: L.settingsStatusBarScrollModifierModOrAlt,
-                    },
-                    onChange: function (value) {
-                        self.plugin.setStatusBarScrollModifierMode(value);
-                    },
-                });
-
-                var useCustomScroll = (self.plugin.data.statusBarScrollPreset || 'trackpad') === 'custom';
-
-                addDropdownSetting(contentEl, {
-                    name: L.settingsStatusBarScrollThreshold,
-                    desc: L.settingsStatusBarScrollThresholdDesc,
-                    value: String(self.plugin.data.statusBarScrollThreshold || 30),
-                    disabled: !useCustomScroll,
-                    items: {
-                        '12': '12',
-                        '16': '16',
-                        '24': '24',
-                        '30': '30',
-                        '40': '40',
-                        '60': '60',
-                        '90': '90',
-                    },
-                    onChange: function (value) {
-                        self.plugin.setStatusBarScrollThreshold(value);
-                    },
-                });
-
-                addDropdownSetting(contentEl, {
-                    name: L.settingsStatusBarScrollCooldown,
-                    desc: L.settingsStatusBarScrollCooldownDesc,
-                    value: String(self.plugin.data.statusBarScrollCooldownMs || 500),
-                    disabled: !useCustomScroll,
-                    items: {
-                        '200': '200 ms',
-                        '350': '350 ms',
-                        '500': '500 ms',
-                        '750': '750 ms',
-                        '1000': '1000 ms',
-                    },
-                    onChange: function (value) {
-                        self.plugin.setStatusBarScrollCooldownMs(value);
-                    },
-                });
-
-                addDropdownSetting(contentEl, {
-                    name: L.settingsStatusBarScrollResetWindow,
-                    desc: L.settingsStatusBarScrollResetWindowDesc,
-                    value: String(self.plugin.data.statusBarScrollResetMs || 250),
-                    disabled: !useCustomScroll,
-                    items: {
-                        '150': '150 ms',
-                        '250': '250 ms',
-                        '400': '400 ms',
-                        '600': '600 ms',
-                    },
-                    onChange: function (value) {
-                        self.plugin.setStatusBarScrollResetMs(value);
-                    },
-                });
-
-                addToggleSetting(contentEl, {
-                    name: L.settingsStatusBarScrollInvert,
-                    desc: L.settingsStatusBarScrollInvertDesc,
-                    value: !!self.plugin.data.statusBarScrollInvert,
-                    onChange: function (value) {
-                        self.plugin.setStatusBarScrollInvert(value);
-                    },
-                });
-            }
-
-            addSubsection(contentEl, L.settingsSubsectionSwitchCommands);
-
-            addToggleSetting(contentEl, {
-                name: L.settingsShowActiveSwitchCommand,
-                desc: L.settingsShowActiveSwitchCommandDesc,
-                value: !!self.plugin.data.showActiveSwitchCommand,
-                onChange: function (value) {
-                    self.plugin.setShowActiveSwitchCommand(value);
-                },
-            });
-
-            addToggleSetting(contentEl, {
-                name: L.settingsNumberedSwitchCommands,
-                desc: L.settingsNumberedSwitchCommandsDesc,
-                value: !!self.plugin.data.numberedSwitchCommands,
-                onChange: function (value) {
-                    self.plugin.setNumberedSwitchCommands(value);
-                },
-            });
-
-            addSubsection(contentEl, L.settingsSubsectionSwitchPreview);
-
-            // Preview before switching — master toggle with nested sub-toggles
-            var allOn = !!self.plugin.data.previewNext && !!self.plugin.data.previewPrevious;
-            var masterSetting = new obsidian.Setting(contentEl)
-                .setName(L.settingsPreviewHeading)
-                .setDesc(L.settingsPreviewDesc)
-                .addToggle(function (toggle) {
-                    toggle.setValue(allOn);
-                    toggle.onChange(function (value) {
-                        self.plugin.setSwitchPreviewEnabled(value).then(function () {
-                            self.display();
-                        });
-                    });
-                });
-
-            masterSetting.settingEl.addClass('wpp-has-nested');
-            var nestedDiv = masterSetting.settingEl.createDiv({ cls: 'wpp-nested-settings' });
-
-            new obsidian.Setting(nestedDiv)
-                .setName(L.settingsPreviewNext)
-                .addToggle(function (toggle) {
-                    toggle.setValue(!!self.plugin.data.previewNext);
-                    toggle.onChange(function (value) {
-                        self.plugin.setPreviewNext(value).then(function () {
-                            self.display();
-                        });
-                    });
-                });
-
-            new obsidian.Setting(nestedDiv)
-                .setName(L.settingsPreviewPrevious)
-                .addToggle(function (toggle) {
-                    toggle.setValue(!!self.plugin.data.previewPrevious);
-                    toggle.onChange(function (value) {
-                        self.plugin.setPreviewPrevious(value).then(function () {
-                            self.display();
-                        });
-                    });
-                });
 
             addSection(L.settingsSectionSessionListSearch);
 
@@ -843,18 +737,17 @@ var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
         }
 
         // ── Footer (all tabs) ──
-        var footerEl = containerEl.createDiv();
-        footerEl.style.fontSize = '12px';
-        footerEl.style.color = 'var(--text-faint)';
-        footerEl.style.marginTop = '24px';
+        var footerEl = containerEl.createDiv({ cls: 'wpp-settings-footer' });
 
-        var helpEl = footerEl.createEl('p', { text: L.settingsTranslationHelp });
-        helpEl.style.margin = '0 0 4px';
-
-        footerEl.createEl('a', {
-            text: L.settingsGitHubLink,
+        var creditEl = footerEl.createEl('p', { cls: 'wpp-settings-credit' });
+        creditEl.appendText(L.settingsForkCreditBefore);
+        creditEl.createEl('a', {
+            cls: 'wpp-settings-credit-link',
+            text: L.settingsForkCreditLink,
             href: 'https://github.com/s1m4ne/obsidian-workspace-plus',
+            attr: { target: '_blank', rel: 'noopener' },
         });
+        creditEl.appendText(L.settingsForkCreditAfter);
     };
 
     return WorkspacePlusPlusSettingTab;

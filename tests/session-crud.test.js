@@ -103,6 +103,10 @@ test('session crud creates and activates a new session', async function () {
 
 test('session crud duplicates an arbitrary session without switching', async function () {
     const plugin = createPlugin({
+        sessions: {
+            a: { id: 'a', name: 'A', layout: { layout: 'a' }, modified: 1 },
+            b: { id: 'b', name: 'B', layout: { layout: 'b' }, modified: 1, note: 'Keep me' },
+        },
         sessionGroups: {
             b: ['g1', 'g2'],
         },
@@ -116,6 +120,7 @@ test('session crud duplicates an arbitrary session without switching', async fun
     assert.notEqual(newId, 'b');
     assert.deepEqual(plugin.data.sessions[newId].layout, { layout: 'b' });
     assert.notEqual(plugin.data.sessions[newId].layout, plugin.data.sessions.b.layout);
+    assert.equal(plugin.data.sessions[newId].note, 'Keep me');
     assert.deepEqual(plugin.data.sessionGroups[newId], ['g1', 'g2']);
     assert.equal(plugin.commandSyncs, 1);
     assert.equal(plugin.persistCalls, 1);

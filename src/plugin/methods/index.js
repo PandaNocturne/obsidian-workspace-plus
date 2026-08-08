@@ -15,8 +15,8 @@ var attachSessionStartupMethods = require('./session-startup');
 var attachSessionSwitchingMethods = require('./session-switching');
 var attachSessionCommandMethods = require('./session-commands');
 var attachHistoryMethods = require('./history');
-var attachFrontmatterMethods = require('./frontmatter');
 var attachSettingsStateMethods = require('./settings-state');
+var attachZenModeMethods = require('./zen-mode');
 
 function attachPluginMethods(WorkspacePlusPlus) {
     attachHotkeyMethods(WorkspacePlusPlus);
@@ -34,8 +34,8 @@ function attachPluginMethods(WorkspacePlusPlus) {
     attachSessionSwitchingMethods(WorkspacePlusPlus);
     attachSessionCommandMethods(WorkspacePlusPlus);
     attachHistoryMethods(WorkspacePlusPlus);
-    attachFrontmatterMethods(WorkspacePlusPlus);
     attachSettingsStateMethods(WorkspacePlusPlus);
+    attachZenModeMethods(WorkspacePlusPlus);
 }
 
 module.exports = attachPluginMethods;

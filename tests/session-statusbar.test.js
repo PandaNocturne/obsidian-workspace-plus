@@ -33,6 +33,7 @@ function createStatusBarEl() {
     return {
         classes: [],
         children: [],
+        style: {},
         addClass: function (cls) {
             if (this.classes.indexOf(cls) === -1) this.classes.push(cls);
         },
@@ -40,6 +41,14 @@ function createStatusBarEl() {
             this.classes = this.classes.filter(function (item) {
                 return item !== cls;
             });
+        },
+        toggleClass: function (cls, force) {
+            var has = this.classes.indexOf(cls) !== -1;
+            if (force === true || (force === undefined && !has)) {
+                this.addClass(cls);
+            } else if (force === false || (force === undefined && has)) {
+                this.removeClass(cls);
+            }
         },
         empty: function () {
             this.children = [];
@@ -57,6 +66,7 @@ function createPlugin(options) {
     function PluginMock() {}
     attachSessionStatusBarMethods(PluginMock);
     const plugin = new PluginMock();
+    plugin.data = options.data || {};
     plugin.statusBarEl = options.statusBarEl === false ? null : createStatusBarEl();
     plugin.getActiveSession = function () {
         return options.session || null;
@@ -104,6 +114,55 @@ test('session status bar renders active group before session name', function () 
     assert.deepEqual(plugin.statusBarEl.children.map(function (child) {
         return child.text;
     }), [undefined, 'Group One', ' / ', 'Session One']);
+});
+
+test('session status bar nests using session membership, not stale active group', function () {
+    const plugin = createPlugin({
+        session: { id: 's1', name: 'Session One' },
+        group: { id: 'g-stale', name: 'Stale Group' },
+    });
+    plugin.data = {
+        activeGroupId: 'g-stale',
+        groups: {
+            'g-stale': { id: 'g-stale', name: 'Stale Group' },
+            g1: { id: 'g1', name: 'Real Group' },
+        },
+        sessionGroups: {
+            s1: ['g1'],
+        },
+    };
+    plugin.chooseSessionGroupForView = function (sessionId) {
+        return sessionId === 's1' ? 'g1' : null;
+    };
+
+    plugin.updateStatusBar();
+
+    assert.deepEqual(plugin.statusBarEl.children.map(function (child) {
+        return child.text;
+    }), [undefined, 'Real Group', ' / ', 'Session One']);
+});
+
+test('session status bar does not nest Default / ungrouped sessions', function () {
+    const plugin = createPlugin({
+        session: { id: 's1', name: 'Default Session' },
+        group: { id: 'g1', name: 'Group One' },
+    });
+    plugin.data = {
+        activeGroupId: 'g1',
+        groups: {
+            g1: { id: 'g1', name: 'Group One' },
+        },
+        sessionGroups: {},
+    };
+    plugin.chooseSessionGroupForView = function () {
+        return null;
+    };
+
+    plugin.updateStatusBar();
+
+    assert.deepEqual(plugin.statusBarEl.children.map(function (child) {
+        return child.text;
+    }), [undefined, 'Default Session']);
 });
 
 test('session status bar toggles unsaved highlight class', function () {

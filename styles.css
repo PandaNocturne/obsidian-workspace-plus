@@ -3,23 +3,86 @@
    Matches the core Workspace plugin modal design
    ============================================================ */
 
+/* Session manager modal: fixed height, wide enough for 3-column cards.
+   Keep a harmless rule above this block so an accidental UTF-8 BOM cannot
+   break the modal width selector (Obsidian attaches BOM to the first rule). */
+.wpp-css-ready {}
+
+.modal.wpp-session-manager-modal {
+    --modal-width: min(80vw, 800px);
+    --modal-max-width: min(80vw, 800px);
+    --modal-height: min(60vh, 600px);
+    --modal-max-height: min(60vh, 600px);
+    width: min(80vw, 800px);
+    max-width: min(80vw, 800px);
+    height: min(60vh, 600px);
+    max-height: min(60vh, 600px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal.wpp-session-manager-modal>.modal-title {
+    flex-shrink: 0;
+}
+
+.modal.wpp-session-manager-modal>.modal-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Keep room so footer archive badge is not clipped by the modal edge */
+    padding-bottom: 4px;
+    box-sizing: border-box;
+}
+
+.wpp-modal {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 5px;
+    margin: 5px;
+    gap: 0;
+}
+
+/* Session manager: consistent side inset aligned with title / chrome */
+.modal.wpp-session-manager-modal .wpp-modal {
+    padding: 4px;
+    margin: 0;
+    overflow: hidden;
+}
+
 /* Save section */
 .wpp-save-container {
     display: flex;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+    min-width: 0;
 }
 
 .wpp-save-input {
     flex: 1;
+    min-width: 0;
 }
 
 .wpp-filter-container {
     margin-bottom: 8px;
+    flex-shrink: 0;
+    min-width: 0;
 }
 
 .wpp-filter-input {
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 /* Session list */
@@ -27,8 +90,25 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    max-height: 60vh;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow-x: hidden;
     overflow-y: auto;
+    padding-bottom: 4px;
+}
+
+.wpp-session-list--cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    align-items: stretch;
+    /* Prevent a single row from stretching to fill the fixed modal height */
+    align-content: start;
+    width: 100%;
+    box-sizing: border-box;
+    /* Room for card focus/selection outline (offset outside the border box) */
+    padding: 4px;
 }
 
 .wpp-session-item {
@@ -36,11 +116,372 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 12px;
-    border-radius: 6px;
-    cursor: grab;
+    border-radius: var(--radius-m, 8px);
+    cursor: pointer;
+    position: relative;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-.wpp-session-item:hover {
+/* Card layout — aligned with colorful-sticky-notes workspace panel */
+.wpp-session-item--card {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    height: 120px;
+    padding: 12px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m, 8px);
+    background: var(--background-secondary);
+    box-shadow: none;
+    cursor: pointer;
+    gap: 0px;
+    overflow: visible;
+}
+
+.wpp-session-item--card:hover {
+    background: var(--background-secondary);
+}
+
+.wpp-session-item--card.wpp-focused {
+    background: var(--background-secondary);
+}
+
+.wpp-session-item--card .wpp-session-index {
+    display: none;
+}
+
+.wpp-session-item--card .wpp-session-info {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 0;
+}
+
+.wpp-session-item--card .wpp-session-name-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    min-width: 0;
+    width: 100%;
+}
+
+.wpp-session-item--card .wpp-session-name {
+    font-size: var(--font-ui-medium);
+    font-weight: 600;
+    color: var(--text-normal);
+    line-height: 1.35;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+}
+
+.wpp-session-item--card .wpp-session-note {
+    font-size: var(--font-ui-smaller);
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 2px 0 0px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    white-space: pre-wrap;
+    text-align: left;
+}
+
+.wpp-session-item--card .wpp-session-note--placeholder {
+    color: var(--text-faint);
+    font-style: italic;
+    -webkit-line-clamp: 2;
+}
+
+.wpp-session-item-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.wpp-session-item-footer-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.wpp-session-item--card .wpp-session-modified {
+    font-size: var(--font-ui-smaller);
+    color: var(--text-muted);
+    line-height: 1.4;
+    text-align: left;
+    max-width: 100%;
+    margin-top: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wpp-session-item--card .wpp-session-actions {
+    margin-left: 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    max-width: none;
+    min-width: 0;
+    opacity: 1;
+}
+
+.modal.wpp-session-manager-modal .wpp-session-item--card .wpp-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--input-height) - 4px);
+    min-width: calc(var(--input-height) - 4px);
+    height: calc(var(--input-height) - 4px);
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-m, 8px);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    box-sizing: border-box;
+    box-shadow: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.modal.wpp-session-manager-modal .wpp-session-item--card .wpp-icon-btn:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+.modal.wpp-session-manager-modal .wpp-session-item--card .wpp-icon-btn:focus,
+.modal.wpp-session-manager-modal .wpp-session-item--card .wpp-icon-btn:focus-visible {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+    outline: none;
+    box-shadow: none;
+}
+
+/* Drag handle — matches colorful-sticky-notes */
+.wpp-session-item-drag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    margin: 0;
+    border-radius: var(--radius-s, 4px);
+    color: var(--text-muted);
+    cursor: grab;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease, color 0.12s ease, background-color 0.12s ease;
+}
+
+.wpp-session-item:hover .wpp-session-item-drag,
+.wpp-session-item.is-dragging .wpp-session-item-drag {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.wpp-session-item-drag svg {
+    width: var(--icon-size, 16px);
+    height: var(--icon-size, 16px);
+    flex-shrink: 0;
+    stroke: currentColor;
+}
+
+.wpp-session-item-drag:hover {
+    color: var(--text-normal);
+    background: var(--background-modifier-hover);
+}
+
+.wpp-session-item-drag:active {
+    cursor: grabbing;
+}
+
+.wpp-session-item--archived .wpp-session-item-drag {
+    display: none;
+}
+
+.wpp-session-item.is-active.wpp-session-item--card {
+    border-color: var(--interactive-accent);
+    background: var(--background-secondary);
+}
+
+.wpp-session-item.is-opening {
+    cursor: wait;
+}
+
+.wpp-session-badge {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    z-index: 2;
+    pointer-events: none;
+    box-shadow: var(--shadow-s);
+}
+
+.wpp-session-badge--loading {
+    background: var(--interactive-accent);
+}
+
+.wpp-session-badge-spinner {
+    display: block;
+    width: 15px;
+    height: 15px;
+    box-sizing: border-box;
+    border: 2px solid color-mix(in srgb, currentColor 32%, transparent);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: wpp-badge-spin 0.72s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes wpp-badge-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.wpp-session-badge svg {
+    display: block;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.wpp-modal-footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+    min-width: 0;
+    margin-top: auto;
+    padding-top: 12px;
+    padding-right: 6px;
+    border-top: 1px solid var(--background-modifier-border);
+    overflow: visible;
+}
+
+.wpp-modal-footer-left {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 4px;
+}
+
+.wpp-modal-footer-hints {
+    flex: 1;
+    min-width: 0;
+}
+
+.wpp-archive-btn-wrap {
+    position: relative;
+    flex-shrink: 0;
+    overflow: visible;
+    /* Keep badge inside the modal padding box */
+    margin-right: 2px;
+    padding-top: 4px;
+    padding-right: 4px;
+}
+
+/* Footer toolbar icons: no focus outline */
+.wpp-modal-footer-bar .wpp-icon-btn:focus,
+.wpp-modal-footer-bar .wpp-icon-btn:focus-visible,
+.wpp-modal-footer-bar .wpp-icon-btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+/* Session manager modal: suppress focus rings on toolbar / icon buttons */
+.modal.wpp-session-manager-modal .wpp-icon-btn:focus,
+.modal.wpp-session-manager-modal .wpp-icon-btn:focus-visible,
+.modal.wpp-session-manager-modal .wpp-icon-btn:active,
+.modal.wpp-session-manager-modal .wpp-settings-btn:focus,
+.modal.wpp-session-manager-modal .wpp-settings-btn:focus-visible,
+.modal.wpp-session-manager-modal .wpp-archive-btn:focus,
+.modal.wpp-session-manager-modal .wpp-archive-btn:focus-visible,
+.modal.wpp-session-manager-modal .wpp-session-actions .wpp-btn-focused,
+.modal.wpp-session-manager-modal button:focus,
+.modal.wpp-session-manager-modal button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.wpp-archive-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.wpp-session-item--archived {
+    cursor: default;
+}
+
+.wpp-session-item:hover:not(.wpp-session-item--card) {
     background: var(--background-modifier-hover-dimmed, rgba(var(--mono-rgb-100), 0.03));
 }
 
@@ -98,6 +539,18 @@
     margin-top: 2px;
 }
 
+.wpp-session-note {
+    font-size: var(--font-ui-smaller);
+    color: var(--text-muted);
+    margin-top: 2px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
 .wpp-empty-state {
     padding: 10px 12px;
     color: var(--text-muted);
@@ -108,21 +561,38 @@
     text-align: center;
 }
 
+/* Center empty message in the session list pane (under group tabs) */
+.wpp-session-list--cards:has(> .wpp-empty-state) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+}
+
+.wpp-session-list--cards > .wpp-empty-state {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
 /* Keyboard focus */
-.wpp-session-item.wpp-focused {
+.wpp-session-item.wpp-focused:not(.wpp-session-item--card) {
     background: var(--background-modifier-hover);
 }
 
-/* Multi-select */
+/* Multi-select (no outline — accent border only where needed) */
 .wpp-session-item.wpp-selected {
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: -2px;
+    background: var(--background-modifier-hover);
 }
 
-.wpp-session-item.wpp-focused.wpp-selected {
+.wpp-session-item.wpp-focused.wpp-selected:not(.wpp-session-item--card) {
     background: var(--background-modifier-hover);
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: -2px;
+}
+
+.wpp-session-item--card.wpp-selected,
+.wpp-session-item--card.wpp-focused.wpp-selected {
+    background: var(--background-secondary);
+    border-color: var(--interactive-accent);
 }
 
 /* Bulk actions bar */
@@ -137,19 +607,28 @@
 }
 
 .wpp-session-item.is-dragging {
-    visibility: hidden;
+    opacity: 0.35;
+}
+
+.wpp-session-item.is-drop-target {
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 3px var(--interactive-accent);
 }
 
 body.wpp-session-list-dragging,
 body.wpp-session-list-dragging * {
-    cursor: grabbing;
+    cursor: grabbing !important;
+    user-select: none !important;
 }
 
 .wpp-drag-clone {
-    opacity: 0.85;
+    border-radius: var(--radius-m, 8px);
+    border: 2px solid var(--interactive-accent);
     box-shadow: var(--shadow-l);
+    opacity: 0.92;
+    overflow: hidden;
     background: var(--background-primary);
-    border-radius: 6px;
+    pointer-events: none;
 }
 
 /* Preserve search overlay row layout when clone is moved to document.body */
@@ -205,8 +684,7 @@ body.wpp-session-list-dragging * {
 .wpp-icon-btn:focus-visible {
     background: var(--background-modifier-hover);
     color: var(--text-muted);
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: 2px;
+    outline: none;
     box-shadow: none;
 }
 
@@ -225,8 +703,9 @@ body.wpp-session-list-dragging * {
 
 .wpp-confirm-buttons button.wpp-btn-focused,
 .wpp-session-actions .wpp-btn-focused {
-    outline: 2px solid var(--interactive-accent);
-    outline-offset: 2px;
+    background: var(--interactive-accent);
+    outline: none;
+    box-shadow: none;
 }
 
 /* Confirm modal hint */
@@ -251,11 +730,23 @@ body.wpp-session-list-dragging * {
     color: var(--text-faint);
     text-align: center;
     margin-top: 12px;
+    flex-shrink: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .wpp-rename-input {
     width: 100%;
     margin-bottom: 8px;
+}
+
+.wpp-session-note-input {
+    width: 100%;
+    min-height: 64px;
+    margin-bottom: 8px;
+    resize: vertical;
 }
 
 /* Status bar */
@@ -265,9 +756,57 @@ body.wpp-session-list-dragging * {
     gap: 4px;
     cursor: pointer;
     max-width: 200px;
+    margin: 0 8px;
+    padding: 0 6px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.wpp-status-bar.wpp-status-bar-hidden {
+    display: none !important;
+}
+
+.wpp-zen-status-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 0 6px;
+    border-radius: 4px;
+    color: var(--text-muted);
+    user-select: none;
+}
+
+.wpp-zen-status-bar.wpp-zen-status-bar-hidden {
+    display: none !important;
+}
+
+.wpp-zen-status-bar:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+.wpp-zen-status-bar.is-active {
+    color: var(--text-on-accent);
+    background: var(--interactive-accent);
+    font-weight: var(--font-semibold, 600);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--interactive-accent) 70%, transparent);
+}
+
+.wpp-zen-status-bar.is-active:hover {
+    background: var(--interactive-accent-hover, var(--interactive-accent));
+    color: var(--text-on-accent);
+}
+
+.wpp-zen-status-icon {
+    display: inline-flex;
+    --icon-size: 14px;
+}
+
+.wpp-zen-status-label {
+    font-size: var(--font-ui-smaller);
+    line-height: 1;
 }
 
 .wpp-status-bar:hover {
@@ -496,20 +1035,67 @@ body.wpp-session-list-dragging * {
     z-index: 1;
 }
 
-.wpp-resize-tl { top: 0; left: 0; cursor: nwse-resize; }
-.wpp-resize-tr { top: 0; right: 0; cursor: nesw-resize; }
-.wpp-resize-bl { bottom: 0; left: 0; cursor: nesw-resize; }
-.wpp-resize-br { bottom: 0; right: 0; cursor: nwse-resize; }
+.wpp-resize-tl {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+}
+
+.wpp-resize-tr {
+    top: 0;
+    right: 0;
+    cursor: nesw-resize;
+}
+
+.wpp-resize-bl {
+    bottom: 0;
+    left: 0;
+    cursor: nesw-resize;
+}
+
+.wpp-resize-br {
+    bottom: 0;
+    right: 0;
+    cursor: nwse-resize;
+}
 
 /* Edge resize handles */
 .wpp-resize-edge {
     position: absolute;
     z-index: 1;
 }
-.wpp-resize-top    { top: 0; left: 12px; right: 12px; height: 6px; cursor: n-resize; }
-.wpp-resize-bottom { bottom: 0; left: 12px; right: 12px; height: 6px; cursor: s-resize; }
-.wpp-resize-left   { left: 0; top: 12px; bottom: 12px; width: 6px; cursor: w-resize; }
-.wpp-resize-right  { right: 0; top: 12px; bottom: 12px; width: 6px; cursor: e-resize; }
+
+.wpp-resize-top {
+    top: 0;
+    left: 12px;
+    right: 12px;
+    height: 6px;
+    cursor: n-resize;
+}
+
+.wpp-resize-bottom {
+    bottom: 0;
+    left: 12px;
+    right: 12px;
+    height: 6px;
+    cursor: s-resize;
+}
+
+.wpp-resize-left {
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 6px;
+    cursor: w-resize;
+}
+
+.wpp-resize-right {
+    right: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 6px;
+    cursor: e-resize;
+}
 
 .wpp-search-overlay .wpp-switch-item {
     width: 100%;
@@ -644,6 +1230,57 @@ body.wpp-session-list-dragging * {
     flex-shrink: 0;
 }
 
+.wpp-group-tabs-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    /* margin-bottom: 10px; */
+    flex-shrink: 0;
+    padding: 2px 0 2px;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.wpp-group-tabs-row-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+    justify-content: space-between;
+    gap: 2px;
+    width: 100%;
+    min-width: 0;
+}
+
+.wpp-group-tabs-default {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.wpp-group-tabs-all {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.wpp-group-tabs-groups {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+}
+
 .wpp-group-tab {
     padding: 4px 12px;
     border-radius: 6px;
@@ -668,6 +1305,22 @@ body.wpp-session-list-dragging * {
     color: var(--text-on-accent);
 }
 
+.wpp-group-tab--all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    max-width: none;
+    overflow: visible;
+}
+
+.wpp-group-tab--all svg {
+    width: var(--icon-xs);
+    height: var(--icon-xs);
+}
+
 /* Group tab D&D dragging */
 .wpp-group-tab.is-dragging {
     visibility: hidden;
@@ -680,18 +1333,9 @@ body.wpp-session-list-dragging * {
     background: var(--background-modifier-hover);
 }
 
-/* Modal group tabs row */
-.wpp-group-tabs-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-bottom: 8px;
-    overflow-x: auto;
-    padding: 2px 0;
-}
-
 /* Group add button */
-.wpp-group-add-btn {
+.wpp-group-add-btn,
+.wpp-group-locate-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -703,12 +1347,14 @@ body.wpp-session-list-dragging * {
     flex-shrink: 0;
 }
 
-.wpp-group-add-btn:hover {
+.wpp-group-add-btn:hover,
+.wpp-group-locate-btn:hover {
     background: var(--background-modifier-hover);
     color: var(--text-normal);
 }
 
-.wpp-group-add-btn svg {
+.wpp-group-add-btn svg,
+.wpp-group-locate-btn svg {
     width: var(--icon-xs);
     height: var(--icon-xs);
 }
@@ -753,6 +1399,82 @@ body.wpp-session-list-dragging * {
 .wpp-settings-tab.is-active {
     background: var(--interactive-accent);
     color: var(--text-on-accent);
+}
+
+.wpp-settings-footer {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--background-modifier-border);
+    font-size: var(--font-ui-smaller);
+    color: var(--text-faint);
+    line-height: 1.5;
+}
+
+.wpp-settings-credit {
+    margin: 0;
+}
+
+.wpp-settings-credit-link {
+    text-decoration: underline;
+}
+
+/* ============================================================
+   Zen / focus tab mode (inspired by Vertical Tabs)
+   ============================================================ */
+
+/*
+ * Lock the TAB GROUP only (.workspace-tabs), never view content.
+ * JS MutationObserver re-pins .wpp-zen-active synchronously on DOM remount
+ * so Excalidraw load cannot briefly drop zen (no load-start / load-end flash).
+ */
+body.wpp-zen-mode:not(.is-popout-window)
+    .workspace-split.mod-root:has(.workspace-tabs.wpp-zen-active, .workspace-tabs.mod-active)
+    .workspace-tabs:not(.mod-active):not(.wpp-zen-active) {
+    display: none;
+    flex-basis: unset;
+}
+
+body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-tabs.mod-active,
+body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-tabs.wpp-zen-active {
+    display: flex;
+    flex-basis: 100%;
+}
+
+body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-split:has(.workspace-tabs.mod-active),
+body.wpp-zen-mode:not(.is-popout-window) .workspace-split.mod-root .workspace-split:has(.workspace-tabs.wpp-zen-active) {
+    flex-basis: 100%;
+}
+
+body.wpp-mission-control-open.wpp-zen-mode:not(.is-popout-window)
+    .workspace-split.mod-root
+    .workspace-tabs.wpp-zen-active,
+body.wpp-mission-control-open.wpp-zen-mode:not(.is-popout-window)
+    .workspace-split.mod-root
+    .workspace-tabs.mod-active {
+    display: flex !important;
+    flex-basis: 100% !important;
+}
+
+body.wpp-zen-mode.wpp-zen-hide-inactive-tabs:not(.is-popout-window)
+    .workspace-split.mod-root
+    .workspace-tabs
+    > .workspace-tab-header-container
+    .workspace-tab-header:not(.is-active) {
+    display: none;
+}
+
+body.wpp-zen-mode.wpp-zen-hide-inactive-tabs:not(.is-popout-window)
+    .workspace-split.mod-root
+    .workspace-tabs
+    > .workspace-tab-header-container
+    .workspace-tab-header.is-active {
+    container-type: unset;
+    max-width: unset;
+    width: unset;
+}
+
+body.wpp-zen-mode {
+    --tab-stacked-pane-width: 100%;
 }
 
 /* Settings: nested sub-toggles below parent */
@@ -883,6 +1605,30 @@ body.wpp-session-list-dragging * {
 
 /* ── Version History Modal ── */
 
+.wpp-history-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.wpp-history-tab {
+    flex: 1;
+}
+
+.wpp-history-tab.is-active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.wpp-history-edit-layout-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 4px;
+    font-size: var(--font-ui-small);
+    color: var(--text-muted);
+}
+
 .wpp-history-modal .wpp-history-list {
     max-height: 60vh;
     overflow-y: auto;
@@ -904,6 +1650,7 @@ body.wpp-session-list-dragging * {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     padding: 8px 12px;
     border-radius: 6px;
 }
@@ -930,13 +1677,617 @@ body.wpp-session-list-dragging * {
     text-overflow: ellipsis;
 }
 
+.wpp-history-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
 .wpp-history-restore-btn {
     flex-shrink: 0;
-    margin-left: 8px;
+    margin-left: 4px;
 }
 
 .wpp-history-empty {
     color: var(--text-muted);
     text-align: center;
     padding: 24px 0;
+}
+
+/* ============================================================
+   Tab switcher — overlay panel (workspace tabs stay visible underneath)
+   ============================================================ */
+
+body.wpp-mission-control-open {
+    --wpp-mc-leaf-gap: 20px;
+    /* Card outer size only — does NOT scale preview text */
+    --wpp-mc-layout-scale: 0.5;
+    --wpp-mc-content-zoom: 0.45;
+    --wpp-mc-source-width: 650px;
+    --wpp-mc-source-height: 488px; /* default 4:3 */
+    --wpp-mc-leaf-width: calc(var(--wpp-mc-source-width) * var(--wpp-mc-layout-scale));
+    --wpp-mc-leaf-height: calc(var(--wpp-mc-source-height) * var(--wpp-mc-layout-scale));
+    --wpp-mc-panel-max-width: 80vw;
+    --wpp-mc-panel-max-height: 80vh;
+    /* Shared gap above both task-view hints (nav hint / grid hint) */
+    --wpp-mc-hint-gap: 18px;
+    --wpp-mc-toolbar-top: 18px;
+    --wpp-mc-toolbar-height: 36px; /* padding 4+4 + control 28 */
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.45);
+    /* backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px); */
+    cursor: default;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    overflow: auto;
+    padding: 30px;
+    border-radius: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    /* Avoid transform here — nested scale() on cards breaks overflow clipping */
+    pointer-events: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-grid-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: var(--wpp-mc-panel-max-width);
+    pointer-events: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wpp-mc-leaf-gap);
+    justify-content: center;
+    align-content: flex-start;
+    align-items: flex-start;
+    box-sizing: border-box;
+    width: max-content;
+    max-width: 100%;
+    max-height: var(--wpp-mc-panel-max-height);
+    min-height: 0;
+    overflow: auto;
+    padding: 30px;
+    border-radius: 12px;
+    background: var(--modal-background, var(--background-primary));
+    border: 1px solid var(--background-modifier-border);
+    box-shadow: var(--shadow-l);
+    pointer-events: auto;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 0 0 auto;
+    width: var(--wpp-mc-leaf-width);
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 2px solid var(--background-modifier-border);
+    background: var(--background-primary);
+    box-shadow: var(--shadow-s);
+    cursor: default;
+    contain: layout paint;
+}
+
+/* Current workspace leaf — thicker accent border */
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-active-tab {
+    border-color: var(--interactive-accent);
+    border-width: 4px;
+}
+
+/* Keyboard / hover focus — selection ring (what Enter will activate) */
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused {
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--interactive-accent) 35%, transparent);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-dragging {
+    opacity: 0.35;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-drop-target {
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 3px var(--interactive-accent);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    height: 34px;
+    padding: 0 6px 0 8px;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--background-modifier-border);
+    background: var(--background-secondary);
+    cursor: grab;
+    user-select: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-header:active {
+    cursor: grabbing;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-icon {
+    flex-shrink: 0;
+    display: flex;
+    color: var(--text-muted);
+    --icon-size: 14px;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-normal);
+    line-height: 1.2;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 2px;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-pin,
+body.wpp-mission-control-open .wpp-tab-switcher-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-s, 4px);
+    color: var(--text-muted);
+    cursor: pointer;
+    opacity: 0.75;
+    --icon-size: 14px;
+    transition: opacity 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-card:hover .wpp-tab-switcher-pin,
+body.wpp-mission-control-open .wpp-tab-switcher-card:hover .wpp-tab-switcher-close,
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-tab-switcher-pin,
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-tab-switcher-close,
+body.wpp-mission-control-open .wpp-tab-switcher-pin.is-active {
+    opacity: 1;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-pin:hover,
+body.wpp-mission-control-open .wpp-tab-switcher-close:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-pin.is-active {
+    color: var(--interactive-accent);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-close:hover {
+    background: var(--background-modifier-error, #e93147);
+    color: var(--text-on-accent, #fff);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-pin:focus,
+body.wpp-mission-control-open .wpp-tab-switcher-pin:focus-visible,
+body.wpp-mission-control-open .wpp-tab-switcher-close:focus,
+body.wpp-mission-control-open .wpp-tab-switcher-close:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-viewport {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--wpp-mc-leaf-height);
+    overflow: hidden;
+    border: none;
+    border-radius: 0;
+    background: var(--background-primary);
+    cursor: pointer;
+    box-shadow: none;
+    contain: paint;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-card.is-focused .wpp-tab-switcher-viewport {
+    border-color: transparent;
+    box-shadow: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-scale {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    /* No transform:scale — content zoom is controlled only by --wpp-mc-content-zoom */
+    transform: none;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--background-primary);
+}
+
+/* Preview content zoom (CSS zoom). Default 1 = 1:1, no shrink. */
+body.wpp-mission-control-open .wpp-tab-switcher-scale > * {
+    zoom: var(--wpp-mc-content-zoom);
+}
+
+body.wpp-tab-switcher-dragging {
+    cursor: grabbing !important;
+    user-select: none !important;
+}
+
+.wpp-tab-switcher-drag-clone {
+    border-radius: 10px;
+    border: 2px solid var(--interactive-accent);
+    box-shadow: var(--shadow-l);
+    opacity: 0.92;
+    overflow: hidden;
+    background: var(--background-primary);
+    pointer-events: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-loading-spinner {
+    width: 28px;
+    height: 28px;
+    box-sizing: border-box;
+    border: 2px solid color-mix(in srgb, var(--text-muted) 30%, transparent);
+    border-top-color: var(--text-muted);
+    border-radius: 50%;
+    animation: wpp-tab-switcher-spin 0.72s linear infinite;
+}
+
+@keyframes wpp-tab-switcher-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-clone {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    max-width: none !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+    box-sizing: border-box;
+    /* Keep transform-based views (Canvas / Excalidraw) in their source viewport space */
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
+    transform: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-clone .view-header,
+body.wpp-mission-control-open .wpp-tab-switcher-clone .cg-note-toolbar-container,
+body.wpp-mission-control-open .wpp-tab-switcher-clone .canvas-controls,
+body.wpp-mission-control-open .wpp-tab-switcher-clone .excalidraw-menu,
+body.wpp-mission-control-open .wpp-tab-switcher-clone .layer-ui__wrapper,
+body.wpp-mission-control-open .wpp-tab-switcher-clone .App-menu,
+body.wpp-mission-control-open .wpp-tab-switcher-clone .App-toolbar,
+body.wpp-mission-control-open .wpp-tab-switcher-clone .App-bottom-bar,
+body.wpp-mission-control-open .wpp-tab-switcher-clone .Island {
+    display: none !important;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback {
+    padding: 16px 18px;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-normal);
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background: var(--background-primary);
+}
+
+/* Canvas: document embed (![[path]]) fills the scaled thumbnail */
+body.wpp-mission-control-open .wpp-tab-switcher-embed {
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background: var(--background-primary);
+}
+
+/* Excalidraw: static SVG/PNG / canvas snapshot — no interactive embed */
+body.wpp-mission-control-open .wpp-tab-switcher-static-preview {
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background: var(--background-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Static / icon previews already match the card frame — skip content-zoom */
+body.wpp-mission-control-open .wpp-tab-switcher-scale > .wpp-tab-switcher-static-preview,
+body.wpp-mission-control-open .wpp-tab-switcher-scale > .wpp-tab-switcher-preview-icon {
+    zoom: 1;
+    width: 100%;
+    height: 100%;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-static-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+    user-select: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-embed > p {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-embed .internal-embed,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .markdown-embed,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .media-embed {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    background: transparent;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-embed .markdown-embed-title,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .embed-title {
+    display: none !important;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-embed .markdown-embed-content,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .markdown-embed-content > .markdown-preview-view,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .canvas-wrapper,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .excalidraw-wrapper,
+body.wpp-mission-control-open .wpp-tab-switcher-embed .excalidraw {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback p,
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback li,
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback h1,
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback h2,
+body.wpp-mission-control-open .wpp-tab-switcher-md-fallback h3 {
+    color: var(--text-normal);
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-preview-text {
+    margin: 0;
+    padding: 12px 14px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-text);
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+    word-break: break-word;
+    pointer-events: none;
+    user-select: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-preview-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--text-faint);
+    opacity: 0.7;
+    --icon-size: 40px;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-floating-hint,
+body.wpp-mission-control-open .wpp-tab-switcher-hint {
+    padding: 4px 10px;
+    border-radius: var(--radius-m);
+    background: rgba(0, 0, 0, 0.45);
+    color: var(--text-on-accent, #fff);
+    font-size: var(--font-ui-smaller);
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: min(90vw, var(--wpp-mc-panel-max-width));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.35;
+    text-align: center;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-floating-hint {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    z-index: 1002;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-grid-hint {
+    position: fixed;
+    transform: translateX(-50%);
+    z-index: 1002;
+    max-width: min(90vw, var(--wpp-mc-panel-max-width));
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-hint.is-hidden {
+    display: none;
+}
+
+/* Top controls: cycle which split's tabs are shown */
+body.wpp-mission-control-open .wpp-tab-switcher-toolbar {
+    position: fixed;
+    top: var(--wpp-mc-toolbar-top);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1003;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 6px;
+    border-radius: var(--radius-m);
+    background: rgba(0, 0, 0, 0.45);
+    color: var(--text-on-accent, #fff);
+    pointer-events: auto;
+    user-select: none;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-toolbar.is-hidden {
+    display: none;
+}
+
+/* Separate hint under split nav — own container, not inside toolbar */
+body.wpp-mission-control-open .wpp-tab-switcher-toolbar-hint {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1002;
+    max-width: 70vw;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-toolbar-hint.is-below-nav {
+    top: calc(
+        var(--wpp-mc-toolbar-top)
+        + var(--wpp-mc-toolbar-height)
+        + var(--wpp-mc-hint-gap)
+    );
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-s);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    opacity: 1;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-pages {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border: 2px solid transparent;
+    border-radius: var(--radius-s);
+    font-size: var(--font-ui-small);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+body.wpp-mission-control-open .wpp-tab-switcher-split-page:hover {
+    background: rgba(255, 255, 255, 0.16);
+    opacity: 1;
+}
+
+/* Selected / previewed split in task view — original accent fill */
+body.wpp-mission-control-open .wpp-tab-switcher-split-page.is-active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent, #fff);
+    opacity: 1;
+    font-weight: var(--font-semibold, 600);
+}
+
+/* Live workspace page's split — border only */
+body.wpp-mission-control-open .wpp-tab-switcher-split-page.is-workspace-split {
+    border-color: var(--interactive-accent);
+}
+
+/* Selected + current: keep accent fill, use light border so it stays visible */
+body.wpp-mission-control-open .wpp-tab-switcher-split-page.is-active.is-workspace-split {
+    border-color: var(--text-on-accent, #fff);
+}
+
+/* Drop target while dragging a tab header onto another split page (preview switch) */
+body.wpp-mission-control-open.wpp-tab-switcher-dragging .wpp-tab-switcher-split-page.is-drop-target {
+    background: color-mix(in srgb, var(--interactive-accent) 55%, transparent);
+    border-color: var(--interactive-accent);
+    color: var(--text-on-accent, #fff);
+    opacity: 1;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 45%, transparent);
+    transform: scale(1.08);
+}
+
+/* Empty grid area as append drop zone when moving across splits */
+body.wpp-mission-control-open.wpp-tab-switcher-dragging .wpp-tab-switcher-grid.is-drop-target {
+    outline: 2px dashed color-mix(in srgb, var(--interactive-accent) 70%, transparent);
+    outline-offset: 6px;
+    border-radius: var(--radius-m);
 }

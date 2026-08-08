@@ -30,19 +30,11 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
             if (!self.data.sessions) self.data.sessions = {};
             if (!self.data.sessionOrder) self.data.sessionOrder = [];
 
-            // Migrate legacy settings into statusBarActions
-            if (!self.data.statusBarActions) {
-                self.data.statusBarActions = Object.assign({}, DEFAULT_DATA.statusBarActions);
-                if (self.data.statusBarQuickSwitcher === false) {
-                    self.data.statusBarActions.click = 'sessionManager';
-                }
-                if (self.data.versionHistoryCtrlRmbRestore === false) {
-                    self.data.statusBarActions.modRightClick = 'none';
-                }
-            }
-            self.data.statusBarActions = Object.assign({}, DEFAULT_DATA.statusBarActions, self.data.statusBarActions || {});
-
             self.normalizeGroupFeatureState();
+            self.migrateZenModeToSessions();
+            if (typeof self.migrateRemovedStatusBarActions === 'function') {
+                self.migrateRemovedStatusBarActions();
+            }
             self.isSwitchingSession = false;
             self.pendingSwitchRequest = null;
             self.switchLockAt = 0;
@@ -56,6 +48,9 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
             self.sessionSwitchNotice = null;
             self.syncSessionOrder();
             self.registerSessionStorageListeners();
+            if (typeof self.normalizeLanguageSetting === 'function') {
+                self.normalizeLanguageSetting();
+            }
             i18n.resolveLocale(self.data.language);
             var L = i18n.L;
 
@@ -76,9 +71,14 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
             self.registerEvent(self.app.workspace.on('layout-change', function () {
                 self.noteStartupLayoutChange();
                 self.updateStatusBar();
+                self.refreshZenModeFocus();
             }));
             self.registerEvent(self.app.workspace.on('active-leaf-change', function () {
                 if (self.isSwitchingSession) return;
+                self.refreshZenModeFocus();
+                if (typeof self.rememberZenFocusFromWorkspace === 'function') {
+                    self.rememberZenFocusFromWorkspace();
+                }
                 setTimeout(function () {
                     self.updateStatusBar();
                 }, 0);
@@ -92,13 +92,23 @@ var WorkspacePlusPlus = /** @class */ (function (_super) {
                 self.scheduleStartupFlush();
                 self.startHistorySnapshotTimer();
                 self.initRotationBackupTimestamp();
-                self.registerFrontmatterListeners();
                 self.scheduleStartupSessionStorageChecks();
+                if (typeof self.restoreZenFocusLeaf === 'function') {
+                    self.restoreZenFocusLeaf();
+                }
+                self.applyZenModeClasses();
+                // Cold start: activeLeaf / tab headers often settle a beat later
+                self.scheduleZenModeRefresh(50);
+                self.scheduleZenModeRefresh(400);
             });
         });
     };
 
     WorkspacePlusPlus.prototype.onunload = function () {
+        if (typeof this.clearZenModeRefreshTimers === 'function') {
+            this.clearZenModeRefreshTimers();
+        }
+        this.clearZenModeClasses();
         this.stopHistorySnapshotTimer();
         this.hideSwitchOverlay();
         this.hideSearchOverlay();

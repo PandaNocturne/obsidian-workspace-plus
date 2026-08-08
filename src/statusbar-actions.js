@@ -50,17 +50,6 @@ function resolveLabel(L, labelKey) {
 
 var ACTIONS = [
     {
-        id: 'quickSwitcher',
-        labelKey: 'statusBarActionQuickSwitcher',
-        run: function (plugin) {
-            if (plugin.searchOverlayEl) {
-                plugin.hideSearchOverlay();
-            } else {
-                plugin.openSearchOverlay(plugin.statusBarEl);
-            }
-        },
-    },
-    {
         id: 'sessionManager',
         labelKey: 'statusBarActionSessionManager',
         run: function (plugin) {
@@ -82,13 +71,6 @@ var ACTIONS = [
         },
     },
     {
-        id: 'saveCurrentNoteNameAsSession',
-        labelKey: 'cmdSaveCurrentNoteNameAsSession',
-        run: function (plugin) {
-            return plugin.saveCurrentNoteNameAsSession();
-        },
-    },
-    {
         id: 'reloadWithoutSaving',
         labelKey: 'statusBarActionReloadWithoutSaving',
         run: function (plugin) {
@@ -107,20 +89,6 @@ var ACTIONS = [
         labelKey: 'cmdDuplicate',
         run: function (plugin) {
             return plugin.duplicateCurrentSession();
-        },
-    },
-    {
-        id: 'previousSession',
-        labelKey: 'cmdPrevious',
-        run: function (plugin) {
-            return plugin.switchRelativeFromStatusBar(-1);
-        },
-    },
-    {
-        id: 'nextSession',
-        labelKey: 'cmdNext',
-        run: function (plugin) {
-            return plugin.switchRelativeFromStatusBar(1);
         },
     },
     {

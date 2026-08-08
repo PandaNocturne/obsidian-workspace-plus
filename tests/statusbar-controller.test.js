@@ -6,24 +6,20 @@ const Module = require('module');
 
 function loadStatusBarController(calls) {
     calls = calls || [];
-    const statusBarActionsStub = {
-        executeStatusBarAction: function (_plugin, actionId, event) {
-            calls.push(['action', actionId, event.type || '']);
-        },
-    };
-    const utilsStub = {
-        isMacPlatform: function () {
-            return false;
-        },
-        isModPressed: function (event) {
-            return !!(event && event.ctrlKey);
+    const modalsStub = {
+        SessionManagerModal: class {
+            constructor(app, plugin) {
+                calls.push(['modal', app, plugin]);
+            }
+            open() {
+                calls.push(['open']);
+            }
         },
     };
 
     const originalLoad = Module._load;
     Module._load = function (request, parent, isMain) {
-        if (request === './utils') return utilsStub;
-        if (request === './statusbar-actions') return statusBarActionsStub;
+        if (request === './modals') return modalsStub;
         return originalLoad(request, parent, isMain);
     };
 
@@ -38,14 +34,8 @@ function loadStatusBarController(calls) {
 
 function createEvent(props) {
     const event = Object.assign({
-        type: 'event',
-        altKey: false,
-        ctrlKey: false,
-        metaKey: false,
-        shiftKey: false,
-        deltaX: 0,
-        deltaY: 0,
-        deltaMode: 0,
+        type: 'click',
+        button: 0,
         prevented: 0,
         stopped: 0,
         preventDefault: function () {
@@ -58,101 +48,13 @@ function createEvent(props) {
     return event;
 }
 
-test('status bar controller resolves scroll preset configs', function () {
-    const controller = loadStatusBarController();
-
-    assert.deepEqual(controller.getStatusBarScrollConfig({ statusBarScrollPreset: 'notchedWheel' }), {
-        threshold: 16,
-        cooldownMs: 350,
-        resetMs: 220,
-    });
-    assert.deepEqual(controller.getStatusBarScrollConfig({
-        statusBarScrollPreset: 'custom',
-        statusBarScrollThreshold: '40',
-        statusBarScrollCooldownMs: '750',
-        statusBarScrollResetMs: '400',
-    }), {
-        threshold: 40,
-        cooldownMs: 750,
-        resetMs: 400,
-    });
-    assert.deepEqual(controller.getStatusBarScrollConfig({ statusBarScrollPreset: 'missing' }), {
-        threshold: 30,
-        cooldownMs: 500,
-        resetMs: 250,
-    });
-});
-
-test('status bar controller matches scroll modifier modes', function () {
-    const controller = loadStatusBarController();
-
-    assert.equal(controller.matchesStatusBarScrollModifier(createEvent(), false, 'none'), true);
-    assert.equal(controller.matchesStatusBarScrollModifier(createEvent({ ctrlKey: true }), false, 'none'), false);
-    assert.equal(controller.matchesStatusBarScrollModifier(createEvent({ ctrlKey: true }), false, 'modOnly'), true);
-    assert.equal(controller.matchesStatusBarScrollModifier(createEvent({ metaKey: true }), true, 'modOnly'), true);
-    assert.equal(controller.matchesStatusBarScrollModifier(createEvent({ altKey: true }), false, 'altOnly'), true);
-    assert.equal(controller.matchesStatusBarScrollModifier(createEvent({ altKey: true }), false, 'modOrAlt'), true);
-    assert.equal(controller.matchesStatusBarScrollModifier(createEvent({ ctrlKey: true }), false, 'modOrAlt'), true);
-});
-
-test('status bar controller resolves modified click slots', function () {
-    const controller = loadStatusBarController();
-
-    assert.equal(controller.getClickSlot(createEvent()), 'click');
-    assert.equal(controller.getClickSlot(createEvent({ shiftKey: true })), 'shiftClick');
-    assert.equal(controller.getClickSlot(createEvent({ ctrlKey: true })), 'modClick');
-    assert.equal(controller.getClickSlot(createEvent({ altKey: true, ctrlKey: true })), 'altClick');
-    assert.equal(controller.getMiddleClickSlot(createEvent({ ctrlKey: true })), 'modMiddleClick');
-    assert.equal(controller.getRightClickSlot(createEvent({ altKey: true })), 'altRightClick');
-});
-
-test('status bar controller accumulates wheel delta and switches after threshold', function () {
-    const controller = loadStatusBarController();
-    const calls = [];
-    const plugin = {
-        data: {
-            statusBarModScrollSwitch: true,
-            statusBarScrollPreset: 'custom',
-            statusBarScrollThreshold: 30,
-            statusBarScrollCooldownMs: 500,
-            statusBarScrollResetMs: 250,
-            statusBarScrollModifierMode: 'none',
-            statusBarScrollInvert: false,
-        },
-        isSwitchingSession: false,
-        statusBarScrollDelta: 0,
-        statusBarScrollEventAt: 0,
-        statusBarScrollSwitchAt: 0,
-        switchRelativeFromScroll: function (direction) {
-            calls.push(direction);
-            return Promise.resolve(true);
-        },
-    };
-
-    const first = createEvent({ type: 'wheel', deltaY: 10 });
-    const second = createEvent({ type: 'wheel', deltaY: 25 });
-
-    assert.equal(controller.handleStatusBarWheel(plugin, first, 1000), false);
-    assert.equal(plugin.statusBarScrollDelta, 10);
-    assert.equal(first.prevented, 1);
-    assert.equal(first.stopped, 1);
-
-    assert.equal(controller.handleStatusBarWheel(plugin, second, 1050), true);
-    assert.equal(plugin.statusBarScrollDelta, 0);
-    assert.equal(plugin.statusBarScrollSwitchAt, 1050);
-    assert.deepEqual(calls, [1]);
-});
-
-test('status bar controller setup wires basic click handling', function () {
+test('status bar controller opens session manager on click', function () {
     const calls = [];
     const controller = loadStatusBarController(calls);
     const listeners = {};
+    const app = { id: 'app' };
     const plugin = {
-        data: {
-            statusBarActions: {
-                click: 'quickSwitcher',
-            },
-        },
+        app: app,
         addStatusBarItem: function () {
             return {
                 addClass: function (className) {
@@ -169,7 +71,7 @@ test('status bar controller setup wires basic click handling', function () {
     };
 
     controller.setupStatusBar(plugin);
-    const event = createEvent({ type: 'click' });
+    const event = createEvent();
     listeners.click(event);
 
     assert.equal(plugin.statusBarEl !== undefined, true);
@@ -178,6 +80,30 @@ test('status bar controller setup wires basic click handling', function () {
     assert.deepEqual(calls, [
         ['class', 'wpp-status-bar'],
         ['update'],
-        ['action', 'quickSwitcher', 'click'],
+        ['modal', app, plugin],
+        ['open'],
     ]);
+});
+
+test('status bar controller ignores non-primary clicks', function () {
+    const calls = [];
+    const controller = loadStatusBarController(calls);
+    const listeners = {};
+    const plugin = {
+        app: {},
+        addStatusBarItem: function () {
+            return {
+                addClass: function () {},
+                addEventListener: function (type, handler) {
+                    listeners[type] = handler;
+                },
+            };
+        },
+        updateStatusBar: function () {},
+    };
+
+    controller.setupStatusBar(plugin);
+    listeners.click(createEvent({ button: 1 }));
+
+    assert.deepEqual(calls, []);
 });

@@ -33,9 +33,31 @@ function loadSessionSavingMethods() {
 const attachSessionSavingMethods = loadSessionSavingMethods();
 const attachLayoutRestoreMethods = require('../src/plugin/methods/layout-restore');
 
+function loadGroupMethods() {
+    const obsidianStub = {
+        Notice: class {
+            constructor(_message) {}
+        },
+    };
+    const originalLoad = Module._load;
+    Module._load = function (request, parent, isMain) {
+        if (request === 'obsidian') return obsidianStub;
+        return originalLoad(request, parent, isMain);
+    };
+
+    try {
+        return require('../src/plugin/methods/groups');
+    } finally {
+        Module._load = originalLoad;
+    }
+}
+
+const attachGroupMethods = loadGroupMethods();
+
 function createPlugin(initialData) {
     function PluginMock() {}
     attachLayoutRestoreMethods(PluginMock);
+    attachGroupMethods(PluginMock);
     attachSessionSavingMethods(PluginMock);
     const plugin = new PluginMock();
     plugin.data = Object.assign({
@@ -44,6 +66,10 @@ function createPlugin(initialData) {
         autoSaveOnSwitch: true,
         warnOnUnsavedSwitch: true,
         highlightUnsavedSessionChanges: true,
+        groupFeatureEnabled: true,
+        groups: {},
+        groupOrder: [],
+        sessionGroups: {},
         sessions: {
             a: { id: 'a', name: 'A', layout: { layout: 'old' }, modified: 1 },
             b: { id: 'b', name: 'B', layout: { layout: 'target' }, modified: 1 },
@@ -77,6 +103,8 @@ function createPlugin(initialData) {
     plugin.syncSessionCommands = function () {
         plugin.commandSyncs += 1;
     };
+    plugin.applyZenModeClasses = function () {};
+    plugin.scheduleZenModeRefresh = function () {};
     plugin.persistData = function () {
         plugin.persistCalls += 1;
         return Promise.resolve(true);

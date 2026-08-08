@@ -13,12 +13,10 @@ function loadStatusBarActions() {
     const i18nStub = {
         L: {
             statusBarActionNone: 'Do nothing',
+            statusBarActionSessionManager: 'Open Session Manager',
             cmdSaveAs: 'Save current session as...',
-            cmdSaveCurrentNoteNameAsSession: 'Save current note name as session',
             cmdRename: 'Rename current session',
             cmdDuplicate: 'Duplicate current session',
-            cmdPrevious: 'Previous session',
-            cmdNext: 'Next session',
             cmdNewEmpty: 'Create blank session',
             cmdToggleAutoSave: 'Toggle auto-save on switch',
         },
@@ -63,26 +61,30 @@ function loadStatusBarActions() {
     }
 }
 
-test('status bar actions expose first-pass direct action ids', function () {
+test('status bar actions expose core action ids without switch shortcuts', function () {
     const statusBarActions = loadStatusBarActions();
 
     const expected = [
+        'sessionManager',
         'saveAsSession',
-        'saveCurrentNoteNameAsSession',
         'renameSession',
         'duplicateSession',
-        'previousSession',
-        'nextSession',
         'newEmptySession',
         'toggleAutoSaveOnSwitch',
+        'versionHistory',
+        'restoreLatestHistory',
     ];
 
     for (let i = 0; i < expected.length; i++) {
         assert.ok(statusBarActions.ACTION_IDS.includes(expected[i]));
     }
+
+    assert.equal(statusBarActions.ACTION_IDS.includes('quickSwitcher'), false);
+    assert.equal(statusBarActions.ACTION_IDS.includes('previousSession'), false);
+    assert.equal(statusBarActions.ACTION_IDS.includes('nextSession'), false);
 });
 
-test('status bar actions delegate new direct actions to plugin methods', async function () {
+test('status bar actions delegate core actions to plugin methods', async function () {
     const statusBarActions = loadStatusBarActions();
     const calls = [];
     const plugin = {
@@ -90,19 +92,11 @@ test('status bar actions delegate new direct actions to plugin methods', async f
             calls.push('saveAsSession');
             return Promise.resolve(true);
         },
-        saveCurrentNoteNameAsSession: function () {
-            calls.push('saveCurrentNoteNameAsSession');
-            return Promise.resolve(true);
-        },
         renameCurrentSession: function () {
             calls.push('renameCurrentSession');
         },
         duplicateCurrentSession: function () {
             calls.push('duplicateCurrentSession');
-            return Promise.resolve(true);
-        },
-        switchRelativeFromStatusBar: function (offset) {
-            calls.push(['switchRelativeFromStatusBar', offset]);
             return Promise.resolve(true);
         },
         createEmptySession: function () {
@@ -116,21 +110,15 @@ test('status bar actions delegate new direct actions to plugin methods', async f
     };
 
     await statusBarActions.executeStatusBarAction(plugin, 'saveAsSession');
-    await statusBarActions.executeStatusBarAction(plugin, 'saveCurrentNoteNameAsSession');
     await statusBarActions.executeStatusBarAction(plugin, 'renameSession');
     await statusBarActions.executeStatusBarAction(plugin, 'duplicateSession');
-    await statusBarActions.executeStatusBarAction(plugin, 'previousSession');
-    await statusBarActions.executeStatusBarAction(plugin, 'nextSession');
     await statusBarActions.executeStatusBarAction(plugin, 'newEmptySession');
     await statusBarActions.executeStatusBarAction(plugin, 'toggleAutoSaveOnSwitch');
 
     assert.deepEqual(calls, [
         'saveAsSession',
-        'saveCurrentNoteNameAsSession',
         'renameCurrentSession',
         'duplicateCurrentSession',
-        ['switchRelativeFromStatusBar', -1],
-        ['switchRelativeFromStatusBar', 1],
         'createEmptySession',
         ['toggleAutoSaveOnSwitch', { notify: true }],
     ]);
@@ -140,25 +128,18 @@ test('status bar action labels reuse existing localized command labels', functio
     const statusBarActions = loadStatusBarActions();
     const L = {
         statusBarActionNone: 'Do nothing',
+        statusBarActionSessionManager: 'Open Session Manager',
         cmdSaveAs: 'Save current session as...',
-        cmdSaveCurrentNoteNameAsSession: 'Save current note name as session',
         cmdRename: 'Rename current session',
         cmdDuplicate: 'Duplicate current session',
-        cmdPrevious: 'Previous session',
-        cmdNext: 'Next session',
         cmdNewEmpty: 'Create blank session',
         cmdToggleAutoSave: 'Toggle auto-save on switch',
     };
 
+    assert.equal(statusBarActions.getActionLabel(L, 'sessionManager'), 'Open Session Manager');
     assert.equal(statusBarActions.getActionLabel(L, 'saveAsSession'), 'Save current session as...');
-    assert.equal(
-        statusBarActions.getActionLabel(L, 'saveCurrentNoteNameAsSession'),
-        'Save current note name as session'
-    );
     assert.equal(statusBarActions.getActionLabel(L, 'renameSession'), 'Rename current session');
     assert.equal(statusBarActions.getActionLabel(L, 'duplicateSession'), 'Duplicate current session');
-    assert.equal(statusBarActions.getActionLabel(L, 'previousSession'), 'Previous session');
-    assert.equal(statusBarActions.getActionLabel(L, 'nextSession'), 'Next session');
     assert.equal(statusBarActions.getActionLabel(L, 'newEmptySession'), 'Create blank session');
     assert.equal(statusBarActions.getActionLabel(L, 'toggleAutoSaveOnSwitch'), 'Toggle auto-save on switch');
 });
