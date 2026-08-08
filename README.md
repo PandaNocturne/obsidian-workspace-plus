@@ -1,4 +1,4 @@
-# Workspace++ Beta
+﻿# Workspace++ Beta
 
 Workspace++ Beta 是 [Workspace++](https://github.com/s1m4ne/obsidian-workspace-plus) 的功能修改版，用于保存、切换与组织 Obsidian 工作区会话。工作区管理能力可追溯至 [Workspaces Plus](https://github.com/jsmorabito/obsidian-workspaces-plus)。
 
@@ -8,7 +8,7 @@ Workspace++ Beta 是 [Workspace++](https://github.com/s1m4ne/obsidian-workspace-
 
 ### 工作区管理面板
 
-![工作区管理](assets/readme/workspace-manager.png)
+![工作区管理](assets/workspace-manager.png)
 
 - 可以对工作区进行创建、注释、切换、删除、备份、复制
 - 支持分组管理工作区，可自定义创建分组，对工作区进行分类、批量操作与切换分组视图
@@ -20,7 +20,7 @@ Workspace++ Beta 是 [Workspace++](https://github.com/s1m4ne/obsidian-workspace-
 
 ### 任务视图模式
 
-![任务视图](assets/readme/task-view.gif)
+![任务视图](assets/task-view.gif)
 
 通过命令「切换标签页（任务视图）」打开类 Mission Control 的网格预览：
 
