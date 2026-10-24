@@ -16,7 +16,8 @@ i18n.resolveLocale();
 // ============================================================
 var WorkspacePlusPlus = /** @class */ (function (_super) {
     function WorkspacePlusPlus() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        // Obsidian 1.15+ Plugin is a native ES class; _super.apply breaks.
+        return Reflect.construct(_super, arguments, WorkspacePlusPlus);
     }
 
     WorkspacePlusPlus.prototype = Object.create(_super.prototype);

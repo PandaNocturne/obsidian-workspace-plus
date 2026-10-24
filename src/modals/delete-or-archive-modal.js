@@ -8,7 +8,7 @@ var i18n = require('../i18n');
  */
 var DeleteOrArchiveModal = /** @class */ (function (_super) {
     function DeleteOrArchiveModal(app, message, onArchive, onDelete, options) {
-        var _this = _super.call(this, app) || this;
+        var _this = Reflect.construct(_super, [app], DeleteOrArchiveModal);
         _this.message = message;
         _this.onArchive = onArchive;
         _this.onDelete = onDelete;

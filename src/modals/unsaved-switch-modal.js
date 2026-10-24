@@ -8,7 +8,7 @@ var i18n = require('../i18n');
 // ============================================================
 var UnsavedSwitchModal = /** @class */ (function (_super) {
     function UnsavedSwitchModal(app, message, onSaveAndSwitch, onSwitchWithoutSaving, onCancel) {
-        var _this = _super.call(this, app) || this;
+        var _this = Reflect.construct(_super, [app], UnsavedSwitchModal);
         _this.message = message;
         _this.onSaveAndSwitch = onSaveAndSwitch;
         _this.onSwitchWithoutSaving = onSwitchWithoutSaving;

@@ -8,7 +8,7 @@ var i18n = require('../i18n');
 // ============================================================
 var RenameModal = /** @class */ (function (_super) {
     function RenameModal(app, currentName, onRename, options) {
-        var _this = _super.call(this, app) || this;
+        var _this = Reflect.construct(_super, [app], RenameModal);
         _this.currentName = currentName;
         _this.onRename = onRename;
         _this.modalOptions = options || {};

@@ -26,7 +26,7 @@ function isElementVisible(el) {
 var SessionManagerModal = /** @class */ (function (_super) {
     // Inherit from Modal
     function SessionManagerModal(app, plugin) {
-        var _this = _super.call(this, app) || this;
+        var _this = Reflect.construct(_super, [app], SessionManagerModal);
         _this.plugin = plugin;
         return _this;
     }

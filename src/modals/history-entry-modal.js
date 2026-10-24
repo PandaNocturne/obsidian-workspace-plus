@@ -18,7 +18,7 @@ var i18n = require('../i18n');
  */
 var HistoryEntryModal = /** @class */ (function (_super) {
     function HistoryEntryModal(app, options) {
-        var _this = _super.call(this, app) || this;
+        var _this = Reflect.construct(_super, [app], HistoryEntryModal);
         _this.modalOptions = options || {};
         return _this;
     }

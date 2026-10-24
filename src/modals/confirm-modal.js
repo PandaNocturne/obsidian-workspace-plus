@@ -8,7 +8,7 @@ var i18n = require('../i18n');
 // ============================================================
 var ConfirmModal = /** @class */ (function (_super) {
     function ConfirmModal(app, message, onConfirm, options) {
-        var _this = _super.call(this, app) || this;
+        var _this = Reflect.construct(_super, [app], ConfirmModal);
         _this.message = message;
         _this.onConfirm = onConfirm;
         _this.options = options || {};

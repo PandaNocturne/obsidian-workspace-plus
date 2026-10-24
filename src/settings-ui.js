@@ -9,7 +9,7 @@ var modals = require('./modals');
 // ============================================================
 var GroupSessionsModal = /** @class */ (function (_super) {
     function GroupSessionsModal(app, plugin, group) {
-        var _this = _super.call(this, app) || this;
+        var _this = Reflect.construct(_super, [app], GroupSessionsModal);
         _this.plugin = plugin;
         _this.group = group;
         return _this;

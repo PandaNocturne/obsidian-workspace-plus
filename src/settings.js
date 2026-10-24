@@ -19,7 +19,7 @@ var addAsyncActionSetting = settingsUi.addAsyncActionSetting;
 // ============================================================
 var WorkspacePlusPlusSettingTab = /** @class */ (function (_super) {
     function WorkspacePlusPlusSettingTab(app, plugin) {
-        var _this = _super.call(this, app, plugin) || this;
+        var _this = Reflect.construct(_super, [app, plugin], WorkspacePlusPlusSettingTab);
         _this.plugin = plugin;
         return _this;
     }

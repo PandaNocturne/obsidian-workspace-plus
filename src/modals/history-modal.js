@@ -12,7 +12,7 @@ var DAY = 86400000;
 // ============================================================
 var HistoryModal = /** @class */ (function (_super) {
     function HistoryModal(app, plugin, session) {
-        var _this = _super.call(this, app) || this;
+        var _this = Reflect.construct(_super, [app], HistoryModal);
         _this.plugin = plugin;
         _this.sessionId = session && session.id;
         _this.activeTab = 'manual';

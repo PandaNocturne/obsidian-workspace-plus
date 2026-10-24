@@ -1912,7 +1912,7 @@ var require_confirm_modal = __commonJS({
       /** @class */
       function(_super) {
         function ConfirmModal2(app, message, onConfirm, options) {
-          var _this = _super.call(this, app) || this;
+          var _this = Reflect.construct(_super, [app], ConfirmModal2);
           _this.message = message;
           _this.onConfirm = onConfirm;
           _this.options = options || {};
@@ -2005,7 +2005,7 @@ var require_history_entry_modal = __commonJS({
       /** @class */
       function(_super) {
         function HistoryEntryModal2(app, options) {
-          var _this = _super.call(this, app) || this;
+          var _this = Reflect.construct(_super, [app], HistoryEntryModal2);
           _this.modalOptions = options || {};
           return _this;
         }
@@ -2107,7 +2107,7 @@ var require_history_modal = __commonJS({
       /** @class */
       function(_super) {
         function HistoryModal2(app, plugin, session) {
-          var _this = _super.call(this, app) || this;
+          var _this = Reflect.construct(_super, [app], HistoryModal2);
           _this.plugin = plugin;
           _this.sessionId = session && session.id;
           _this.activeTab = "manual";
@@ -2377,7 +2377,7 @@ var require_rename_modal = __commonJS({
       /** @class */
       function(_super) {
         function RenameModal2(app, currentName, onRename, options) {
-          var _this = _super.call(this, app) || this;
+          var _this = Reflect.construct(_super, [app], RenameModal2);
           _this.currentName = currentName;
           _this.onRename = onRename;
           _this.modalOptions = options || {};
@@ -3176,7 +3176,7 @@ var require_delete_or_archive_modal = __commonJS({
       /** @class */
       function(_super) {
         function DeleteOrArchiveModal2(app, message, onArchive, onDelete, options) {
-          var _this = _super.call(this, app) || this;
+          var _this = Reflect.construct(_super, [app], DeleteOrArchiveModal2);
           _this.message = message;
           _this.onArchive = onArchive;
           _this.onDelete = onDelete;
@@ -3730,7 +3730,7 @@ var require_session_manager_modal = __commonJS({
       /** @class */
       function(_super) {
         function SessionManagerModal2(app, plugin) {
-          var _this = _super.call(this, app) || this;
+          var _this = Reflect.construct(_super, [app], SessionManagerModal2);
           _this.plugin = plugin;
           return _this;
         }
@@ -5037,7 +5037,7 @@ var require_unsaved_switch_modal = __commonJS({
       /** @class */
       function(_super) {
         function UnsavedSwitchModal2(app, message, onSaveAndSwitch, onSwitchWithoutSaving, onCancel) {
-          var _this = _super.call(this, app) || this;
+          var _this = Reflect.construct(_super, [app], UnsavedSwitchModal2);
           _this.message = message;
           _this.onSaveAndSwitch = onSaveAndSwitch;
           _this.onSwitchWithoutSaving = onSwitchWithoutSaving;
@@ -6966,7 +6966,7 @@ var require_settings_ui = __commonJS({
       /** @class */
       function(_super) {
         function GroupSessionsModal2(app, plugin, group) {
-          var _this = _super.call(this, app) || this;
+          var _this = Reflect.construct(_super, [app], GroupSessionsModal2);
           _this.plugin = plugin;
           _this.group = group;
           return _this;
@@ -7134,7 +7134,7 @@ var require_settings = __commonJS({
       /** @class */
       function(_super) {
         function WorkspacePlusPlusSettingTab2(app, plugin) {
-          var _this = _super.call(this, app, plugin) || this;
+          var _this = Reflect.construct(_super, [app, plugin], WorkspacePlusPlusSettingTab2);
           _this.plugin = plugin;
           return _this;
         }
@@ -14393,7 +14393,7 @@ var WorkspacePlusPlus = (
   /** @class */
   function(_super) {
     function WorkspacePlusPlus2() {
-      return _super !== null && _super.apply(this, arguments) || this;
+      return Reflect.construct(_super, arguments, WorkspacePlusPlus2);
     }
     WorkspacePlusPlus2.prototype = Object.create(_super.prototype);
     WorkspacePlusPlus2.prototype.constructor = WorkspacePlusPlus2;
